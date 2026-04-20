@@ -1626,7 +1626,7 @@ Generated on: ${new Date().toLocaleString()}
 </div>
 
 <div class="no-print" style="text-align:center;margin:20px 0">
-<button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+<button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
 </div>
 
 <script>
