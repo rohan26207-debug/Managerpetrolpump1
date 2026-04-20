@@ -510,8 +510,14 @@ class LocalStorageService {
 
   exportAllData() {
     const stockData = {};
-    const stockKeys = Object.keys(localStorage).filter(key => key.endsWith('StockData'));
-    stockKeys.forEach(key => { stockData[key] = JSON.parse(localStorage.getItem(key) || '{}'); });
+    if (this.keys) {
+      const fuelSettings = this.getFuelSettings() || {};
+      Object.keys(fuelSettings).forEach(fuelType => {
+        const storageKey = `${fuelType.toLowerCase()}StockData`;
+        const data = this.getItem(storageKey);
+        if (data) stockData[storageKey] = data;
+      });
+    }
     const contactInfo = localStorage.getItem(nsKey('mpump_contact_info'));
     const notes = localStorage.getItem(nsKey('mpp_notes'));
     const onlineUrl = localStorage.getItem(nsKey('mpump_online_url'));
@@ -590,10 +596,25 @@ class LocalStorageService {
       if (importedData.expenseData) this.setExpenseData(mergeArrays(this.getExpenseData(), importedData.expenseData));
       if (importedData.customers) this.setCustomers(mergeArrays(this.getCustomers(), importedData.customers));
       if (importedData.payments) this.setPayments(mergeArrays(this.getPayments(), importedData.payments));
+      if (importedData.settlements) this.setSettlements(mergeArrays(this.getSettlements(), importedData.settlements));
+      if (importedData.settlementTypes) this.setSettlementTypes(mergeArrays(this.getSettlementTypes(), importedData.settlementTypes));
+      if (importedData.incomeCategories) this.setIncomeCategories(mergeArrays(this.getIncomeCategories(), importedData.incomeCategories));
+      if (importedData.expenseCategories) this.setExpenseCategories(mergeArrays(this.getExpenseCategories(), importedData.expenseCategories));
 
       if (importedData.fuelSettings && !this.getFuelSettings()) this.setFuelSettings(importedData.fuelSettings);
 
-      if (importedData.stockData) { Object.keys(importedData.stockData).forEach(key => { if (!localStorage.getItem(nsKey(key))) localStorage.setItem(nsKey(key), JSON.stringify(importedData.stockData[key])); }); }
+      if (importedData.stockData) {
+        Object.keys(importedData.stockData).forEach(key => {
+          const existing = this.getItem(key);
+          if (!existing) {
+            this.setItem(key, importedData.stockData[key]);
+          } else {
+            // Merge stock data by date - keep existing dates, add new ones
+            const merged = { ...importedData.stockData[key], ...existing };
+            this.setItem(key, merged);
+          }
+        });
+      }
 
       if (importedData.contactInfo && !localStorage.getItem(nsKey('mpump_contact_info'))) localStorage.setItem(nsKey('mpump_contact_info'), JSON.stringify(importedData.contactInfo));
       if (importedData.notes !== undefined && !localStorage.getItem(nsKey('mpp_notes'))) localStorage.setItem(nsKey('mpp_notes'), importedData.notes);

@@ -1468,9 +1468,11 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                               try {
                                 const importedData = JSON.parse(event.target.result);
                                 
-                                // Validate data structure
+                                // Validate data structure - accept if has any valid data
                                 if (!importedData.salesData && !importedData.creditData && 
-                                    !importedData.incomeData && !importedData.expenseData) {
+                                    !importedData.incomeData && !importedData.expenseData &&
+                                    !importedData.customers && !importedData.payments &&
+                                    !importedData.settlements && !importedData.fuelSettings) {
                                   toast({
                                     title: "Invalid Backup File",
                                     description: "The file doesn't contain valid backup data",
