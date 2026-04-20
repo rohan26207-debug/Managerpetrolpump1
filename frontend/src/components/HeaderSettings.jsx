@@ -201,7 +201,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
   };
 
   const handleProPasswordSubmit = () => {
-    if (proPassword === 'rash') {
+    if (proPassword === '123456') {
       setProMode(true);
       localStorage.setItem('mpump_pro_mode', 'true');
       setShowProPasswordDialog(false);
