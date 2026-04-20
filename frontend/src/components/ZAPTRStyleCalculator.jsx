@@ -1335,7 +1335,7 @@ const ZAPTRStyleCalculator = () => {
           `${rowNum}. Fuel Sales`,
           filteredStats.fuelLitersNoMPP !== undefined ? 
             (filteredStats.fuelLitersNoMPP + (filteredStats.fuelLitersMPP || 0)).toFixed(2) : '0.00',
-          `₹${filteredStats.fuelSalesNoMPP !== undefined ? 
+          `${filteredStats.fuelSalesNoMPP !== undefined ? 
             (filteredStats.fuelSalesNoMPP + (filteredStats.fuelSalesMPP || 0)).toFixed(2) : '0.00'}`
         ]);
         rowNum++;
@@ -1347,7 +1347,7 @@ const ZAPTRStyleCalculator = () => {
           summaryData.push([
             `${rowNum}. Credit Sales`,
             creditLiters.toFixed(2),
-            `₹${creditAmount.toFixed(2)}`
+            `${creditAmount.toFixed(2)}`
           ]);
           rowNum++;
         }
@@ -1357,7 +1357,7 @@ const ZAPTRStyleCalculator = () => {
         summaryData.push([
           `${rowNum}. Settlement`,
           '-',
-          `₹${totalSettlement.toFixed(2)}`
+          `${totalSettlement.toFixed(2)}`
         ]);
         rowNum++;
 
@@ -1367,7 +1367,7 @@ const ZAPTRStyleCalculator = () => {
           summaryData.push([
             `${rowNum}. Income`,
             '-',
-            `₹${totalIncome.toFixed(2)}`
+            `${totalIncome.toFixed(2)}`
           ]);
           rowNum++;
         }
@@ -1378,7 +1378,7 @@ const ZAPTRStyleCalculator = () => {
           summaryData.push([
             `${rowNum}. Expenses`,
             '-',
-            `₹${totalExp.toFixed(2)}`
+            `${totalExp.toFixed(2)}`
           ]);
           rowNum++;
         }
@@ -1387,7 +1387,7 @@ const ZAPTRStyleCalculator = () => {
         summaryData.push([
           { content: 'Cash in Hand', styles: { fontStyle: 'bold' } },
           '-',
-          { content: `₹${filteredStats.cashInHand.toFixed(2)}`, styles: { fontStyle: 'bold' } }
+          { content: `${filteredStats.cashInHand.toFixed(2)}`, styles: { fontStyle: 'bold' } }
         ]);
 
         doc.autoTable({
@@ -1425,15 +1425,15 @@ const ZAPTRStyleCalculator = () => {
           sale.endReading,
           sale.testing || 0,
           sale.liters.toFixed(2),
-          `₹${sale.rate.toFixed(2)}`,
-          `₹${sale.amount.toFixed(2)}`
+          `${sale.rate.toFixed(2)}`,
+          `${sale.amount.toFixed(2)}`
         ]);
 
         salesTableData.push([
           { content: 'Total Reading Sales', colSpan: 5, styles: { fontStyle: 'bold' } },
           filteredStats.totalLiters.toFixed(2),
           '-',
-          `₹${filteredStats.fuelCashSales.toFixed(2)}`
+          `${filteredStats.fuelCashSales.toFixed(2)}`
         ]);
 
         doc.autoTable({
@@ -1475,13 +1475,13 @@ const ZAPTRStyleCalculator = () => {
           credit.vehicleNumber || 'N/A',
           credit.fuelType || 'N/A',
           credit.liters ? credit.liters.toFixed(2) : 'N/A',
-          credit.rate ? `₹${credit.rate.toFixed(2)}` : 'N/A',
-          `₹${credit.amount.toFixed(2)}`
+          credit.rate ? `${credit.rate.toFixed(2)}` : 'N/A',
+          `${credit.amount.toFixed(2)}`
         ]);
 
         creditTableData.push([
           { content: 'Total Credit Sales', colSpan: 5, styles: { fontStyle: 'bold' } },
-          `₹${filteredStats.creditAmount.toFixed(2)}`
+          `${filteredStats.creditAmount.toFixed(2)}`
         ]);
 
         doc.autoTable({
@@ -1518,7 +1518,7 @@ const ZAPTRStyleCalculator = () => {
           index + 1,
           settlement.date,
           settlement.description || 'Settlement',
-          `₹${settlement.amount.toFixed(2)}`,
+          `${settlement.amount.toFixed(2)}`,
           settlement.mpp ? 'Yes' : 'No'
         ]);
 
@@ -1526,7 +1526,7 @@ const ZAPTRStyleCalculator = () => {
         const totalSettlement = filteredSettlements.reduce((sum, s) => sum + s.amount, 0);
         settlementTableData.push([
           { content: 'Total', colSpan: 3, styles: { fontStyle: 'bold' } },
-          { content: `₹${totalSettlement.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } },
+          { content: `${totalSettlement.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } },
           ''
         ]);
 
@@ -1566,12 +1566,12 @@ const ZAPTRStyleCalculator = () => {
         const incomeExpenseData = [];
         if (showIncome) {
           filteredIncome.forEach(income => {
-            incomeExpenseData.push(['Income', income.description, `₹${income.amount.toFixed(2)}`]);
+            incomeExpenseData.push(['Income', income.description, `${income.amount.toFixed(2)}`]);
           });
         }
         if (showExpense) {
           filteredExpenses.forEach(expense => {
-            incomeExpenseData.push(['Expense', expense.description, `₹${expense.amount.toFixed(2)}`]);
+            incomeExpenseData.push(['Expense', expense.description, `${expense.amount.toFixed(2)}`]);
           });
         }
 
@@ -1608,13 +1608,13 @@ const ZAPTRStyleCalculator = () => {
           p.customerName || 'Unknown',
           p.paymentType || p.mode || 'N/A',
           p.paymentType === 'Settlement' ? (p.settlementType || '') : '-',
-          `₹${p.amount.toFixed(2)}`
+          `${p.amount.toFixed(2)}`
         ]);
 
         const totalReceipts = filteredReceipts.reduce((sum, p) => sum + p.amount, 0);
         receiptTableData.push([
           { content: 'Total Receipts', colSpan: 3, styles: { fontStyle: 'bold' } },
-          { content: `₹${totalReceipts.toFixed(2)}`, styles: { fontStyle: 'bold' } }
+          { content: `${totalReceipts.toFixed(2)}`, styles: { fontStyle: 'bold' } }
         ]);
 
         doc.autoTable({
@@ -1692,17 +1692,17 @@ const ZAPTRStyleCalculator = () => {
       yPos += 5;
 
       const bankSettlementData = [
-        ['Cash', `₹${finalCashTotal.toFixed(2)}`],
-        ['Card', `₹${cardTotal.toFixed(2)}`],
-        ['Paytm', `₹${paytmTotal.toFixed(2)}`],
-        ['PhonePe', `₹${phonepeTotal.toFixed(2)}`],
-        ['DTP', `₹${dtpTotal.toFixed(2)}`]
+        ['Cash', `${finalCashTotal.toFixed(2)}`],
+        ['Card', `${cardTotal.toFixed(2)}`],
+        ['Paytm', `${paytmTotal.toFixed(2)}`],
+        ['PhonePe', `${phonepeTotal.toFixed(2)}`],
+        ['DTP', `${dtpTotal.toFixed(2)}`]
       ];
       
       const grandTotal = finalCashTotal + cardTotal + paytmTotal + phonepeTotal + dtpTotal;
       bankSettlementData.push([
         { content: 'Total', styles: { fontStyle: 'bold' } },
-        { content: `₹${grandTotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
+        { content: `${grandTotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
       ]);
 
       doc.autoTable({
@@ -1855,12 +1855,12 @@ FUEL SALES: ${fuelSettings ? Object.keys(fuelSettings).map(fuelType => {
 <div class="s">SUMMARY</div>
 <table>
 <tr><th>Category<th>Litres<th>Amount</tr>
-<tr><td>1. Fuel Sales<td class="r">${stats.totalLiters.toFixed(2)}<td class="r">₹${stats.totalFuelAmount.toFixed(2)}</tr>
-<tr><td>2. Credit Sales<td class="r">${stats.creditLiters.toFixed(2)}<td class="r">₹${stats.creditAmount.toFixed(2)}</tr>
-<tr><td>3. Settlement<td class="r">-<td class="r">₹${stats.totalSettlement.toFixed(2)}</tr>
-<tr><td>4. Income<td class="r">-<td class="r">₹${stats.otherIncome.toFixed(2)}</tr>
-<tr><td>5. Expenses<td class="r">-<td class="r">₹${stats.totalExpenses.toFixed(2)}</tr>
-<tr class="t"><td><b>Cash in Hand</b><td class="r"><b>-</b><td class="r"><b>₹${stats.cashInHand.toFixed(2)}</b></tr>
+<tr><td>1. Fuel Sales<td class="r">${stats.totalLiters.toFixed(2)}<td class="r">${stats.totalFuelAmount.toFixed(2)}</tr>
+<tr><td>2. Credit Sales<td class="r">${stats.creditLiters.toFixed(2)}<td class="r">${stats.creditAmount.toFixed(2)}</tr>
+<tr><td>3. Settlement<td class="r">-<td class="r">${stats.totalSettlement.toFixed(2)}</tr>
+<tr><td>4. Income<td class="r">-<td class="r">${stats.otherIncome.toFixed(2)}</tr>
+<tr><td>5. Expenses<td class="r">-<td class="r">${stats.totalExpenses.toFixed(2)}</tr>
+<tr class="t"><td><b>Cash in Hand</b><td class="r"><b>-</b><td class="r"><b>${stats.cashInHand.toFixed(2)}</b></tr>
 </table>
 
 ${todaySales.length > 0 ? `
@@ -1976,12 +1976,12 @@ ${(() => {
   const total = cash + card + paytm + phonepe + dtp;
   
   return `
-    <tr><td>Cash<td class="r">₹${cash.toFixed(2)}</tr>
-    <tr><td>Card<td class="r">₹${card.toFixed(2)}</tr>
-    <tr><td>Paytm<td class="r">₹${paytm.toFixed(2)}</tr>
-    <tr><td>PhonePe<td class="r">₹${phonepe.toFixed(2)}</tr>
-    <tr><td>DTP<td class="r">₹${dtp.toFixed(2)}</tr>
-    <tr class="t"><td><b>Total</b><td class="r"><b>₹${total.toFixed(2)}</b></tr>
+    <tr><td>Cash<td class="r">${cash.toFixed(2)}</tr>
+    <tr><td>Card<td class="r">${card.toFixed(2)}</tr>
+    <tr><td>Paytm<td class="r">${paytm.toFixed(2)}</tr>
+    <tr><td>PhonePe<td class="r">${phonepe.toFixed(2)}</tr>
+    <tr><td>DTP<td class="r">${dtp.toFixed(2)}</tr>
+    <tr class="t"><td><b>Total</b><td class="r"><b>${total.toFixed(2)}</b></tr>
   `;
 })()}
 </table>
@@ -2097,7 +2097,7 @@ window.onload = function() {
       summaryData.push([
         `${rowNum}. Fuel Sales`,
         currentStats.totalLiters.toFixed(2),
-        `₹${currentStats.totalFuelAmount.toFixed(2)}`
+        `${currentStats.totalFuelAmount.toFixed(2)}`
       ]);
       rowNum++;
 
@@ -2105,7 +2105,7 @@ window.onload = function() {
       summaryData.push([
         `${rowNum}. Credit Sales`,
         currentStats.creditLiters.toFixed(2),
-        `₹${currentStats.creditAmount.toFixed(2)}`
+        `${currentStats.creditAmount.toFixed(2)}`
       ]);
       rowNum++;
 
@@ -2113,7 +2113,7 @@ window.onload = function() {
       summaryData.push([
         `${rowNum}. Settlement`,
         '-',
-        `₹${currentStats.totalSettlement.toFixed(2)}`
+        `${currentStats.totalSettlement.toFixed(2)}`
       ]);
       rowNum++;
 
@@ -2121,7 +2121,7 @@ window.onload = function() {
       summaryData.push([
         `${rowNum}. Income`,
         '-',
-        `₹${currentStats.otherIncome.toFixed(2)}`
+        `${currentStats.otherIncome.toFixed(2)}`
       ]);
       rowNum++;
 
@@ -2129,7 +2129,7 @@ window.onload = function() {
       summaryData.push([
         `${rowNum}. Expenses`,
         '-',
-        `₹${currentStats.totalExpenses.toFixed(2)}`
+        `${currentStats.totalExpenses.toFixed(2)}`
       ]);
       rowNum++;
 
@@ -2137,7 +2137,7 @@ window.onload = function() {
       summaryData.push([
         { content: 'Cash in Hand', styles: { fontStyle: 'bold' } },
         '-',
-        { content: `₹${currentStats.cashInHand.toFixed(2)}`, styles: { fontStyle: 'bold' } }
+        { content: `${currentStats.cashInHand.toFixed(2)}`, styles: { fontStyle: 'bold' } }
       ]);
 
       doc.autoTable({
@@ -2394,17 +2394,17 @@ window.onload = function() {
         .reduce((sum, p) => sum + (p.amount || 0), 0);
       
       const bankSettlementData = [
-        ['Cash', `₹${cashTotal.toFixed(2)}`],
-        ['Card', `₹${cardTotal.toFixed(2)}`],
-        ['Paytm', `₹${paytmTotal.toFixed(2)}`],
-        ['PhonePe', `₹${phonepeTotal.toFixed(2)}`],
-        ['DTP', `₹${dtpTotal.toFixed(2)}`]
+        ['Cash', `${cashTotal.toFixed(2)}`],
+        ['Card', `${cardTotal.toFixed(2)}`],
+        ['Paytm', `${paytmTotal.toFixed(2)}`],
+        ['PhonePe', `${phonepeTotal.toFixed(2)}`],
+        ['DTP', `${dtpTotal.toFixed(2)}`]
       ];
       
       const grandTotal = cashTotal + cardTotal + paytmTotal + phonepeTotal + dtpTotal;
       bankSettlementData.push([
         { content: 'Total', styles: { fontStyle: 'bold' } },
-        { content: `₹${grandTotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
+        { content: `${grandTotal.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
       ]);
 
       doc.autoTable({
