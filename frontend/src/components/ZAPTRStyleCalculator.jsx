@@ -1422,15 +1422,30 @@ const ZAPTRStyleCalculator = () => {
         doc.text('Page ' + i + ' of ' + pc + ' | Generated on: ' + new Date().toLocaleString(), pw/2, ph - 5, { align: 'center' });
       }
 
-      // Save PDF - detect Android WebView
+      // Save PDF
       const fileName = 'Report_' + selectedDate + '.pdf';
-      if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.openPdfWithViewer) {
-        // Android: pass base64 to Java bridge
-        const base64 = doc.output('dataurlstring').split(',')[1];
-        window.MPumpCalcAndroid.openPdfWithViewer(base64, fileName);
-        toast({ title: "PDF Generated", description: 'Saving ' + fileName });
+      
+      // Check if Android WebView
+      const isAndroidWebView = typeof window.MPumpCalcAndroid !== 'undefined';
+      
+      if (isAndroidWebView) {
+        // Android: try JS bridge first, fallback to print dialog
+        try {
+          const base64 = doc.output('dataurlstring').split(',')[1];
+          window.MPumpCalcAndroid.openPdfWithViewer(base64, fileName);
+          toast({ title: "PDF Generated", description: 'Opening ' + fileName });
+        } catch (bridgeError) {
+          console.warn('JS bridge failed, using print dialog:', bridgeError);
+          // Fallback: open HTML print dialog (same as Balance tab)
+          const pdfBlob = doc.output('bloburl');
+          const printWindow = window.open('', '_blank');
+          if (printWindow) {
+            printWindow.document.write('<html><head><title>' + fileName + '</title></head><body style="margin:0"><embed width="100%" height="100%" src="' + pdfBlob + '" type="application/pdf"></body></html>');
+            printWindow.document.close();
+          }
+        }
       } else {
-        // Browser: normal download
+        // Desktop browser: direct download (small file)
         doc.save(fileName);
         toast({ title: "PDF Downloaded", description: fileName });
       }
