@@ -638,7 +638,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
             {formData.incomeEntries.length > 0 && (
               <div className="mt-3 space-y-2">
                 {formData.incomeEntries.map((entry, index) => (
-                  <div key={index} className={`flex items-center justify-between px-3 py-2 rounded text-sm ${
+                  <div key={entry.id || "inc-" + index} className={`flex items-center justify-between px-3 py-2 rounded text-sm ${
                     isDarkMode ? 'bg-green-900 bg-opacity-30 text-green-400' : 'bg-green-50 text-green-700'
                   }`}>
                     <span>+ {entry.description}</span>
@@ -660,7 +660,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
             {formData.expenseEntries.length > 0 && (
               <div className="mt-3 space-y-2">
                 {formData.expenseEntries.map((entry, index) => (
-                  <div key={index} className={`flex items-center justify-between px-3 py-2 rounded text-sm ${
+                  <div key={entry.id || "exp-" + index} className={`flex items-center justify-between px-3 py-2 rounded text-sm ${
                     isDarkMode ? 'bg-red-900 bg-opacity-30 text-red-400' : 'bg-red-50 text-red-700'
                   }`}>
                     <span>- {entry.description}</span>
@@ -882,7 +882,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                     {credit.fuelEntries && credit.fuelEntries.length > 0 ? (
                       <div className="space-y-2 mb-3">
                         {credit.fuelEntries.map((entry, index) => (
-                          <div key={index} className={`p-2 rounded border ${
+                          <div key={"item-" + index} className={`p-2 rounded border ${
                             isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-slate-50 border-slate-200'
                           }`}>
                             <div className="flex items-center justify-between">
@@ -931,7 +931,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                     {credit.incomeEntries && credit.incomeEntries.length > 0 && (
                       <div className="space-y-2 mb-3">
                         {credit.incomeEntries.map((entry, index) => (
-                          <div key={index} className={`p-2 rounded border ${
+                          <div key={"item-" + index} className={`p-2 rounded border ${
                             isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-green-50 border-green-200'
                           }`}>
                             <div className="flex items-center justify-between">
@@ -956,7 +956,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                     {credit.expenseEntries && credit.expenseEntries.length > 0 && (
                       <div className="space-y-2 mb-3">
                         {credit.expenseEntries.map((entry, index) => (
-                          <div key={index} className={`p-2 rounded border ${
+                          <div key={"item-" + index} className={`p-2 rounded border ${
                             isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-red-50 border-red-200'
                           }`}>
                             <div className="flex items-center justify-between">

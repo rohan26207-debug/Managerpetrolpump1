@@ -81,7 +81,7 @@ class LocalStorageService {
     // Announce namespace switch to UI (for any listeners interested)
     try {
       window.dispatchEvent(new CustomEvent('localStorageChange', { detail: { userId, namespace: ACTIVE_NAMESPACE } }));
-    } catch (_) {}
+    } catch (e) { console.warn('localStorage event dispatch failed:', e.message); }
 
     return { prevNs, newNs: ACTIVE_NAMESPACE };
   }
@@ -96,7 +96,7 @@ class LocalStorageService {
     this.initializeDefaultData();
     try {
       window.dispatchEvent(new CustomEvent('localStorageChange', { detail: { userId: null, namespace: ACTIVE_NAMESPACE } }));
-    } catch (_) {}
+    } catch (e) { console.warn('localStorage event dispatch failed:', e.message); }
     return prevNs;
   }
 

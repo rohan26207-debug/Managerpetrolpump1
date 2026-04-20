@@ -172,7 +172,7 @@ const UnifiedRecords = ({
       {credit.fuelEntries && credit.fuelEntries.length > 0 ? (
         <div className="space-y-2 mb-2">
           {credit.fuelEntries.map((entry, index) => (
-            <div key={index} className={`p-2 rounded border ${
+            <div key={entry.id || `fuel-${index}`} className={`p-2 rounded border ${
               isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-purple-50 border-purple-200'
             }`}>
               <div className="flex items-center justify-between mb-1">
@@ -223,7 +223,7 @@ const UnifiedRecords = ({
       {credit.incomeEntries && credit.incomeEntries.length > 0 && (
         <div className="space-y-2 mb-2">
           {credit.incomeEntries.map((entry, index) => (
-            <div key={index} className={`p-2 rounded border ${
+            <div key={entry.id || `inc-${index}`} className={`p-2 rounded border ${
               isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-green-50 border-green-200'
             }`}>
               <div className="flex items-center justify-between">
@@ -241,7 +241,7 @@ const UnifiedRecords = ({
       {credit.expenseEntries && credit.expenseEntries.length > 0 && (
         <div className="space-y-2">
           {credit.expenseEntries.map((entry, index) => (
-            <div key={index} className={`p-2 rounded border ${
+            <div key={entry.id || `exp-${index}`} className={`p-2 rounded border ${
               isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-red-50 border-red-200'
             }`}>
               <div className="flex items-center justify-between">

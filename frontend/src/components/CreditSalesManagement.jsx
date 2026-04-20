@@ -742,7 +742,7 @@ const CreditSalesManagement = ({
                     <div className="space-y-2 mb-2">
                       {credit.fuelEntries.map((entry, index) => (
                         <div
-                          key={index}
+                          key={entry.id || `fuel-${index}`}
                           className={`p-2 rounded border ${
                             isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-purple-50 border-purple-200'
                           }`}

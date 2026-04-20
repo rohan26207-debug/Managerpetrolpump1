@@ -436,7 +436,7 @@ window.onload = function() {
                   <tbody>
                     {sortedData.map((row, index) => (
                       <tr
-                        key={index}
+                        key={row.customerId || `out-${index}`}
                         className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-slate-200'}`}
                       >
                         <td className={`p-3 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>

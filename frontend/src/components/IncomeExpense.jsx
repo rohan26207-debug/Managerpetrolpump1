@@ -397,7 +397,7 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
                     <div className="p-1">
                       {(activeType === 'income' ? incomeDescHistory : expenseDescHistory).map((desc, index) => (
                         <div
-                          key={index}
+                          key={`desc-${desc}-${index}`}
                           className={`flex items-center justify-between p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer group ${isDarkMode ? 'text-white' : ''}`}
                         >
                           <span
