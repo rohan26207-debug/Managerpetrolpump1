@@ -465,8 +465,9 @@ const ZAPTRStyleCalculator = () => {
     });
     console.log('========================================');
     
-    // Cash in Hand = Fuel Sales (no MPP) - Credit Sales (no MPP) - Expenses (no MPP) + Income (no MPP) - Settlement (no MPP)
-    const cashInHand = fuelCashSales - creditTotalAmountNoMPP - totalExpensesNoMPP + otherIncomeNoMPP - settlementNoMPP;
+    // Cash in Hand = All Fuel Sales - All Credit Sales + All Income - All Expenses - All Settlement
+    const totalSettlement = todaySettlements.reduce((sum, s) => sum + (s.amount || 0), 0);
+    const cashInHand = totalFuelAmount - creditTotalAmount + otherIncome - totalExpenses - totalSettlement;
     
     // MPP Cash is separate and calculated independently
     // Total available cash = Cash in Hand + MPP Cash (for display only)
@@ -507,6 +508,7 @@ const ZAPTRStyleCalculator = () => {
       creditAmountNoMPP: creditTotalAmountNoMPP,
       creditLitersNoMPP,
       settlementNoMPP,
+      totalSettlement,
       fuelSalesMPP,
       fuelLitersMPP,
       creditAmountMPP,
@@ -2840,7 +2842,7 @@ window.onload = function() {
                   </div>
                 </div>
 
-                {/* Credit Sales (No MPP) */}
+                {/* Credit Sales */}
                 <div className={`flex justify-between items-center p-2 sm:p-3 rounded-lg border-l-4 border-orange-500 ${
                   isDarkMode ? 'bg-gray-700' : 'bg-orange-50'
                 }`}>
@@ -2858,12 +2860,12 @@ window.onload = function() {
                     <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
                       isDarkMode ? 'text-white' : 'text-slate-800'
                     }`}>
-                      {stats.creditLitersNoMPP.toFixed(2)}L • ₹{stats.creditAmountNoMPP.toFixed(2)}
+                      {stats.creditLiters.toFixed(2)}L • ₹{stats.creditAmount.toFixed(2)}
                     </div>
                   </div>
                 </div>
 
-                {/* Income (No MPP) */}
+                {/* Income */}
                 <div className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${
                   isDarkMode ? 'bg-gray-700' : 'bg-green-50'
                 }`}>
@@ -2881,12 +2883,12 @@ window.onload = function() {
                     <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
                       isDarkMode ? 'text-white' : 'text-slate-800'
                     }`}>
-                      ₹{stats.otherIncomeNoMPP.toFixed(2)}
+                      ₹{stats.otherIncome.toFixed(2)}
                     </div>
                   </div>
                 </div>
 
-                {/* Expenses (No MPP) */}
+                {/* Expenses */}
                 <div className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${
                   isDarkMode ? 'bg-gray-700' : 'bg-red-50'
                 }`}>
@@ -2904,12 +2906,12 @@ window.onload = function() {
                     <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
                       isDarkMode ? 'text-white' : 'text-slate-800'
                     }`}>
-                      ₹{stats.totalExpensesNoMPP.toFixed(2)}
+                      ₹{stats.totalExpenses.toFixed(2)}
                     </div>
                   </div>
                 </div>
 
-                {/* Settlement (No MPP) */}
+                {/* Settlement */}
                 <div className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${
                   isDarkMode ? 'bg-gray-700' : 'bg-yellow-50'
                 }`}>
@@ -2927,7 +2929,7 @@ window.onload = function() {
                     <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
                       isDarkMode ? 'text-white' : 'text-slate-800'
                     }`}>
-                      ₹{stats.settlementNoMPP.toFixed(2)}
+                      ₹{stats.totalSettlement.toFixed(2)}
                     </div>
                   </div>
                 </div>
