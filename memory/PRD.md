@@ -1,12 +1,11 @@
 # Petrol Pump Management App - PRD
 
 ## Overview
-React-based petrol pump management application with Firebase Auth (Email/Password) and Firestore real-time cloud sync. Uses user-scoped localStorage for offline persistence.
+React-based petrol pump management application. 100% offline with localStorage only. No Firebase, no cloud sync, no login required.
 
 ## Tech Stack
 - Frontend: React.js, TailwindCSS, Shadcn/UI
-- Auth: Firebase Email/Password
-- Database: Firebase Firestore (cloud sync) + localStorage (offline)
+- Data Storage: Browser localStorage (fully offline)
 - Process Control: Supervisor
 
 ## Core Features
@@ -17,6 +16,7 @@ React-based petrol pump management application with Firebase Auth (Email/Passwor
 - Income/Expense tracking
 - Settlement management
 - Daily reports with PDF/print export
+- Manual backup (export/import JSON)
 - Auto backup (weekly)
 - Pro Mode for advanced features
 
@@ -27,8 +27,10 @@ React-based petrol pump management application with Firebase Auth (Email/Passwor
 - Delete Data restricted to Pro Mode
 - Merge Backup repositioned above Auto Backup
 - MPP checkbox always visible in Add Sale form
-- MPP-tagged sales excluded from stock calculations (MPPStock.jsx)
-- MPP section removed from dashboard summary (only non-MPP data shown)
+- MPP-tagged sales excluded from stock calculations
+- MPP section removed from dashboard summary
+- Fixed "change is not defined" runtime error in Firestore listeners
+- **Made app 100% offline**: Removed Firebase Auth, Firestore sync, login screen. App loads directly with localStorage only.
 
 ## Pending/Future Tasks
-- P1: Clean up deprecated DeviceLinking.jsx component
+- P1: Clean up deprecated DeviceLinking.jsx and other unused Firebase files (firebase.js, firebaseSync.js, syncService.js, AuthContext.js, LoginScreen.jsx, SyncStatus.jsx, SyncDebugPanel.jsx, authService.js)

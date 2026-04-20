@@ -27,15 +27,11 @@ import {
   Mail,
   Globe,
   X,
-  Cloud,
-  CloudOff,
   RefreshCw,
-  LogOut,
   Receipt,
   ArrowRightLeft
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
-import { useAuth } from '../contexts/AuthContext';
 import { useAutoBackupWeekly } from '../hooks/use-auto-backup-weekly';
 import localStorageService, { exportAllData, importAllData, mergeAllData } from '../services/localStorage';
 import CustomerManagement from './CustomerManagement';
@@ -51,7 +47,6 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
   const [showProPasswordDialog, setShowProPasswordDialog] = useState(false);
   const [proPassword, setProPassword] = useState('');
   const { toast } = useToast();
-  const { logout, user } = useAuth();
   
   // Auto-backup weekly hook
   const { toggleAutoBackup, getBackupStatus } = useAutoBackupWeekly(toast);
@@ -77,8 +72,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
         '⚠️ WARNING: This will DELETE ALL DATA!\n\n' +
         '• All sales, customers, payments\n' +
         '• All income, expenses, settlements\n' +
-        '• All fuel settings and categories\n' +
-        '• Data from localStorage AND Firestore\n\n' +
+        '• All fuel settings and categories\n\n' +
         'This action CANNOT be undone!\n\n' +
         'Type "DELETE ALL" to confirm:'
       );
@@ -106,53 +100,9 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
       keysToRemove.forEach(key => localStorage.removeItem(key));
       console.log('✅ localStorage cleared:', keysToRemove.length, 'keys');
 
-      // Clear Firestore data
-      const { collection, query, where, getDocs, deleteDoc, doc } = 
-        await import('firebase/firestore');
-      const { db, auth } = await import('../services/firebase');
-      
-      const userId = auth.currentUser?.uid;
-      if (!userId) {
-        throw new Error('User not authenticated');
-      }
-
-      const collections = [
-        'customers', 'sales', 'creditSales', 'payments', 
-        'settlements', 'incomeExpenses'
-      ];
-      
-      let totalDeleted = 0;
-      
-      for (const collName of collections) {
-        const q = query(collection(db, collName), where('userId', '==', userId));
-        const snapshot = await getDocs(q);
-        
-        for (const document of snapshot.docs) {
-          await deleteDoc(doc(db, collName, document.id));
-          totalDeleted++;
-        }
-      }
-      
-      // Also clear settings collections (document ID = userId)
-      const settingsCollections = [
-        'fuelSettings', 'settlementTypes', 
-        'incomeCategories', 'expenseCategories'
-      ];
-      
-      for (const collName of settingsCollections) {
-        try {
-          await deleteDoc(doc(db, collName, userId));
-          totalDeleted++;
-        } catch (e) {
-          // Document might not exist, that's ok
-        }
-      }
-
-      console.log('✅ Firestore cleared:', totalDeleted, 'documents');
-
       toast({
-        title: "All Data Cleared! 🗑️",
-        description: `Deleted ${totalDeleted} Firestore documents and ${keysToRemove.length} localStorage keys.`,
+        title: "All Data Cleared!",
+        description: `Deleted ${keysToRemove.length} localStorage keys.`,
       });
 
       // Reload page to reset state
@@ -165,28 +115,6 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
       toast({
         title: "Error Clearing Data",
         description: error.message || "Failed to clear all data.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Logout handler
-  const handleLogout = async () => {
-    try {
-      const confirmLogout = window.confirm('Are you sure you want to logout?');
-      
-      if (confirmLogout) {
-        await logout();
-        toast({
-          title: "Logged Out",
-          description: "You have been logged out successfully.",
-        });
-      }
-    } catch (error) {
-      console.error('❌ Logout error:', error);
-      toast({
-        title: "Logout Failed",
-        description: "Failed to logout. Please try again.",
         variant: "destructive",
       });
     }
@@ -784,83 +712,6 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
               <TabsContent value="contact" className="p-0">
                 <ScrollArea className="h-[calc(100vh-200px)] px-4 py-4">
                 <div className="space-y-4 pb-20">
-                  {/* Logged-in User Info */}
-                  {user && (
-                    <div className={`border-2 rounded-lg p-4 ${
-                      isDarkMode ? 'border-green-600 bg-green-900/20' : 'border-green-500 bg-green-50'
-                    }`}>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full">
-                          <User className="w-6 h-6 text-green-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className={`text-xs font-medium ${
-                            isDarkMode ? 'text-green-400' : 'text-green-700'
-                          }`}>
-                            Logged in as
-                          </div>
-                          <div className={`font-semibold break-all ${
-                            isDarkMode ? 'text-white' : 'text-slate-800'
-                          }`}>
-                            {user.email}
-                          </div>
-                          <div className={`text-xs ${
-                            isDarkMode ? 'text-gray-400' : 'text-slate-600'
-                          }`}>
-                            User ID: {user.uid.substring(0, 8)}...
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Account/Logout Section - Moved here after logged-in user info */}
-                  <div className={`border rounded-lg p-4 ${
-                    isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-slate-200 bg-slate-50'
-                  }`}>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <LogOut className={`w-5 h-5 ${
-                          isDarkMode ? 'text-red-400' : 'text-red-600'
-                        }`} />
-                        <h4 className={`font-medium ${
-                          isDarkMode ? 'text-white' : 'text-slate-800'
-                        }`}>
-                          Account
-                        </h4>
-                      </div>
-                      
-                      <p className={`text-xs ${
-                        isDarkMode ? 'text-gray-400' : 'text-slate-600'
-                      }`}>
-                        Logout to switch to a different account or sign in as another user
-                      </p>
-                      
-                      <Button
-                        onClick={handleLogout}
-                        variant="destructive"
-                        className={`w-full ${
-                          isDarkMode 
-                            ? 'bg-red-600 hover:bg-red-700' 
-                            : 'bg-red-500 hover:bg-red-600'
-                        } text-white`}
-                      >
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Logout
-                      </Button>
-                      
-                      <div className={`mt-3 p-3 rounded-lg ${
-                        isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100'
-                      }`}>
-                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                          💡 <strong>Note:</strong> Your data is saved locally and in the cloud. 
-                          Login again to access it from any device.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator className={isDarkMode ? 'bg-gray-600' : 'bg-slate-200'} />
                   
                   {/* Contact Information Display */}
                   <div className="text-center mb-4">
@@ -1328,7 +1179,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                               <li>All customers and settlements</li>
                               <li>All income and expenses</li>
                               <li>All fuel settings and categories</li>
-                              <li>Data from localStorage AND Firestore</li>
+                              <li>Data from localStorage</li>
                             </ul>
                           </div>
 

@@ -48,15 +48,11 @@ import OutstandingReport from './OutstandingReport';
 import OutstandingPDFReport from './OutstandingPDFReport';
 import CustomerLedger from './CustomerLedger';
 import BankSettlement from './BankSettlement';
-import SyncStatus from './SyncStatus';
 // Anonymous mode: LoginScreen removed
 import MPPStock from './MPPStock';
 import localStorageService from '../services/localStorage';
-import { useAuth } from '../contexts/AuthContext';
-import { setStorageNamespace } from '../services/localStorage';
 
 const ZAPTRStyleCalculator = () => {
-  const { user } = useAuth();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [textSize, setTextSize] = useState(100); // Default 100% (normal size)
   const [parentTab, setParentTab] = useState('today'); // Parent tab: 'today' or 'outstanding'
@@ -92,7 +88,6 @@ const ZAPTRStyleCalculator = () => {
   const [editingSettlementData, setEditingSettlementData] = useState(null);
   const [editingIncomeExpenseData, setEditingIncomeExpenseData] = useState(null);
   const [stockDataVersion, setStockDataVersion] = useState(0); // For triggering stock summary re-render
-  const [syncCounter, setSyncCounter] = useState(0); // For triggering re-render on Firebase sync
   
   // Notes Dialog State
   const [notesOpen, setNotesOpen] = useState(false);
@@ -172,19 +167,8 @@ const ZAPTRStyleCalculator = () => {
     }
   };
 
-  // Set namespace when user is available
+  // Load data on mount (offline mode)
   useEffect(() => {
-    if (user?.uid) {
-      console.log('🔑 Setting storage namespace for user:', user.uid);
-      setStorageNamespace(user.uid);
-    }
-  }, [user]);
-
-  // Load data on mount and when user changes
-  useEffect(() => {
-    // Wait for namespace to be set before loading
-    if (!user?.uid) return;
-    
     loadData();
     // Load notes (not date-specific)
     const savedNotes = localStorage.getItem('mpp_notes');
@@ -192,25 +176,20 @@ const ZAPTRStyleCalculator = () => {
       setNotes(savedNotes);
     }
 
-    // Listen for Firebase sync updates from other devices
+    // Listen for localStorage updates
     const handleStorageChange = () => {
-      console.log('🔄 Data synced from another device - reloading...');
-      
-      // Force reload by updating state with fresh data
+      console.log('🔄 Data changed - reloading...');
       setTimeout(() => {
         loadData();
-        setSyncCounter(prev => prev + 1); // Increment to force re-render
-        console.log('✅ UI refreshed with synced data');
-      }, 100); // Small delay to ensure localStorage is updated
+      }, 100);
     };
 
     window.addEventListener('localStorageChange', handleStorageChange);
 
-    // Cleanup listener on unmount
     return () => {
       window.removeEventListener('localStorageChange', handleStorageChange);
     };
-  }, [user]);
+  }, []);
 
   // Reload data when date changes (to reflect any new data)
   useEffect(() => {
@@ -537,7 +516,7 @@ const ZAPTRStyleCalculator = () => {
   // Recalculate stats when data or sync changes
   const stats = React.useMemo(() => {
     return getTodayStats();
-  }, [salesData, creditData, incomeData, expenseData, settlementData, selectedDate, syncCounter]);
+  }, [salesData, creditData, incomeData, expenseData, settlementData, selectedDate]);
 
   // Data handling functions (offline localStorage)
   const addSaleRecord = (saleData) => {
@@ -785,31 +764,9 @@ const ZAPTRStyleCalculator = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [savedScrollPosition, setSavedScrollPosition] = useState(0);
   
-  // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [authLoading, setAuthLoading] = useState(false);
-
-  // Check screen size for mobile detection
-  // Check authentication status
+  // Initialize localStorage namespace (offline mode - no auth)
   useEffect(() => {
-    const { onAuthStateChanged } = require('firebase/auth');
-    const { auth } = require('../services/firebase');
-    
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      // In anonymous mode, Firebase will sign-in anonymously via initializeAuth()
-      // Ensure sync is initialized regardless
-      setIsAuthenticated(true);
-      setAuthLoading(false);
-      try {
-        const firebaseSyncService = require('../services/firebaseSync').default;
-        await firebaseSyncService.initialize();
-        console.log('✅ Firebase sync initialized');
-      } catch (error) {
-        console.error('❌ Failed to initialize Firebase sync:', error);
-      }
-    });
-
-    return () => unsubscribe();
+    localStorageService.setNamespace('local');
   }, []);
 
   useEffect(() => {
@@ -2535,22 +2492,7 @@ window.onload = function() {
     return text;
   };
 
-  // Show loading while checking auth
-  if (authLoading) {
-    return (
-      <div className={`min-h-screen flex items-center justify-center ${
-        isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
-      }`}>
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Anonymous mode: always proceed (auth may be anonymous)
-  // No login screen in anonymous mode
+  // Offline mode: always proceed directly
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${
@@ -3903,9 +3845,6 @@ window.onload = function() {
             </div>
           </SheetContent>
         </Sheet>
-
-        {/* Firebase Sync Status Indicator */}
-        <SyncStatus isDarkMode={isDarkMode} />
 
       </div>
     </div>

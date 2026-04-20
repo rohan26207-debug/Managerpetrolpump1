@@ -1,14 +1,11 @@
 /**
  * Local Storage Service for Offline M.Pump Calc
  * Handles all data persistence in browser localStorage
- * Now with Firebase sync for multi-device support
+ * 100% offline - no cloud sync
  * Adds per-user namespacing so different users never see each other's data
  */
 
-// Import Firebase sync service (lazy below to avoid cycles)
-let firebaseSyncService = null;
-
-// Active namespace prefix: e.g., "mpp:<uid>:"
+// Active namespace prefix: e.g., "mpp:local:"
 let ACTIVE_NAMESPACE = null;
 
 // Helper to build namespaced key
@@ -44,16 +41,7 @@ const LEGACY_MISC_KEYS = [
 ];
 
 // Detect and require lazily to avoid circular deps
-const getFirebaseSync = () => {
-  if (!firebaseSyncService) {
-    try {
-      firebaseSyncService = require('./firebaseSync').default;
-    } catch (error) {
-      console.log('Firebase sync not available:', error.message);
-    }
-  }
-  return firebaseSyncService;
-};
+// Firebase sync removed - fully offline mode
 
 class LocalStorageService {
   constructor() {
@@ -333,8 +321,6 @@ class LocalStorageService {
     };
     income.push(newIncome);
     this.setIncomeData(income);
-    const firebaseSync = getFirebaseSync();
-    if (firebaseSync) firebaseSync.syncIncomeExpense(newIncome, 'add');
     return newIncome;
   }
 
@@ -354,8 +340,6 @@ class LocalStorageService {
     };
     expenses.push(newExpense);
     this.setExpenseData(expenses);
-    const firebaseSync = getFirebaseSync();
-    if (firebaseSync) firebaseSync.syncIncomeExpense(newExpense, 'add');
     return newExpense;
   }
 
@@ -363,8 +347,6 @@ class LocalStorageService {
   getFuelSettings() { return this.getItem(this.keys.fuelSettings); }
   setFuelSettings(settings) {
     const result = this.setItem(this.keys.fuelSettings, settings);
-    const firebaseSync = getFirebaseSync();
-    if (firebaseSync) firebaseSync.syncFuelSettings(settings);
     return result;
   }
 
@@ -424,7 +406,6 @@ class LocalStorageService {
     const saleToDelete = sales.find(s => s.id === id);
     const updated = sales.filter(s => s.id !== id);
     this.setSalesData(updated);
-    if (saleToDelete) { const fs = getFirebaseSync(); if (fs) fs.syncSale(saleToDelete, 'delete'); }
     return true;
   }
   deleteCreditRecord(id) {
@@ -432,7 +413,6 @@ class LocalStorageService {
     const creditToDelete = credits.find(c => c.id === id);
     const updated = credits.filter(c => c.id !== id);
     this.setCreditData(updated);
-    if (creditToDelete) { const fs = getFirebaseSync(); if (fs) fs.syncCreditSale(creditToDelete, 'delete'); }
     return true;
   }
   deleteIncomeRecord(id) {
@@ -440,7 +420,6 @@ class LocalStorageService {
     const rec = income.find(i => i.id === id);
     const updated = income.filter(i => i.id !== id);
     this.setIncomeData(updated);
-    if (rec) { const fs = getFirebaseSync(); if (fs) fs.syncIncomeExpense(rec, 'delete'); }
     return true;
   }
   deleteExpenseRecord(id) {
@@ -448,7 +427,6 @@ class LocalStorageService {
     const rec = expenses.find(e => e.id === id);
     const updated = expenses.filter(e => e.id !== id);
     this.setExpenseData(updated);
-    if (rec) { const fs = getFirebaseSync(); if (fs) fs.syncIncomeExpense(rec, 'delete'); }
     return true;
   }
 
@@ -486,7 +464,6 @@ class LocalStorageService {
     if (idx !== -1) {
       income[idx] = { ...income[idx], ...updatedData };
       this.setIncomeData(income);
-      const fs = getFirebaseSync();
       if (fs) fs.syncIncomeExpense(income[idx], 'update');
       return income[idx];
     }
@@ -498,7 +475,6 @@ class LocalStorageService {
     if (idx !== -1) {
       expenses[idx] = { ...expenses[idx], ...updatedData };
       this.setExpenseData(expenses);
-      const fs = getFirebaseSync();
       if (fs) fs.syncIncomeExpense(expenses[idx], 'update');
       return expenses[idx];
     }
@@ -682,7 +658,6 @@ class LocalStorageService {
     customers.push(newCustomer);
     customers.sort((a, b) => a.name.localeCompare(b.name));
     this.setCustomers(customers);
-    const fs = getFirebaseSync(); if (fs) fs.syncCustomer(newCustomer, 'add');
     return newCustomer;
   }
   deleteCustomer(id) {
@@ -690,7 +665,6 @@ class LocalStorageService {
     const customerToDelete = customers.find(c => c.id === id);
     const updated = customers.filter(c => c.id !== id);
     this.setCustomers(updated);
-    if (customerToDelete) { const fs = getFirebaseSync(); if (fs) fs.syncCustomer(customerToDelete, 'delete'); }
     return true;
   }
   updateCustomer(id, startingBalance, isMPP, newName) {
@@ -723,7 +697,6 @@ class LocalStorageService {
     });
     this.setCustomers(updated);
     const updatedCustomer = updated.find(c => c.id === id);
-    if (updatedCustomer) { const fs = getFirebaseSync(); if (fs) fs.syncCustomer(updatedCustomer, 'update'); }
     return updatedCustomer;
   }
 
@@ -755,19 +728,18 @@ class LocalStorageService {
     const paymentToDelete = payments.find(p => p.id === id);
     const updated = payments.filter(p => p.id !== id);
     this.setPayments(updated);
-    if (paymentToDelete) { const fs = getFirebaseSync(); if (fs) fs.syncPayment(paymentToDelete, 'delete'); }
     return true;
   }
 
   // ===== Categories =====
   getIncomeCategories() { return this.getItem(this.keys.incomeCategories) || []; }
-  setIncomeCategories(categories) { const result = this.setItem(this.keys.incomeCategories, categories); const fs = getFirebaseSync(); if (fs) fs.syncIncomeCategories(categories); return result; }
+  setIncomeCategories(categories) { return this.setItem(this.keys.incomeCategories, categories); }
   addIncomeCategory(name) { const categories = this.getIncomeCategories(); const newCategory = { id: Date.now().toString(), name }; categories.push(newCategory); categories.sort((a,b)=>a.name.localeCompare(b.name)); this.setIncomeCategories(categories); return newCategory; }
   deleteIncomeCategory(id) { const categories = this.getIncomeCategories(); const updated = categories.filter(c => c.id !== id); this.setIncomeCategories(updated); return true; }
   updateIncomeCategory(id, name) { const categories = this.getIncomeCategories(); const updated = categories.map(c => c.id === id ? { ...c, name } : c); updated.sort((a,b)=>a.name.localeCompare(b.name)); this.setIncomeCategories(updated); return updated.find(c => c.id === id); }
 
   getExpenseCategories() { return this.getItem(this.keys.expenseCategories) || []; }
-  setExpenseCategories(categories) { const result = this.setItem(this.keys.expenseCategories, categories); const fs = getFirebaseSync(); if (fs) fs.syncExpenseCategories(categories); return result; }
+  setExpenseCategories(categories) { return this.setItem(this.keys.expenseCategories, categories); }
   addExpenseCategory(name) { const categories = this.getExpenseCategories(); const newCategory = { id: Date.now().toString(), name }; categories.push(newCategory); categories.sort((a,b)=>a.name.localeCompare(b.name)); this.setExpenseCategories(categories); return newCategory; }
   deleteExpenseCategory(id) { const categories = this.getExpenseCategories(); const updated = categories.filter(c => c.id !== id); this.setExpenseCategories(updated); return true; }
   updateExpenseCategory(id, name) { const categories = this.getExpenseCategories(); const updated = categories.map(c => c.id === id ? { ...c, name } : c); updated.sort((a,b)=>a.name.localeCompare(b.name)); this.setExpenseCategories(updated); return updated.find(c => c.id === id); }
@@ -780,7 +752,6 @@ class LocalStorageService {
     const newSettlement = { id: Date.now().toString(), date: settlementData.date, amount: parseFloat(settlementData.amount), description: settlementData.description || '', mpp: settlementData.mpp || false, timestamp: new Date().toISOString() };
     settlements.push(newSettlement);
     this.setSettlements(settlements);
-    const fs = getFirebaseSync(); if (fs) fs.syncSettlement(newSettlement, 'add');
     return newSettlement;
   }
   updateSettlement(id, settlementData) {
@@ -789,7 +760,6 @@ class LocalStorageService {
     if (index !== -1) {
       settlements[index] = { ...settlements[index], date: settlementData.date, amount: parseFloat(settlementData.amount), description: settlementData.description || '', mpp: settlementData.mpp !== undefined ? settlementData.mpp : settlements[index].mpp, timestamp: new Date().toISOString() };
       this.setSettlements(settlements);
-      const fs = getFirebaseSync(); if (fs) fs.syncSettlement(settlements[index], 'update');
       return settlements[index];
     }
     return null;
@@ -799,13 +769,12 @@ class LocalStorageService {
     const toDelete = settlements.find(s => s.id === id);
     const updated = settlements.filter(s => s.id !== id);
     this.setSettlements(updated);
-    const fs = getFirebaseSync(); if (fs && toDelete) fs.syncSettlement(toDelete, 'delete');
     return true;
   }
 
   // ===== Settlement Types =====
   getSettlementTypes() { return this.getItem(this.keys.settlementTypes) || []; }
-  setSettlementTypes(types) { const result = this.setItem(this.keys.settlementTypes, types); const fs = getFirebaseSync(); if (fs) fs.syncSettlementTypes(types); return result; }
+  setSettlementTypes(types) { return this.setItem(this.keys.settlementTypes, types); }
   addSettlementType(name) { const types = this.getSettlementTypes(); const newType = { id: Date.now().toString(), name }; types.push(newType); types.sort((a,b)=>a.name.localeCompare(b.name)); this.setSettlementTypes(types); return newType; }
   deleteSettlementType(id) { const types = this.getSettlementTypes(); const updated = types.filter(t => t.id !== id); this.setSettlementTypes(updated); return true; }
   updateSettlementType(id, name) { const types = this.getSettlementTypes(); const updated = types.map(t => t.id === id ? { ...t, name } : t); types.sort((a,b)=>a.name.localeCompare(b.name)); this.setSettlementTypes(updated); return updated.find(t => t.id === id); }
