@@ -1254,7 +1254,7 @@ const ZAPTRStyleCalculator = () => {
   
   // Direct PDF generation - uses browser print for small file size
   // Direct PDF using jsPDF with built-in Helvetica (0 font embedding = small files)
-  const generateDirectPDF = () => {
+  const generateDirectPDF = (mode = 'open') => {
     try {
       const doc = new jsPDF({ compress: true, putOnlyUsedFonts: true });
       const pw = doc.internal.pageSize.getWidth();
@@ -1429,7 +1429,34 @@ const ZAPTRStyleCalculator = () => {
       // Check if Android WebView
       const isAndroidWebView = typeof window.MPumpCalcAndroid !== 'undefined';
       
-      if (isAndroidWebView) {
+      if (mode === 'share') {
+        // SHARE flow: Android native chooser if available, else Web Share API fallback
+        if (isAndroidWebView && typeof window.MPumpCalcAndroid.sharePdf === 'function') {
+          try {
+            const base64 = doc.output('dataurlstring').split(',')[1];
+            window.MPumpCalcAndroid.sharePdf(base64, fileName);
+            toast({ title: "Opening share sheet…", description: fileName });
+          } catch (bridgeError) {
+            console.warn('Share bridge failed:', bridgeError);
+            toast({ title: "Share failed", description: bridgeError.message, variant: "destructive" });
+          }
+        } else if (typeof navigator !== 'undefined' && navigator.share && navigator.canShare) {
+          // Web Share API (modern browsers on Android/iOS)
+          const blob = doc.output('blob');
+          const shareFile = new File([blob], fileName, { type: 'application/pdf' });
+          if (navigator.canShare({ files: [shareFile] })) {
+            navigator.share({ files: [shareFile], title: fileName, text: 'Daily Report - ' + fileName })
+              .then(() => toast({ title: "Shared", description: fileName }))
+              .catch((err) => { if (err.name !== 'AbortError') toast({ title: "Share cancelled" }); });
+          } else {
+            doc.save(fileName);
+            toast({ title: "Share not supported, downloaded instead", description: fileName });
+          }
+        } else {
+          doc.save(fileName);
+          toast({ title: "Share not supported, downloaded instead", description: fileName });
+        }
+      } else if (isAndroidWebView) {
         // Android: try JS bridge first, fallback to print dialog
         try {
           const base64 = doc.output('dataurlstring').split(',')[1];
@@ -2345,6 +2372,21 @@ window.onload = function() {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => generateDirectPDF('share')}
+                      data-testid="share-pdf-btn"
+                      className={`text-xs h-7 px-2 ${
+                        isDarkMode 
+                          ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                          : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+                      }`}
+                      title="Share PDF (WhatsApp / Email / Drive)"
+                    >
+                      <Share2 className="w-3 h-3 mr-1" />
+                      Share
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => setNotesOpen(true)}
                       className={`text-xs h-7 px-2 ${
                         isDarkMode 
@@ -2359,7 +2401,7 @@ window.onload = function() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={generateDirectPDF}
+                      onClick={() => generateDirectPDF('open')}
                       className={`text-xs h-7 px-2 ${
                         isDarkMode 
                           ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 

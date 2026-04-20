@@ -225,6 +225,49 @@ public class MainActivity extends AppCompatActivity {
             openPdfWithViewer(base64Data, fileName);
         }
 
+        /**
+         * Generates the PDF, saves it, and immediately launches an ACTION_SEND chooser
+         * (WhatsApp / Email / Drive / Bluetooth / etc.) so the user can forward the
+         * daily report in one tap.
+         */
+        @JavascriptInterface
+        public void sharePdf(String base64Data, String fileName) {
+            try {
+                byte[] pdfBytes = Base64.decode(base64Data, Base64.DEFAULT);
+
+                // Also drop a copy into public Downloads so it's archived
+                savePdfToDownloads(pdfBytes, fileName);
+
+                // Write to app-private folder for FileProvider share
+                File dir = new File(getExternalFilesDir(null), "MPumpCalc");
+                if (!dir.exists()) dir.mkdirs();
+                File file = new File(dir, fileName);
+                try (FileOutputStream fos = new FileOutputStream(file)) {
+                    fos.write(pdfBytes);
+                }
+
+                Uri uri = FileProvider.getUriForFile(
+                    MainActivity.this,
+                    getPackageName() + ".fileprovider",
+                    file
+                );
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("application/pdf");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, fileName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, "Daily Report - " + fileName);
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                Intent chooser = Intent.createChooser(shareIntent, "Share PDF via");
+                chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(chooser);
+            } catch (Exception e) {
+                Log.e(TAG, "Share PDF error: " + e.getMessage(), e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Share failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }
+
         @JavascriptInterface
         public void showToast(String message) {
             runOnUiThread(() -> Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show());
