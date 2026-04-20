@@ -509,66 +509,77 @@ class LocalStorageService {
   }
 
   exportAllData() {
+    // Export 100% of all data
     const stockData = {};
-    if (this.keys) {
-      const fuelSettings = this.getFuelSettings() || {};
-      Object.keys(fuelSettings).forEach(fuelType => {
-        const storageKey = `${fuelType.toLowerCase()}StockData`;
-        const data = this.getItem(storageKey);
-        if (data) stockData[storageKey] = data;
-      });
-    }
-    const contactInfo = localStorage.getItem(nsKey('mpump_contact_info'));
-    const notes = localStorage.getItem(nsKey('mpp_notes'));
-    const onlineUrl = localStorage.getItem(nsKey('mpump_online_url'));
-    const autoBackupSettings = localStorage.getItem(nsKey('mpump_auto_backup_settings'));
-    const weeklyBackupSettings = localStorage.getItem(nsKey('mpump_auto_backup_weekly_settings'));
-    const textSize = localStorage.getItem(nsKey('appTextSize'));
-    const theme = localStorage.getItem(nsKey('appTheme'));
+    const fuelSettings = this.getFuelSettings() || {};
+    Object.keys(fuelSettings).forEach(fuelType => {
+      const storageKey = `${fuelType.toLowerCase()}StockData`;
+      const data = this.getItem(storageKey);
+      if (data) stockData[storageKey] = data;
+    });
 
     return {
+      // Core data
       salesData: this.getSalesData(),
       creditData: this.getCreditData(),
       incomeData: this.getIncomeData(),
       expenseData: this.getExpenseData(),
-      fuelSettings: this.getFuelSettings(),
       customers: this.getCustomers(),
       payments: this.getPayments(),
       settlements: this.getSettlements(),
+      // Settings & types
+      fuelSettings: this.getFuelSettings(),
       settlementTypes: this.getSettlementTypes(),
       incomeCategories: this.getIncomeCategories(),
       expenseCategories: this.getExpenseCategories(),
+      rates: this.getAllRates(),
+      // History
+      incomeDescHistory: this.getItem(this.keys.incomeDescHistory) || [],
+      expenseDescHistory: this.getItem(this.keys.expenseDescHistory) || [],
+      // Stock
       stockData,
-      contactInfo: contactInfo ? JSON.parse(contactInfo) : null,
-      notes: notes || '',
-      onlineUrl: onlineUrl || '',
-      autoBackupSettings: autoBackupSettings ? JSON.parse(autoBackupSettings) : null,
-      weeklyBackupSettings: weeklyBackupSettings ? JSON.parse(weeklyBackupSettings) : null,
-      appPreferences: { textSize: textSize || '100', theme: theme || 'light' },
+      // App settings
+      contactInfo: (() => { try { const v = localStorage.getItem(nsKey('mpump_contact_info')); return v ? JSON.parse(v) : null; } catch(e) { return null; } })(),
+      notes: localStorage.getItem(nsKey('mpp_notes')) || '',
+      onlineUrl: localStorage.getItem(nsKey('mpump_online_url')) || '',
+      autoBackupSettings: (() => { try { const v = localStorage.getItem(nsKey('mpump_auto_backup_settings')); return v ? JSON.parse(v) : null; } catch(e) { return null; } })(),
+      weeklyBackupSettings: (() => { try { const v = localStorage.getItem(nsKey('mpump_auto_backup_weekly_settings')); return v ? JSON.parse(v) : null; } catch(e) { return null; } })(),
+      appPreferences: {
+        textSize: localStorage.getItem(nsKey('appTextSize')) || '100',
+        theme: localStorage.getItem(nsKey('appTheme')) || 'light'
+      },
       exportDate: new Date().toISOString(),
-      version: '2.1'
+      version: '2.2'
     };
   }
 
   importAllData(data) {
     try {
+      // Core data - full overwrite
       if (data.salesData) this.setSalesData(data.salesData);
       if (data.creditData) this.setCreditData(data.creditData);
       if (data.incomeData) this.setIncomeData(data.incomeData);
       if (data.expenseData) this.setExpenseData(data.expenseData);
-      if (data.fuelSettings) this.setFuelSettings(data.fuelSettings);
       if (data.customers) this.setCustomers(data.customers);
       if (data.payments) this.setPayments(data.payments);
       if (data.settlements) this.setSettlements(data.settlements);
+      // Settings & types
+      if (data.fuelSettings) this.setFuelSettings(data.fuelSettings);
       if (data.settlementTypes) this.setSettlementTypes(data.settlementTypes);
       if (data.incomeCategories) this.setIncomeCategories(data.incomeCategories);
       if (data.expenseCategories) this.setExpenseCategories(data.expenseCategories);
-      if (data.stockData) { Object.keys(data.stockData).forEach(key => { localStorage.setItem(nsKey(key), JSON.stringify(data.stockData[key])); }); }
-      if (data.contactInfo) { localStorage.setItem(nsKey('mpump_contact_info'), JSON.stringify(data.contactInfo)); }
-      if (data.notes !== undefined) { localStorage.setItem(nsKey('mpp_notes'), data.notes); }
-      if (data.onlineUrl !== undefined) { localStorage.setItem(nsKey('mpump_online_url'), data.onlineUrl); }
-      if (data.autoBackupSettings) { localStorage.setItem(nsKey('mpump_auto_backup_settings'), JSON.stringify(data.autoBackupSettings)); }
-      if (data.weeklyBackupSettings) { localStorage.setItem(nsKey('mpump_auto_backup_weekly_settings'), JSON.stringify(data.weeklyBackupSettings)); }
+      if (data.rates) this.setAllRates(data.rates);
+      // History
+      if (data.incomeDescHistory) this.setItem(this.keys.incomeDescHistory, data.incomeDescHistory);
+      if (data.expenseDescHistory) this.setItem(this.keys.expenseDescHistory, data.expenseDescHistory);
+      // Stock
+      if (data.stockData) { Object.keys(data.stockData).forEach(key => { this.setItem(key, data.stockData[key]); }); }
+      // App settings
+      if (data.contactInfo) localStorage.setItem(nsKey('mpump_contact_info'), JSON.stringify(data.contactInfo));
+      if (data.notes !== undefined) localStorage.setItem(nsKey('mpp_notes'), data.notes);
+      if (data.onlineUrl !== undefined) localStorage.setItem(nsKey('mpump_online_url'), data.onlineUrl);
+      if (data.autoBackupSettings) localStorage.setItem(nsKey('mpump_auto_backup_settings'), JSON.stringify(data.autoBackupSettings));
+      if (data.weeklyBackupSettings) localStorage.setItem(nsKey('mpump_auto_backup_weekly_settings'), JSON.stringify(data.weeklyBackupSettings));
       if (data.appPreferences) {
         if (data.appPreferences.textSize) localStorage.setItem(nsKey('appTextSize'), data.appPreferences.textSize);
         if (data.appPreferences.theme) localStorage.setItem(nsKey('appTheme'), data.appPreferences.theme);
@@ -586,52 +597,82 @@ class LocalStorageService {
       console.log('mergeAllData: Namespace:', ACTIVE_NAMESPACE);
       console.log('mergeAllData: Import keys:', Object.keys(importedData));
       
-      const mergeArrays = (existingArray, newArray) => {
-        if (!Array.isArray(existingArray)) existingArray = [];
-        if (!Array.isArray(newArray)) newArray = [];
-        const existingIds = new Set(existingArray.map(item => item.id));
-        const itemsToAdd = newArray.filter(item => !existingIds.has(item.id));
-        console.log(`mergeAllData: existing=${existingArray.length}, new=${newArray.length}, adding=${itemsToAdd.length}`);
-        return [...existingArray, ...itemsToAdd];
+      // Merge arrays by ID - current data takes preference (existing items kept, new items added)
+      const mergeArrays = (existing, incoming) => {
+        if (!Array.isArray(existing)) existing = [];
+        if (!Array.isArray(incoming)) incoming = [];
+        const existingIds = new Set(existing.map(item => item.id));
+        const newItems = incoming.filter(item => !existingIds.has(item.id));
+        console.log('mergeAllData: existing=' + existing.length + ', incoming=' + incoming.length + ', adding=' + newItems.length);
+        return [...existing, ...newItems];
       };
 
-      if (importedData.salesData) { console.log('mergeAllData: Merging salesData'); this.setSalesData(mergeArrays(this.getSalesData(), importedData.salesData)); }
-      if (importedData.creditData) { console.log('mergeAllData: Merging creditData'); this.setCreditData(mergeArrays(this.getCreditData(), importedData.creditData)); }
-      if (importedData.incomeData) { console.log('mergeAllData: Merging incomeData'); this.setIncomeData(mergeArrays(this.getIncomeData(), importedData.incomeData)); }
-      if (importedData.expenseData) { console.log('mergeAllData: Merging expenseData'); this.setExpenseData(mergeArrays(this.getExpenseData(), importedData.expenseData)); }
-      if (importedData.customers) { console.log('mergeAllData: Merging customers'); this.setCustomers(mergeArrays(this.getCustomers(), importedData.customers)); }
-      if (importedData.payments) { console.log('mergeAllData: Merging payments'); this.setPayments(mergeArrays(this.getPayments(), importedData.payments)); }
-      if (importedData.settlements) { console.log('mergeAllData: Merging settlements'); this.setSettlements(mergeArrays(this.getSettlements(), importedData.settlements)); }
-      if (importedData.settlementTypes) { console.log('mergeAllData: Merging settlementTypes'); this.setSettlementTypes(mergeArrays(this.getSettlementTypes(), importedData.settlementTypes)); }
-      if (importedData.incomeCategories) { console.log('mergeAllData: Merging incomeCategories'); this.setIncomeCategories(mergeArrays(this.getIncomeCategories(), importedData.incomeCategories)); }
-      if (importedData.expenseCategories) { console.log('mergeAllData: Merging expenseCategories'); this.setExpenseCategories(mergeArrays(this.getExpenseCategories(), importedData.expenseCategories)); }
+      // Core data - merge by ID (current data kept, new records added)
+      if (importedData.salesData) this.setSalesData(mergeArrays(this.getSalesData(), importedData.salesData));
+      if (importedData.creditData) this.setCreditData(mergeArrays(this.getCreditData(), importedData.creditData));
+      if (importedData.incomeData) this.setIncomeData(mergeArrays(this.getIncomeData(), importedData.incomeData));
+      if (importedData.expenseData) this.setExpenseData(mergeArrays(this.getExpenseData(), importedData.expenseData));
+      if (importedData.customers) this.setCustomers(mergeArrays(this.getCustomers(), importedData.customers));
+      if (importedData.payments) this.setPayments(mergeArrays(this.getPayments(), importedData.payments));
+      if (importedData.settlements) this.setSettlements(mergeArrays(this.getSettlements(), importedData.settlements));
 
-      if (importedData.fuelSettings && !this.getFuelSettings()) this.setFuelSettings(importedData.fuelSettings);
+      // Settings & types - merge by ID (add new types, keep existing)
+      if (importedData.settlementTypes) this.setSettlementTypes(mergeArrays(this.getSettlementTypes(), importedData.settlementTypes));
+      if (importedData.incomeCategories) this.setIncomeCategories(mergeArrays(this.getIncomeCategories(), importedData.incomeCategories));
+      if (importedData.expenseCategories) this.setExpenseCategories(mergeArrays(this.getExpenseCategories(), importedData.expenseCategories));
 
+      // Fuel settings - keep current if exists, use imported if not
+      if (importedData.fuelSettings) {
+        const current = this.getFuelSettings();
+        if (!current || Object.keys(current).length === 0) {
+          this.setFuelSettings(importedData.fuelSettings);
+        }
+      }
+
+      // Rates - merge by date key (current takes preference)
+      if (importedData.rates) {
+        const currentRates = this.getAllRates() || {};
+        const mergedRates = { ...importedData.rates, ...currentRates };
+        this.setAllRates(mergedRates);
+      }
+
+      // Description history - merge unique values
+      if (importedData.incomeDescHistory) {
+        const current = this.getItem(this.keys.incomeDescHistory) || [];
+        const merged = [...new Set([...current, ...importedData.incomeDescHistory])];
+        this.setItem(this.keys.incomeDescHistory, merged);
+      }
+      if (importedData.expenseDescHistory) {
+        const current = this.getItem(this.keys.expenseDescHistory) || [];
+        const merged = [...new Set([...current, ...importedData.expenseDescHistory])];
+        this.setItem(this.keys.expenseDescHistory, merged);
+      }
+
+      // Stock data - merge by date (current takes preference)
       if (importedData.stockData) {
         Object.keys(importedData.stockData).forEach(key => {
           const existing = this.getItem(key);
           if (!existing) {
             this.setItem(key, importedData.stockData[key]);
           } else {
-            // Merge stock data by date - keep existing dates, add new ones
             const merged = { ...importedData.stockData[key], ...existing };
             this.setItem(key, merged);
           }
         });
       }
 
+      // App settings - keep current if exists, use imported only if current is missing
       if (importedData.contactInfo && !localStorage.getItem(nsKey('mpump_contact_info'))) localStorage.setItem(nsKey('mpump_contact_info'), JSON.stringify(importedData.contactInfo));
       if (importedData.notes !== undefined && !localStorage.getItem(nsKey('mpp_notes'))) localStorage.setItem(nsKey('mpp_notes'), importedData.notes);
       if (importedData.onlineUrl !== undefined && !localStorage.getItem(nsKey('mpump_online_url'))) localStorage.setItem(nsKey('mpump_online_url'), importedData.onlineUrl);
       if (importedData.autoBackupSettings && !localStorage.getItem(nsKey('mpump_auto_backup_settings'))) localStorage.setItem(nsKey('mpump_auto_backup_settings'), JSON.stringify(importedData.autoBackupSettings));
       if (importedData.weeklyBackupSettings && !localStorage.getItem(nsKey('mpump_auto_backup_weekly_settings'))) localStorage.setItem(nsKey('mpump_auto_backup_weekly_settings'), JSON.stringify(importedData.weeklyBackupSettings));
-
       if (importedData.appPreferences) {
         if (importedData.appPreferences.textSize && !localStorage.getItem(nsKey('appTextSize'))) localStorage.setItem(nsKey('appTextSize'), importedData.appPreferences.textSize);
         if (importedData.appPreferences.theme && !localStorage.getItem(nsKey('appTheme'))) localStorage.setItem(nsKey('appTheme'), importedData.appPreferences.theme);
       }
 
+      console.log('mergeAllData: Merge completed successfully');
       return true;
     } catch (error) {
       console.error('Failed to merge data:', error);
