@@ -2739,12 +2739,11 @@ window.onload = function() {
                 </span>
                 {fuelSettings && Object.keys(fuelSettings).map((fuelType, index) => {
                   const storageKey = `${fuelType.toLowerCase()}StockData`;
-                  const savedData = localStorage.getItem(storageKey);
+                  const savedData = localStorageService.getItem(storageKey);
                   let startStock = 0;
                   
                   if (savedData) {
-                    const allStockData = JSON.parse(savedData);
-                    const dateData = allStockData[selectedDate];
+                    const dateData = savedData[selectedDate];
                     if (dateData) {
                       startStock = dateData.startStock || 0;
                     }
