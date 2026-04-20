@@ -473,6 +473,7 @@ const ZAPTRStyleCalculator = () => {
     const totalAvailableCash = cashInHand + mppCash;
     
     const totalLiters = todaySales.reduce((sum, sale) => sum + sale.liters, 0);
+    const totalFuelAmount = todaySales.filter(sale => sale.type === 'cash' || !sale.type).reduce((sum, sale) => sum + sale.amount, 0);
     
     // Total income is fuel sales + other income
     const totalIncome = fuelCashSales + otherIncome;
@@ -488,7 +489,8 @@ const ZAPTRStyleCalculator = () => {
       hasMPPData,
       creditAmount: creditTotalAmount,
       creditLiters,
-      totalLiters, 
+      totalLiters,
+      totalFuelAmount,
       totalSales: fuelCashSales + creditTotalAmount,
       otherIncome,
       otherIncomeNoMPP,
@@ -2833,7 +2835,7 @@ window.onload = function() {
                     <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
                       isDarkMode ? 'text-white' : 'text-slate-800'
                     }`}>
-                      {stats.fuelLitersNoMPP.toFixed(2)}L • ₹{stats.fuelSalesNoMPP.toFixed(2)}
+                      {stats.totalLiters.toFixed(2)}L • ₹{stats.totalFuelAmount.toFixed(2)}
                     </div>
                   </div>
                 </div>
