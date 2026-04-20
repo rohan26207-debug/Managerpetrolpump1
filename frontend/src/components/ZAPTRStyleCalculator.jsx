@@ -2722,74 +2722,46 @@ window.onload = function() {
           </Card>
         )}
 
-        {/* Stock Details Section - Between Operating Date and Add Stock */}
+        {/* Stock Summary - Single line showing start stock */}
         {parentTab === 'today' && (
           <Card key={`stock-summary-${stockDataVersion}`} className={`${
             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
           } shadow-lg mb-2`}>
             <CardContent className="p-2 sm:p-3">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Package className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${
                   isDarkMode ? 'text-purple-400' : 'text-purple-600'
                 }`} />
                 <span className={`text-xs sm:text-sm font-semibold ${
                   isDarkMode ? 'text-gray-300' : 'text-slate-600'
                 }`}>
-                  STOCK
+                  STOCK:
                 </span>
-              </div>
-              {fuelSettings && (() => {
-                const fuelTypes = Object.keys(fuelSettings);
-                const stockRows = fuelTypes.map(fuelType => {
+                {fuelSettings && Object.keys(fuelSettings).map((fuelType, index) => {
                   const storageKey = `${fuelType.toLowerCase()}StockData`;
                   const savedData = localStorage.getItem(storageKey);
-                  let startStock = 0, purchase = 0, endStock = 0;
+                  let startStock = 0;
                   
                   if (savedData) {
                     const allStockData = JSON.parse(savedData);
                     const dateData = allStockData[selectedDate];
                     if (dateData) {
                       startStock = dateData.startStock || 0;
-                      purchase = dateData.purchase || 0;
-                      endStock = dateData.endStock || 0;
                     }
                   }
                   
-                  // Get sales for this fuel type (excluding MPP)
-                  const fuelSalesLiters = salesData
-                    .filter(s => s.date === selectedDate && s.fuelType === fuelType && !s.mpp)
-                    .reduce((sum, s) => sum + (parseFloat(s.liters) || 0), 0);
-
-                  return { fuelType, startStock, purchase, sales: fuelSalesLiters, endStock };
-                });
-
-                return (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs sm:text-sm">
-                      <thead>
-                        <tr className={`${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
-                          <th className="text-left py-1 px-1 font-semibold">Fuel</th>
-                          <th className="text-right py-1 px-1 font-semibold">Start</th>
-                          <th className="text-right py-1 px-1 font-semibold">Purchase</th>
-                          <th className="text-right py-1 px-1 font-semibold">Sales</th>
-                          <th className="text-right py-1 px-1 font-semibold">End</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {stockRows.map(row => (
-                          <tr key={row.fuelType} className={`border-t ${isDarkMode ? 'border-gray-700' : 'border-slate-100'}`}>
-                            <td className={`py-1 px-1 font-medium ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{row.fuelType}</td>
-                            <td className={`text-right py-1 px-1 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{row.startStock.toFixed(0)}</td>
-                            <td className={`text-right py-1 px-1 text-green-600 font-medium`}>{row.purchase.toFixed(0)}</td>
-                            <td className={`text-right py-1 px-1 text-red-600 font-medium`}>{row.sales.toFixed(2)}</td>
-                            <td className={`text-right py-1 px-1 font-bold ${row.endStock < 0 ? 'text-red-600' : isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{row.endStock.toFixed(0)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                );
-              })()}
+                  return (
+                    <span 
+                      key={fuelType}
+                      className={`text-xs sm:text-sm font-medium ${
+                        isDarkMode ? 'text-white' : 'text-slate-800'
+                      }`}
+                    >
+                      {fuelType}-{startStock.toFixed(0)} L{index < Object.keys(fuelSettings).length - 1 ? ', ' : ''}
+                    </span>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
         )}
