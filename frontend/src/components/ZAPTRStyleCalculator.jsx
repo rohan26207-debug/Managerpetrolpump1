@@ -1283,8 +1283,13 @@ const ZAPTRStyleCalculator = () => {
       const doc = new jsPDF({
         orientation: pdfSettings.orientation,
         unit: 'mm',
-        format: pdfSettings.pageSize
+        format: pdfSettings.pageSize,
+        compress: true,
+        putOnlyUsedFonts: true
       });
+
+      // Minimal table styling defaults
+      const tableDefaults = { lineWidth: 0.1, lineColor: [0, 0, 0], cellPadding: 1 };
 
       // Set font
       doc.setFontSize(16);
@@ -1394,7 +1399,7 @@ const ZAPTRStyleCalculator = () => {
           ]],
           body: summaryData,
           theme: 'grid',
-          styles: { fontSize: 7, cellPadding: 1.5 },
+          styles: { ...tableDefaults, fontSize: 7 },
           headStyles: { fillColor: false, textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 7 },
           columnStyles: {
             0: { cellWidth: 55 },
@@ -1436,7 +1441,7 @@ const ZAPTRStyleCalculator = () => {
           head: [['Nozzle', 'Fuel', 'Start', 'End', 'Testing', 'Liters', 'Rate', 'Amount']],
           body: salesTableData,
           theme: 'grid',
-          styles: { fontSize: 7, cellPadding: 1.5 },
+          styles: { ...tableDefaults, fontSize: 7 },
           headStyles: { fillColor: false, textColor: [0, 0, 0], fontStyle: 'bold' },
           columnStyles: {
             0: { halign: 'center', cellWidth: 14 },
@@ -1484,7 +1489,7 @@ const ZAPTRStyleCalculator = () => {
           head: [['Customer', 'Vehicle', 'Fuel Type', 'Liters', 'Rate', 'Amount']],
           body: creditTableData,
           theme: 'grid',
-          styles: { fontSize: 7, cellPadding: 1.5 },
+          styles: { ...tableDefaults, fontSize: 7 },
           headStyles: { fillColor: false, textColor: [0, 0, 0], fontStyle: 'bold' },
           columnStyles: {
             1: { halign: 'center' },
@@ -1617,7 +1622,7 @@ const ZAPTRStyleCalculator = () => {
           head: [['Customer', 'Payment Type', 'Settlement Type', 'Amount']],
           body: receiptTableData,
           theme: 'grid',
-          styles: { fontSize: 7, cellPadding: 1.5 },
+          styles: { ...tableDefaults, fontSize: 7 },
           headStyles: { fillColor: false, textColor: [0, 0, 0], fontStyle: 'bold' },
           columnStyles: {
             0: { cellWidth: 40 },
@@ -1705,7 +1710,7 @@ const ZAPTRStyleCalculator = () => {
         head: [['Payment Mode', 'Amount']],
         body: bankSettlementData,
         theme: 'plain',
-        styles: { fontSize: 10, cellPadding: 3 },
+        styles: { ...tableDefaults, fontSize: 10 },
         headStyles: { textColor: [0, 0, 0], fontStyle: 'bold' },
         columnStyles: {
           0: { cellWidth: 80 },
@@ -2031,7 +2036,10 @@ window.onload = function() {
       const currentStats = stats;
 
       // Create PDF using jsPDF
-      const doc = new jsPDF();
+      const doc = new jsPDF({ compress: true, putOnlyUsedFonts: true });
+
+      // Minimal table styling defaults
+      const tableDefaults = { lineWidth: 0.1, lineColor: [0, 0, 0], cellPadding: 1 };
       let yPos = 20;
 
       // Title
@@ -2175,7 +2183,7 @@ window.onload = function() {
           body: salesTableData,
           theme: 'grid',
           headStyles: { fillColor: false, textColor: [0, 0, 0] },
-          styles: { fontSize: 9 }
+          styles: { ...tableDefaults, fontSize: 9 }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
@@ -2208,7 +2216,7 @@ window.onload = function() {
           body: creditTableData,
           theme: 'grid',
           headStyles: { fillColor: false, textColor: [0, 0, 0] },
-          styles: { fontSize: 9 }
+          styles: { ...tableDefaults, fontSize: 9 }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
@@ -2240,7 +2248,7 @@ window.onload = function() {
           body: settlementTableData,
           theme: 'grid',
           headStyles: { fillColor: false, textColor: [0, 0, 0] },
-          styles: { fontSize: 9 }
+          styles: { ...tableDefaults, fontSize: 9 }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
@@ -2270,7 +2278,7 @@ window.onload = function() {
           body: incomeTableData,
           theme: 'grid',
           headStyles: { fillColor: false, textColor: [0, 0, 0] },
-          styles: { fontSize: 9 }
+          styles: { ...tableDefaults, fontSize: 9 }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
@@ -2300,7 +2308,7 @@ window.onload = function() {
           body: expenseTableData,
           theme: 'grid',
           headStyles: { fillColor: false, textColor: [0, 0, 0] },
-          styles: { fontSize: 9 }
+          styles: { ...tableDefaults, fontSize: 9 }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
@@ -2329,7 +2337,7 @@ window.onload = function() {
           body: receiptTableData,
           theme: 'grid',
           headStyles: { fillColor: false, textColor: [0, 0, 0] },
-          styles: { fontSize: 9 }
+          styles: { ...tableDefaults, fontSize: 9 }
         });
 
         yPos = doc.lastAutoTable.finalY + 10;
@@ -2405,7 +2413,7 @@ window.onload = function() {
         body: bankSettlementData,
         theme: 'plain',
         headStyles: { textColor: [0, 0, 0] },
-        styles: { fontSize: 10 }
+        styles: { ...tableDefaults, fontSize: 10 }
       });
 
       yPos = doc.lastAutoTable.finalY + 10;
