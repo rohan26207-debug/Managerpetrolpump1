@@ -1436,7 +1436,6 @@ const ZAPTRStyleCalculator = () => {
           toast({ title: "PDF Generated", description: 'Opening ' + fileName });
         } catch (bridgeError) {
           console.warn('JS bridge failed, using print dialog:', bridgeError);
-          // Fallback: open HTML print dialog (same as Balance tab)
           const pdfBlob = doc.output('bloburl');
           const printWindow = window.open('', '_blank');
           if (printWindow) {
@@ -1445,9 +1444,11 @@ const ZAPTRStyleCalculator = () => {
           }
         }
       } else {
-        // Desktop browser: direct download (small file)
+        // Desktop browser: download small file + open print dialog for "Save as PDF"
         doc.save(fileName);
         toast({ title: "PDF Downloaded", description: fileName });
+        // Also open print window like Balance tab
+        exportToPDF();
       }
     } catch (error) {
       console.error('PDF error:', error);
