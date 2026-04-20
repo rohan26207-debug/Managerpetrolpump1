@@ -2806,10 +2806,10 @@ window.onload = function() {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg mb-2`}>
           <CardContent className="p-2 sm:p-3">
-            <div className="grid grid-cols-1 gap-3">
-              {/* Summary Column */}
+            <div className="grid grid-cols-2 gap-3">
+              {/* LEFT COLUMN - Summary */}
               <div className="space-y-1.5 sm:space-y-2">
-                {/* Summary Header for Left Column */}
+                {/* Summary Header */}
                 <h2 className={`text-lg sm:text-2xl font-bold mb-2 ${
                   isDarkMode ? 'text-white' : 'text-slate-800'
                 }`}>
@@ -2952,6 +2952,48 @@ window.onload = function() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* RIGHT COLUMN - Fuel Type Breakdown */}
+              <div className="space-y-1.5 sm:space-y-2">
+                <h2 className={`text-lg sm:text-2xl font-bold mb-2 ${
+                  isDarkMode ? 'text-white' : 'text-slate-800'
+                }`}>
+                  Fuel Litres
+                </h2>
+                {fuelSettings && Object.keys(fuelSettings).map((fuelType, index) => {
+                  const fuelData = stats.fuelSalesByType[fuelType] || { liters: 0, amount: 0 };
+                  const colors = ['bg-blue-600', 'bg-green-600', 'bg-orange-600', 'bg-red-600', 'bg-purple-600', 'bg-teal-600'];
+                  const bgColors = [
+                    isDarkMode ? 'bg-gray-700' : 'bg-blue-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-green-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-orange-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-red-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-purple-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-teal-50'
+                  ];
+                  return (
+                    <div key={fuelType} className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${bgColors[index % bgColors.length]}`}>
+                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                        <div className={`w-6 h-6 sm:w-8 sm:h-8 ${colors[index % colors.length]} rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0`}>
+                          {fuelType.charAt(0)}
+                        </div>
+                        <span className={`font-medium text-xs sm:text-base truncate ${
+                          isDarkMode ? 'text-white' : 'text-slate-800'
+                        }`}>
+                          {fuelType}
+                        </span>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
+                          isDarkMode ? 'text-white' : 'text-slate-800'
+                        }`}>
+                          {fuelData.liters.toFixed(2)} L
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </CardContent>

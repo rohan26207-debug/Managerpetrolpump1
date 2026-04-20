@@ -77,6 +77,11 @@ const UnifiedRecords = ({
           <Badge className="bg-purple-100 text-purple-800 border-0 text-xs">
             {sale.fuelType}
           </Badge>
+          {sale.mpp && (
+            <Badge data-testid="mpp-tag-badge" className="bg-amber-100 text-amber-800 border-0 text-xs font-bold">
+              MPP
+            </Badge>
+          )}
           <div className="flex items-center gap-1 text-green-600 font-bold">
             <IndianRupee className="w-4 h-4" />
             <span className="text-base sm:text-lg">{sale.amount.toFixed(2)}</span>
