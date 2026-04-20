@@ -708,7 +708,7 @@ class LocalStorageService {
   setPayments(payments) { return this.setItem(this.keys.payments, payments); }
   addPayment(paymentData) {
     const payments = this.getPayments();
-    const newPayment = { id: Date.now().toString(), customerId: paymentData.customerId, customerName: paymentData.customerName, amount: parseFloat(paymentData.amount), date: paymentData.date, mode: paymentData.mode || 'cash', timestamp: new Date().toISOString(), linkedMPPCreditId: paymentData.linkedMPPCreditId || null, linkedMPPSettlementId: paymentData.linkedMPPSettlementId || null, isAutoMPPTracking: paymentData.isAutoMPPTracking || false, description: paymentData.description || null };
+    const newPayment = { id: Date.now().toString(), customerId: paymentData.customerId, customerName: paymentData.customerName, amount: parseFloat(paymentData.amount), date: paymentData.date, mode: paymentData.mode || 'cash', paymentType: paymentData.paymentType || '', settlementType: paymentData.settlementType || '', timestamp: new Date().toISOString(), linkedMPPCreditId: paymentData.linkedMPPCreditId || null, linkedMPPSettlementId: paymentData.linkedMPPSettlementId || null, isAutoMPPTracking: paymentData.isAutoMPPTracking || false, description: paymentData.description || null };
     payments.push(newPayment);
     this.setPayments(payments);
     return newPayment;
@@ -717,7 +717,7 @@ class LocalStorageService {
     const payments = this.getPayments();
     const index = payments.findIndex(p => p.id === id);
     if (index !== -1) {
-      payments[index] = { ...payments[index], customerId: paymentData.customerId, customerName: paymentData.customerName, amount: parseFloat(paymentData.amount), date: paymentData.date, mode: paymentData.mode || payments[index].mode || 'cash', timestamp: new Date().toISOString() };
+      payments[index] = { ...payments[index], customerId: paymentData.customerId, customerName: paymentData.customerName, amount: parseFloat(paymentData.amount), date: paymentData.date, mode: paymentData.mode || payments[index].mode || 'cash', paymentType: paymentData.paymentType || payments[index].paymentType || '', settlementType: paymentData.settlementType || payments[index].settlementType || '', timestamp: new Date().toISOString() };
       this.setPayments(payments);
       return payments[index];
     }
