@@ -1468,9 +1468,26 @@ const ZAPTRStyleCalculator = () => {
           }
         }
       } else {
-        // Desktop browser: download the exact same jsPDF file (no second print dialog)
+        // Desktop browser: (1) download the jsPDF file, (2) open a print window
+        // showing the SAME PDF so "Save as PDF" from that window yields identical output.
         doc.save(fileName);
         toast({ title: "PDF Downloaded", description: fileName });
+
+        const pdfBlobUrl = doc.output('bloburl');
+        const printWindow = window.open('', '_blank', 'width=900,height=700');
+        if (printWindow) {
+          printWindow.document.write(
+            '<!DOCTYPE html><html><head><title>' + fileName + '</title>' +
+            '<style>html,body{margin:0;padding:0;height:100%;width:100%;overflow:hidden;background:#525659}' +
+            'iframe{border:0;width:100%;height:100%}</style></head>' +
+            '<body><iframe id="pdfFrame" src="' + pdfBlobUrl + '"></iframe>' +
+            '<script>' +
+            'var f=document.getElementById("pdfFrame");' +
+            'f.onload=function(){setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print();}catch(e){window.print();}},400);};' +
+            '</script></body></html>'
+          );
+          printWindow.document.close();
+        }
       }
     } catch (error) {
       console.error('PDF error:', error);
