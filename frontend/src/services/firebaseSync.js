@@ -447,7 +447,7 @@ class FirebaseSyncService {
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
-          if (data.deviceId === this.deviceId && change.type !== 'removed') return;
+          if (data.deviceId === this.deviceId) return;
           localStorageService.setFuelSettings(data.settings);
           uidDetailEvent();
         }
@@ -461,7 +461,7 @@ class FirebaseSyncService {
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
-          if (data.deviceId === this.deviceId && change.type !== 'removed') return;
+          if (data.deviceId === this.deviceId) return;
           localStorageService.setSettlementTypes(data.types);
           uidDetailEvent();
         }
@@ -475,7 +475,7 @@ class FirebaseSyncService {
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
-          if (data.deviceId === this.deviceId && change.type !== 'removed') return;
+          if (data.deviceId === this.deviceId) return;
           localStorageService.setIncomeCategories(data.categories);
           uidDetailEvent();
         }
@@ -489,7 +489,7 @@ class FirebaseSyncService {
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
-          if (data.deviceId === this.deviceId && change.type !== 'removed') return;
+          if (data.deviceId === this.deviceId) return;
           localStorageService.setExpenseCategories(data.categories);
           uidDetailEvent();
         }
