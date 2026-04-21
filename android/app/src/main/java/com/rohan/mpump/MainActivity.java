@@ -177,16 +177,23 @@ public class MainActivity extends AppCompatActivity {
 
         /**
          * Writes the PDF to the public Downloads directory.
-         * - Android 10+ (API 29): MediaStore.Downloads (no permission needed)
-         * - Android 9 and below : Environment.DIRECTORY_DOWNLOADS (WRITE_EXTERNAL_STORAGE already granted at install for maxSdk=28)
          * Returns the user-visible path on success, null on failure.
          */
         private String savePdfToDownloads(byte[] pdfBytes, String fileName) {
+            return saveBytesToDownloads(pdfBytes, fileName, "application/pdf");
+        }
+
+        /**
+         * Writes any bytes to the public Downloads/MPumpCalc/ directory.
+         * - Android 10+ (API 29): MediaStore.Downloads (no permission needed)
+         * - Android 9 and below : Environment.DIRECTORY_DOWNLOADS (WRITE_EXTERNAL_STORAGE already granted at install for maxSdk=28)
+         */
+        private String saveBytesToDownloads(byte[] bytes, String fileName, String mimeType) {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
-                    values.put(MediaStore.Downloads.MIME_TYPE, "application/pdf");
+                    values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
                     values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/MPumpCalc");
                     values.put(MediaStore.Downloads.IS_PENDING, 1);
 
@@ -196,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
                     try (OutputStream os = getContentResolver().openOutputStream(itemUri)) {
                         if (os == null) return null;
-                        os.write(pdfBytes);
+                        os.write(bytes);
                         os.flush();
                     }
 
@@ -210,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!downloads.exists()) downloads.mkdirs();
                     File target = new File(downloads, fileName);
                     try (FileOutputStream fos = new FileOutputStream(target)) {
-                        fos.write(pdfBytes);
+                        fos.write(bytes);
                     }
                     return "Downloads/MPumpCalc/" + fileName;
                 }
@@ -223,6 +230,26 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public void savePdf(String base64Data, String fileName) {
             openPdfWithViewer(base64Data, fileName);
+        }
+
+        /**
+         * Generic downloader for any file type (JSON backup, etc.).
+         * Saves to public Downloads/MPumpCalc/ so the user sees it in the system
+         * Downloads app. Does NOT launch a viewer.
+         */
+        @JavascriptInterface
+        public void saveFileToDownloads(String base64Data, String fileName, String mimeType) {
+            try {
+                byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
+                String location = saveBytesToDownloads(bytes, fileName, mimeType != null ? mimeType : "application/octet-stream");
+                final String msg = location != null
+                    ? "Downloaded: " + location
+                    : "Saved: " + fileName;
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show());
+            } catch (Exception e) {
+                Log.e(TAG, "saveFileToDownloads error: " + e.getMessage(), e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "Save failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
         }
 
         /**

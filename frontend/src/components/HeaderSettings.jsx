@@ -1327,8 +1327,24 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                               const backupData = localStorageService.exportAllData();
                               const dataStr = JSON.stringify(backupData, null, 2);
                               const fileName = `mpump-backup-${new Date().toISOString().split('T')[0]}.json`;
-                              
-                              // Simple download method - works everywhere
+
+                              // Android WebView: route through native bridge so file lands in public Downloads
+                              if (typeof window.MPumpCalcAndroid !== 'undefined' &&
+                                  typeof window.MPumpCalcAndroid.saveFileToDownloads === 'function') {
+                                // btoa does not support UTF-8 directly; encode via TextEncoder then to base64
+                                const bytes = new TextEncoder().encode(dataStr);
+                                let binary = '';
+                                for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                                const base64 = btoa(binary);
+                                window.MPumpCalcAndroid.saveFileToDownloads(base64, fileName, 'application/json');
+                                toast({
+                                  title: "Backup Exported",
+                                  description: `Saved to Downloads/MPumpCalc/${fileName}`,
+                                });
+                                return;
+                              }
+
+                              // Browser: classic anchor download
                               const blob = new Blob([dataStr], { type: 'application/json' });
                               const url = URL.createObjectURL(blob);
                               const link = document.createElement('a');
@@ -1338,9 +1354,9 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                               link.click();
                               document.body.removeChild(link);
                               URL.revokeObjectURL(url);
-                              
+
                               toast({
-                                title: "✓ Backup Exported",
+                                title: "Backup Exported",
                                 description: `Check your Downloads folder for ${fileName}`,
                               });
                             } catch (error) {
