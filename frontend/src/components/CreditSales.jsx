@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import localStorageService from '../services/localStorage';
+import DescriptionSuggestInput from './DescriptionSuggestInput';
 
 const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditRecord, deleteCreditRecord, fuelSettings, selectedDate, salesData, incomeData, expenseData, formResetKey, editingRecord, onRecordSaved, hideRecordsList, customers = [] }) => {
   const [formData, setFormData] = useState({
@@ -231,6 +232,8 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
         ...prev,
         incomeEntries: [...prev.incomeEntries, { ...tempIncome }]
       }));
+      // Save description to shared history so it appears as a suggestion next time
+      localStorageService.addIncomeDescHistory(tempIncome.description);
       setTempIncome({ description: '', amount: '' });
       setShowIncomeDialog(false);
     }
@@ -243,6 +246,8 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
         ...prev,
         expenseEntries: [...prev.expenseEntries, { ...tempExpense }]
       }));
+      // Save description to shared history so it appears as a suggestion next time
+      localStorageService.addExpenseDescHistory(tempExpense.description);
       setTempExpense({ description: '', amount: '' });
       setShowExpenseDialog(false);
     }
@@ -690,13 +695,14 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                   <div className="space-y-4">
                     <div>
                       <Label>Description *</Label>
-                      <Input
-                        type="text"
+                      <DescriptionSuggestInput
+                        type="income"
                         value={tempIncome.description}
-                        onChange={(e) => setTempIncome(prev => ({ ...prev, description: e.target.value }))}
+                        onChange={(val) => setTempIncome(prev => ({ ...prev, description: val }))}
                         placeholder="e.g., Transport, Loading"
-                        className={`mt-1 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                        isDarkMode={isDarkMode}
                         autoFocus
+                        className="mt-1"
                       />
                     </div>
                     <div>
@@ -745,13 +751,14 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                   <div className="space-y-4">
                     <div>
                       <Label>Description *</Label>
-                      <Input
-                        type="text"
+                      <DescriptionSuggestInput
+                        type="expense"
                         value={tempExpense.description}
-                        onChange={(e) => setTempExpense(prev => ({ ...prev, description: e.target.value }))}
+                        onChange={(val) => setTempExpense(prev => ({ ...prev, description: val }))}
                         placeholder="e.g., Discount, Commission"
-                        className={`mt-1 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                        isDarkMode={isDarkMode}
                         autoFocus
+                        className="mt-1"
                       />
                     </div>
                     <div>
