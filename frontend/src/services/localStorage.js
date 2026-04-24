@@ -742,6 +742,53 @@ class LocalStorageService {
     return { totalSize, itemCount, maxSize: 5 * 1024 * 1024, usagePercent: (totalSize / (5 * 1024 * 1024)) * 100 };
   }
 
+  // Export only the data that falls within a single financial year (1 Apr <fyStart>
+  // through 31 Mar <fyStart+1>). Useful for archival / per-year backups so the
+  // exported JSON stays small as data accumulates.
+  // fyStart: integer year representing the start of the FY (e.g. 2024 -> 1 Apr 2024).
+  exportFinancialYearData(fyStart) {
+    const fromDate = `${fyStart}-04-01`;
+    const toDate = `${fyStart + 1}-03-31`;
+    const inRange = (d) => typeof d === 'string' && d >= fromDate && d <= toDate;
+
+    const stockData = {};
+    const fuelSettings = this.getFuelSettings() || {};
+    Object.keys(fuelSettings).forEach(fuelType => {
+      const storageKey = `${fuelType.toLowerCase()}StockData`;
+      const all = this.getItem(storageKey);
+      if (all && typeof all === 'object') {
+        // stockData entries are keyed by date — keep only matching ones
+        const filtered = {};
+        Object.keys(all).forEach(dateKey => {
+          if (inRange(dateKey)) filtered[dateKey] = all[dateKey];
+        });
+        if (Object.keys(filtered).length) stockData[storageKey] = filtered;
+      }
+    });
+
+    return {
+      // Date-bounded core data
+      salesData: this.getSalesData().filter(r => inRange(r.date)),
+      creditData: this.getCreditData().filter(r => inRange(r.date)),
+      incomeData: this.getIncomeData().filter(r => inRange(r.date)),
+      expenseData: this.getExpenseData().filter(r => inRange(r.date)),
+      payments: this.getPayments().filter(r => inRange(r.date)),
+      settlements: this.getSettlements().filter(r => inRange(r.date)),
+      // Reference data – always include in full so the backup is self-contained
+      customers: this.getCustomers(),
+      fuelSettings: this.getFuelSettings(),
+      settlementTypes: this.getSettlementTypes(),
+      incomeCategories: this.getIncomeCategories(),
+      expenseCategories: this.getExpenseCategories(),
+      rates: this.getAllRates(),
+      stockData,
+      // Metadata
+      financialYear: { from: fromDate, to: toDate, label: `FY ${fyStart}-${fyStart + 1}` },
+      exportDate: new Date().toISOString(),
+      version: '2.2-fy',
+    };
+  }
+
   // ===== Customers =====
   getCustomers() { return this.getItem(this.keys.customers) || []; }
   setCustomers(customers) { return this.setItem(this.keys.customers, customers); }

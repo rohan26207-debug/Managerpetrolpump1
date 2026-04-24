@@ -99,7 +99,8 @@ const CustomerLedger = ({ customers, creditData, payments, salesData, settlement
     );
 
     // Calculate running outstanding balance starting with customer's starting balance
-    let runningBalance = customer.startingBalance || 0;
+    const startingBalance = customer.startingBalance || 0;
+    let runningBalance = startingBalance;
     const ledgerWithBalance = combined.map(item => {
       runningBalance += (item.credit - item.received);
       return {
@@ -107,6 +108,23 @@ const CustomerLedger = ({ customers, creditData, payments, salesData, settlement
         outstanding: runningBalance
       };
     });
+
+    // Prepend an explicit opening-balance row so the user can see the initial
+    // balance set in "Customer Initial Balance". Only show it when non-zero
+    // OR when there's no other activity (so the ledger is not empty).
+    if (startingBalance !== 0 || ledgerWithBalance.length === 0) {
+      // Use 1-Apr of the FY containing fromDate as the opening date
+      const fy = fromDate.slice(5) >= '04-01' ? fromDate.slice(0, 4) : (parseInt(fromDate.slice(0, 4), 10) - 1).toString();
+      ledgerWithBalance.unshift({
+        date: `${fy}-04-01`,
+        type: 'opening',
+        credit: startingBalance > 0 ? startingBalance : 0,
+        received: startingBalance < 0 ? -startingBalance : 0,
+        description: 'Opening Balance',
+        outstanding: startingBalance,
+        id: `opening-${customer.id}`,
+      });
+    }
 
     setLedgerData(ledgerWithBalance);
     setShowReport(true);

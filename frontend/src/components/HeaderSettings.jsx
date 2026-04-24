@@ -52,6 +52,13 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
   });
   const [showProPasswordDialog, setShowProPasswordDialog] = useState(false);
   const [proPassword, setProPassword] = useState('');
+  const [fyBackupOpen, setFyBackupOpen] = useState(false);
+  const [fyBackupYear, setFyBackupYear] = useState(() => {
+    // Default to current FY (1 Apr through 31 Mar). If today is on/after Apr 1
+    // current year, the FY starts this year; otherwise the previous year.
+    const now = new Date();
+    return now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  });
   const { toast } = useToast();
   const { confirm, confirmDialog } = useConfirm();
   
@@ -1416,69 +1423,58 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                         <Button 
                           variant="outline" 
                           className="w-full"
-                          onClick={() => {
-                            try {
-                              const backupData = localStorageService.exportAllData();
-                              const dataStr = JSON.stringify(backupData, null, 2);
-                              
-                              navigator.clipboard.writeText(dataStr).then(() => {
-                                toast({
-                                  title: "Backup Data Copied",
-                                  description: "Backup data copied to clipboard. Paste it into a text file and save as .json",
-                                });
-                              }).catch(() => {
-                                // Fallback for older browsers
-                                const textArea = document.createElement('textarea');
-                                textArea.value = dataStr;
-                                textArea.style.position = 'fixed';
-                                textArea.style.left = '-999999px';
-                                document.body.appendChild(textArea);
-                                textArea.select();
-                                
-                                try {
-                                  document.execCommand('copy');
-                                  toast({
-                                    title: "Backup Data Copied",
-                                    description: "Backup data copied to clipboard. Paste it into a text file and save as .json",
-                                  });
-                                } catch (err) {
-                                  toast({
-                                    title: "Copy Failed",
-                                    description: "Could not copy to clipboard. Please enable clipboard permissions.",
-                                    variant: "destructive",
-                                  });
-                                }
-                                
-                                document.body.removeChild(textArea);
-                              });
-                              
-                            } catch (error) {
-                              console.error('Copy error:', error);
-                              toast({
-                                title: "Copy Failed",
-                                description: "Could not copy backup data",
-                                variant: "destructive",
-                              });
-                            }
-                          }}
+                          onClick={() => setFyBackupOpen(true)}
+                          data-testid="backup-financial-year-btn"
                         >
-                          📋 Copy Backup Data
+                          📅 Backup Financial Year
                         </Button>
                         
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => {
-                            const storageInfo = localStorageService.getStorageInfo();
-                            
-                            toast({
-                              title: "Storage Information",
-                              description: `Using ${Math.round(storageInfo.usagePercent)}% of browser storage (${storageInfo.itemCount} items)`,
-                            });
-                          }}
-                        >
-                          📊 Check Storage Usage
-                        </Button>
+                        {/* Live storage gauge */}
+                        {(() => {
+                          const info = localStorageService.getStorageInfo();
+                          const usedKB = Math.round(info.totalSize / 1024);
+                          const maxKB = Math.round(info.maxSize / 1024);
+                          const pct = Math.min(100, Math.round(info.usagePercent));
+                          const barColor = pct < 60
+                            ? (isDarkMode ? 'bg-gray-300' : 'bg-slate-700')
+                            : pct < 85
+                              ? (isDarkMode ? 'bg-yellow-400' : 'bg-yellow-500')
+                              : (isDarkMode ? 'bg-red-400' : 'bg-red-600');
+                          return (
+                            <div
+                              data-testid="storage-gauge"
+                              className={`w-full rounded-lg border p-3 ${
+                                isDarkMode ? 'border-gray-600 bg-gray-800' : 'border-slate-300 bg-slate-50'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-sm font-medium ${
+                                  isDarkMode ? 'text-gray-200' : 'text-slate-700'
+                                }`}>
+                                  📊 Storage Usage
+                                </span>
+                                <span className={`text-xs font-mono ${
+                                  isDarkMode ? 'text-gray-300' : 'text-slate-600'
+                                }`}>
+                                  {usedKB} / {maxKB} KB ({pct}%)
+                                </span>
+                              </div>
+                              <div className={`w-full h-2 rounded-full overflow-hidden ${
+                                isDarkMode ? 'bg-gray-700' : 'bg-slate-200'
+                              }`}>
+                                <div
+                                  className={`h-full transition-all ${barColor}`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                              <p className={`text-xs mt-2 ${
+                                isDarkMode ? 'text-gray-400' : 'text-slate-500'
+                              }`}>
+                                {info.itemCount} items stored. {pct >= 85 ? 'Approaching limit — consider archiving older financial years.' : 'Plenty of room left.'}
+                              </p>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -1870,6 +1866,118 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
         </DialogContent>
       </Dialog>
       {confirmDialog}
+
+      {/* Backup Financial Year Dialog */}
+      {fyBackupOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] p-4"
+          data-testid="fy-backup-dialog"
+        >
+          <Card className={`w-full max-w-md ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'}`}>
+            <CardContent className="p-6 space-y-4">
+              <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                Backup Financial Year
+              </h3>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+                Select the financial year to export. The backup file will contain all data
+                from <strong>1 April {fyBackupYear}</strong> to <strong>31 March {fyBackupYear + 1}</strong>.
+              </p>
+
+              <div>
+                <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-slate-700'}`}>
+                  Financial Year
+                </Label>
+                <select
+                  data-testid="fy-backup-year-select"
+                  value={fyBackupYear}
+                  onChange={(e) => setFyBackupYear(parseInt(e.target.value, 10))}
+                  className={`mt-1 w-full rounded-md border px-3 py-2 ${
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
+                  }`}
+                >
+                  {Array.from({ length: 8 }).map((_, i) => {
+                    const today = new Date();
+                    const currentFy = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+                    const yr = currentFy - i;
+                    return (
+                      <option key={yr} value={yr}>
+                        {yr} – {yr + 1}{i === 0 ? '  (current)' : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className="flex gap-2 justify-end pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setFyBackupOpen(false)}
+                  className={isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-slate-300 text-slate-700 hover:bg-slate-100'}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  data-testid="fy-backup-export-btn"
+                  onClick={() => {
+                    try {
+                      const data = localStorageService.exportFinancialYearData(fyBackupYear);
+                      const dataStr = JSON.stringify(data, null, 2);
+                      const fileName = `mpump-FY${fyBackupYear}-${fyBackupYear + 1}.json`;
+
+                      // Android WebView path — save into Downloads/MPumpCalc
+                      if (typeof window.MPumpCalcAndroid !== 'undefined' &&
+                          typeof window.MPumpCalcAndroid.saveFileToDownloads === 'function') {
+                        const bytes = new TextEncoder().encode(dataStr);
+                        let binary = '';
+                        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                        const base64 = btoa(binary);
+                        window.MPumpCalcAndroid.saveFileToDownloads(base64, fileName, 'application/json');
+                        toast({
+                          title: 'Backup Saved',
+                          description: `Saved to Downloads/MPumpCalc/${fileName}`,
+                        });
+                      } else {
+                        // Browser fallback
+                        const blob = new Blob([dataStr], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = fileName;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                        toast({
+                          title: 'Backup Downloaded',
+                          description: fileName,
+                        });
+                      }
+
+                      const counts = {
+                        sales: data.salesData.length,
+                        credits: data.creditData.length,
+                        receipts: data.payments.length,
+                      };
+                      console.log('FY Backup:', counts);
+                      setFyBackupOpen(false);
+                    } catch (err) {
+                      console.error('FY backup error:', err);
+                      toast({
+                        title: 'Backup Failed',
+                        description: 'Could not generate financial year backup.',
+                        variant: 'destructive',
+                      });
+                    }
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Export FY {fyBackupYear}–{fyBackupYear + 1}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </>
   );
 };
