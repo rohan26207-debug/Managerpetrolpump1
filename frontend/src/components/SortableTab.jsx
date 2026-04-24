@@ -46,7 +46,7 @@ export const SortableTab = ({ id, wiggle, onLongPress, children }) => {
     longPressRef.current.timer = setTimeout(() => {
       longPressRef.current.fired = true;
       onLongPress && onLongPress(id);
-    }, 5000);
+    }, 3000);
   };
 
   const handlePointerMove = (e) => {
