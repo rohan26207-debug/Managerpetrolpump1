@@ -50,6 +50,7 @@ import CustomerLedger from './CustomerLedger';
 import BankSettlement from './BankSettlement';
 // Anonymous mode: LoginScreen removed
 import MPPStock from './MPPStock';
+import DSRReport from './DSRReport';
 import localStorageService from '../services/localStorage';
 
 // Inline Reports tab — date picker with Share/PDF/Copy + live HTML preview of the PDF
@@ -3564,6 +3565,29 @@ window.onload = function() {
                     </div>
                   </div>
 
+                  {/* DSR Block */}
+                  <div 
+                    onClick={() => handleBalanceBlockClick('dsr')}
+                    data-testid="balance-block-dsr"
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 transform ${
+                      isDarkMode
+                        ? 'bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-gray-500 hover:scale-105'
+                        : 'bg-white border-slate-300 hover:bg-slate-50 hover:border-slate-400 hover:scale-105'
+                    }`}
+                    style={{ willChange: 'transform' }}
+                  >
+                    <div className="flex flex-col items-center text-center space-y-2">
+                      <FileText className={`w-8 h-8 ${
+                        isDarkMode ? 'text-gray-400' : 'text-slate-600'
+                      }`} />
+                      <span className={`text-sm font-medium ${
+                        isDarkMode ? 'text-gray-300' : 'text-slate-700'
+                      }`}>
+                        DSR
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Credit Manage Block */}
                   <div 
                     onClick={() => handleBalanceBlockClick('credit-manage')}
@@ -3643,27 +3667,31 @@ window.onload = function() {
                 <TabsList className={`flex w-full mb-4 ${
                   isDarkMode ? 'bg-gray-800' : 'bg-slate-100'
                 }`}>
-                  <TabsTrigger value="reports" className="flex items-center justify-center gap-1 text-xs w-[16.66%]" data-testid="tab-reports">
+                  <TabsTrigger value="reports" className="flex items-center justify-center gap-1 text-xs w-[14.28%]" data-testid="tab-reports">
                     <FileText className="w-3 h-3" />
                     <span className="hidden lg:inline">Reports</span>
                   </TabsTrigger>
-                  <TabsTrigger value="bank-settlement" className="flex items-center justify-center gap-1 text-xs w-[16.66%]">
+                  <TabsTrigger value="bank-settlement" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
                     <Wallet className="w-3 h-3" />
                     <span className="hidden lg:inline">Bank</span>
                   </TabsTrigger>
-                  <TabsTrigger value="outstanding-settings" className="flex items-center justify-center gap-1 text-xs w-[16.66%]">
+                  <TabsTrigger value="outstanding-settings" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
                     <FileText className="w-3 h-3" />
                     <span className="hidden lg:inline">Outstanding</span>
                   </TabsTrigger>
-                  <TabsTrigger value="report" className="flex items-center justify-center gap-1 text-xs w-[16.66%]">
+                  <TabsTrigger value="report" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
                     <Users className="w-3 h-3" />
                     <span className="hidden lg:inline">Ledger</span>
                   </TabsTrigger>
-                  <TabsTrigger value="credit-manage" className="flex items-center justify-center gap-1 text-xs w-[16.66%]">
+                  <TabsTrigger value="dsr" className="flex items-center justify-center gap-1 text-xs w-[14.28%]" data-testid="tab-dsr">
+                    <FileText className="w-3 h-3" />
+                    <span className="hidden lg:inline">DSR</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="credit-manage" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
                     <CreditCard className="w-3 h-3" />
                     <span className="hidden lg:inline">Credit</span>
                   </TabsTrigger>
-                  <TabsTrigger value="receipt-manage" className="flex items-center justify-center gap-1 text-xs w-[16.66%]">
+                  <TabsTrigger value="receipt-manage" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
                     <Receipt className="w-3 h-3" />
                     <span className="hidden lg:inline">Receipt</span>
                   </TabsTrigger>
@@ -3731,6 +3759,14 @@ window.onload = function() {
                       expenseData={expenseData}
                       isDarkMode={isDarkMode}
                       selectedDate={selectedDate}
+                    />
+                  )}
+
+                  {outstandingSubTab === 'dsr' && (
+                    <DSRReport
+                      isDarkMode={isDarkMode}
+                      fuelSettings={fuelSettings}
+                      salesData={salesData}
                     />
                   )}
 
