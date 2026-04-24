@@ -12,7 +12,7 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Manager Pump"
+        android:label="Manager Pump1"
         android:supportsRtl="true"
         android:theme="@style/Theme.ManagerPump"
         android:usesCleartextTraffic="true"
