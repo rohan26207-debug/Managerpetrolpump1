@@ -1613,16 +1613,17 @@ const ZAPTRStyleCalculator = () => {
           y += sp(7);
         }
 
-        const tbl = { theme: 'grid', styles: { font: 'helvetica', fontSize: fs(11), cellPadding: sp(2.2), minCellHeight: sp(4), lineWidth: 0.1, lineColor: [0,0,0], textColor: [0,0,0] }, headStyles: { fillColor: false, textColor: [0,0,0], fontStyle: 'bold', fontSize: fs(11), minCellHeight: sp(4) } };
+        const tbl = { theme: 'grid', styles: { font: 'helvetica', fontSize: fs(11), cellPadding: sp(2.2), minCellHeight: sp(4), lineWidth: 0.1, lineColor: [0,0,0], textColor: [0,0,0] }, headStyles: { fillColor: false, textColor: [0,0,0], fontStyle: 'bold', fontSize: fs(11), minCellHeight: sp(4) }, alternateRowStyles: { fillColor: [245, 245, 245] }, margin: { top: 10, bottom: 6, left: 14, right: 14 } };
         const sectionHeading = (label) => {
-          if (y > ph - 30) { doc.addPage(); y = 15; }
+          if (y > ph - 20) { doc.addPage(); y = 15; }
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(11);
           doc.text(label, 14, y);
-          y += sp(5);
+          // Heading sits directly above the table (no empty gap)
+          y += 4.5;
         };
         const sectionGap = () => {
-          if (y > ph - 30) { doc.addPage(); y = 15; }
+          if (y > ph - 20) { doc.addPage(); y = 15; }
         };
 
         // Summary (heading removed for space)
@@ -1702,14 +1703,6 @@ const ZAPTRStyleCalculator = () => {
         const gt = cashT+cardT+paytmT+phonepeT+dtpT;
         doc.autoTable({ startY: y, ...tbl, body: [['Cash', cashT.toFixed(2)],['Card', cardT.toFixed(2)],['Paytm', paytmT.toFixed(2)],['PhonePe', phonepeT.toFixed(2)],['DTP', dtpT.toFixed(2)],['Total', gt.toFixed(2)]], columnStyles: { 1: {halign:'right'} } });
 
-        // Footer on all pages
-        const pc = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pc; i++) {
-          doc.setPage(i);
-          doc.setFontSize(fs(10));
-          doc.setFont('helvetica', 'normal');
-          doc.text('Page ' + i + ' of ' + pc + ' | Generated on: ' + new Date().toLocaleString(), pw/2, ph - 5, { align: 'center' });
-        }
         return doc;
       };
 
