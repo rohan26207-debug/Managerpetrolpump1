@@ -113,11 +113,12 @@ const ReportPreviewTab = ({
               size="sm"
               onClick={() => generateDirectPDF('share')}
               data-testid="reports-share-btn"
-              className={`text-xs h-7 w-7 p-0 ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+              className={`text-xs h-7 px-2 ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}
               title="Share PDF"
               aria-label="Share PDF"
             >
-              <Share2 className="w-3.5 h-3.5" />
+              <Share2 className="w-3.5 h-3.5 mr-1" />
+              S
             </Button>
             <Button
               variant="outline"
@@ -2754,21 +2755,6 @@ window.onload = function() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => generateDirectPDF('share')}
-                      data-testid="share-pdf-btn"
-                      className={`text-xs h-7 w-7 p-0 ${
-                        isDarkMode 
-                          ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
-                          : 'border-slate-300 text-slate-700 hover:bg-slate-50'
-                      }`}
-                      title="Share PDF (WhatsApp / Email / Drive)"
-                      aria-label="Share PDF"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
                       onClick={() => setNotesOpen(true)}
                       className={`text-xs h-7 px-2 ${
                         isDarkMode 
@@ -2779,6 +2765,22 @@ window.onload = function() {
                     >
                       <FileText className="w-3 h-3 mr-1" />
                       N
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => generateDirectPDF('share')}
+                      data-testid="share-pdf-btn"
+                      className={`text-xs h-7 px-2 ${
+                        isDarkMode 
+                          ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                          : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+                      }`}
+                      title="Share PDF (WhatsApp / Email / Drive)"
+                      aria-label="Share PDF"
+                    >
+                      <Share2 className="w-3.5 h-3.5 mr-1" />
+                      S
                     </Button>
                     <Button
                       variant="outline"
