@@ -49,3 +49,23 @@ React-based petrol pump management application. 100% offline with localStorage o
 - **Rejected (by design)**: localStorage encryption — the app is intentionally offline with on-device business data; encryption provides no security benefit since an attacker with device access also has the decrypt key.
 - **Deferred to P2**: Component refactor of `ZAPTRStyleCalculator`, `HeaderSettings`, `PaymentReceived`, `CreditSales`; blanket console.log removal.
 
+## WebView Dialog Migration (Feb 2026)
+- **Root cause**: `window.confirm` and `window.prompt` are blocked by default inside the Android WebView wrapper, making any destructive action that depended on them silently fail on device (user first reported this via the Receipt bulk-delete button).
+- **Fix**: Created a reusable Promise-based confirmation hook at `/app/frontend/src/hooks/use-confirm.jsx`. Usage pattern:
+  ```js
+  const { confirm, confirmDialog } = useConfirm();
+  const ok = await confirm({ title, message, requireTypedText, isDarkMode });
+  if (ok) { ...do action... }
+  return <div>{ui}{confirmDialog}</div>;
+  ```
+  Supports a `requireTypedText` mode that keeps the confirm button disabled until the user types an exact phrase (used for Clear-All-Data's "DELETE ALL" gate).
+- **Migrated sites** (all now use in-app modals, Android-safe):
+  1. `PaymentReceived.jsx` — Receipt bulk delete (in-app modal, earlier fix)
+  2. `CreditSalesManagement.jsx:181` — Credit sales bulk delete
+  3. `Settlement.jsx:161` — Settlement record delete
+  4. `IncomeExpenseCategories.jsx:103` — Category delete
+  5. `QRCodeScanner.jsx:54` — Merge-scanned-data confirm
+  6. `HeaderSettings.jsx:74` — Clear-All-Data (merged the old 2-step `confirm → prompt` flow into a single modal with inline typed-text gate)
+  7. `HeaderSettings.jsx:1026` — Permanent-delete-by-date-range
+- Verification: `grep 'window\.confirm(\|window\.prompt('` returns zero hits across `src/`. Lint + build clean. Android assets synced.
+
