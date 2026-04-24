@@ -357,6 +357,7 @@ const ZAPTRStyleCalculator = () => {
   const [textSize, setTextSize] = useState(100); // Default 100% (normal size)
   const [parentTab, setParentTab] = useState('today'); // Parent tab: 'today' or 'outstanding'
   const [outstandingSubTab, setOutstandingSubTab] = useState('received'); // Sub-tab in Balance view
+  const [backupDialogOpen, setBackupDialogOpen] = useState(false); // Backup tab opens Settings dialog on Backup
   const [todaySubTab, setTodaySubTab] = useState('all'); // Sub-tab in Today Summary: 'all' or 'c-sales'
   const [salesData, setSalesData] = useState([]);
   const [creditData, setCreditData] = useState([]);
@@ -1105,6 +1106,10 @@ const ZAPTRStyleCalculator = () => {
 
   // Handle block click - show content and hide blocks
   const handleBalanceBlockClick = (blockType) => {
+    if (blockType === 'backup') {
+      setBackupDialogOpen(true);
+      return;
+    }
     setOutstandingSubTab(blockType);
     setShowBalanceBlocks(false);
   };
@@ -1718,6 +1723,54 @@ const ZAPTRStyleCalculator = () => {
         tries += 1;
       }
       console.log('[PDF] final scale=' + scale.toFixed(2) + ' pages=' + doc.internal.getNumberOfPages());
+
+      // Embed a JSON payload of this day's data inside the PDF metadata.
+      // Another device can pick the PDF file via "Merge PDF" and re-import this
+      // day's records — no need to share a separate JSON backup.
+      try {
+        const todaySales = salesData.filter(s => s.date === selectedDate);
+        const todayCredits = creditData.filter(c => c.date === selectedDate);
+        const todaySettlements = settlementData.filter(s => s.date === selectedDate);
+        const todayIncome = incomeData.filter(i => i.date === selectedDate);
+        const todayExpenses = expenseData.filter(e => e.date === selectedDate);
+        const todayReceipts = payments.filter(p => p.date === selectedDate);
+        const dayStock = {};
+        if (fuelSettings) {
+          Object.keys(fuelSettings).forEach(ft => {
+            const key = ft.toLowerCase() + 'StockData';
+            const all = localStorageService.getItem(key);
+            if (all && all[selectedDate]) dayStock[key] = { [selectedDate]: all[selectedDate] };
+          });
+        }
+        const payload = {
+          version: 'MPUMP_PDF_V1',
+          date: selectedDate,
+          salesData: todaySales,
+          creditData: todayCredits,
+          settlements: todaySettlements,
+          incomeData: todayIncome,
+          expenseData: todayExpenses,
+          payments: todayReceipts,
+          stockData: dayStock,
+          fuelSettings,
+          customers: customers || [],
+        };
+        const json = JSON.stringify(payload);
+        // UTF-8 safe base64
+        const bytes = new TextEncoder().encode(json);
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+        const payloadB64 = btoa(binary);
+        doc.setProperties({
+          title: 'Manager Pump - ' + selectedDate,
+          subject: 'Daily Report',
+          author: 'Manager Petrol Pump',
+          creator: 'MPumpCalc',
+          keywords: 'MPUMP_DATA_V1:' + payloadB64 + ':END'
+        });
+      } catch (e) {
+        console.warn('[PDF] payload embed failed:', e);
+      }
 
       // Save PDF
       const fileName = 'Report_' + selectedDate + '.pdf';
@@ -2563,6 +2616,21 @@ window.onload = function() {
               onAddCustomer={handleAddCustomer}
               onDeleteCustomer={handleDeleteCustomer}
               onUpdateCustomer={handleUpdateCustomer}
+            />
+
+            {/* Hidden-trigger Settings dialog, opened by Balance → Backup tab */}
+            <HeaderSettings 
+              isDarkMode={isDarkMode}
+              fuelSettings={fuelSettings}
+              setFuelSettings={setFuelSettings}
+              customers={customers}
+              onAddCustomer={handleAddCustomer}
+              onDeleteCustomer={handleDeleteCustomer}
+              onUpdateCustomer={handleUpdateCustomer}
+              open={backupDialogOpen}
+              onOpenChange={setBackupDialogOpen}
+              defaultTab="backup"
+              hideTrigger={true}
             />
             
             <div 
@@ -3653,6 +3721,29 @@ window.onload = function() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Backup Block */}
+                  <div 
+                    onClick={() => handleBalanceBlockClick('backup')}
+                    data-testid="balance-block-backup"
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 transform ${
+                      isDarkMode
+                        ? 'bg-gray-800 border-gray-600 hover:bg-gray-700 hover:border-gray-500 hover:scale-105'
+                        : 'bg-white border-slate-300 hover:bg-slate-50 hover:border-slate-400 hover:scale-105'
+                    }`}
+                    style={{ willChange: 'transform' }}
+                  >
+                    <div className="flex flex-col items-center text-center space-y-2">
+                      <Wallet className={`w-8 h-8 ${
+                        isDarkMode ? 'text-gray-400' : 'text-slate-600'
+                      }`} />
+                      <span className={`text-sm font-medium ${
+                        isDarkMode ? 'text-gray-300' : 'text-slate-700'
+                      }`}>
+                        Backup
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div key="balance-content" className="mb-4">
@@ -3663,37 +3754,44 @@ window.onload = function() {
 
             {/* Desktop Tab Layout for screens >= 768px */}
             <div className="hidden md:block">
-              <Tabs value={outstandingSubTab} onValueChange={setOutstandingSubTab} className="w-full">
+              <Tabs value={outstandingSubTab} onValueChange={(v) => {
+                if (v === 'backup') { setBackupDialogOpen(true); return; }
+                setOutstandingSubTab(v);
+              }} className="w-full">
                 <TabsList className={`flex w-full mb-4 ${
                   isDarkMode ? 'bg-gray-800' : 'bg-slate-100'
                 }`}>
-                  <TabsTrigger value="reports" className="flex items-center justify-center gap-1 text-xs w-[14.28%]" data-testid="tab-reports">
+                  <TabsTrigger value="reports" className="flex items-center justify-center gap-1 text-xs w-[12.5%]" data-testid="tab-reports">
                     <FileText className="w-3 h-3" />
                     <span className="hidden lg:inline">Reports</span>
                   </TabsTrigger>
-                  <TabsTrigger value="bank-settlement" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
+                  <TabsTrigger value="bank-settlement" className="flex items-center justify-center gap-1 text-xs w-[12.5%]">
                     <Wallet className="w-3 h-3" />
                     <span className="hidden lg:inline">Bank</span>
                   </TabsTrigger>
-                  <TabsTrigger value="outstanding-settings" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
+                  <TabsTrigger value="outstanding-settings" className="flex items-center justify-center gap-1 text-xs w-[12.5%]">
                     <FileText className="w-3 h-3" />
                     <span className="hidden lg:inline">Outstanding</span>
                   </TabsTrigger>
-                  <TabsTrigger value="report" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
+                  <TabsTrigger value="report" className="flex items-center justify-center gap-1 text-xs w-[12.5%]">
                     <Users className="w-3 h-3" />
                     <span className="hidden lg:inline">Ledger</span>
                   </TabsTrigger>
-                  <TabsTrigger value="dsr" className="flex items-center justify-center gap-1 text-xs w-[14.28%]" data-testid="tab-dsr">
+                  <TabsTrigger value="dsr" className="flex items-center justify-center gap-1 text-xs w-[12.5%]" data-testid="tab-dsr">
                     <FileText className="w-3 h-3" />
                     <span className="hidden lg:inline">DSR</span>
                   </TabsTrigger>
-                  <TabsTrigger value="credit-manage" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
+                  <TabsTrigger value="credit-manage" className="flex items-center justify-center gap-1 text-xs w-[12.5%]">
                     <CreditCard className="w-3 h-3" />
                     <span className="hidden lg:inline">Credit</span>
                   </TabsTrigger>
-                  <TabsTrigger value="receipt-manage" className="flex items-center justify-center gap-1 text-xs w-[14.28%]">
+                  <TabsTrigger value="receipt-manage" className="flex items-center justify-center gap-1 text-xs w-[12.5%]">
                     <Receipt className="w-3 h-3" />
                     <span className="hidden lg:inline">Receipt</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="backup" className="flex items-center justify-center gap-1 text-xs w-[12.5%]" data-testid="tab-backup">
+                    <Wallet className="w-3 h-3" />
+                    <span className="hidden lg:inline">Backup</span>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
