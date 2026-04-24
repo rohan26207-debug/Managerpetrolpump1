@@ -56,7 +56,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
   const { confirm, confirmDialog } = useConfirm();
   
   // Auto-backup weekly hook
-  const { toggleAutoBackup, getBackupStatus } = useAutoBackupWeekly(toast);
+  const { toggleAutoBackup, getBackupStatus, backupNow } = useAutoBackupWeekly(toast);
 
   // Income/Expense Categories state
   const [incomeCategories, setIncomeCategories] = useState([]);
@@ -1720,6 +1720,29 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                             Enable automatic backup every 7 days
                           </label>
                         </div>
+
+                        {/* Backup Now button - always available, regardless of auto-backup toggle */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          data-testid="backup-now-btn"
+                          onClick={() => {
+                            const result = backupNow();
+                            if (result?.success) {
+                              // Refresh the "last backup" display
+                              const status = getBackupStatus();
+                              setWeeklyLastBackup(status.lastBackupTime);
+                            }
+                          }}
+                          className={`w-full ${
+                            isDarkMode
+                              ? 'bg-blue-900/40 border-blue-700 text-blue-300 hover:bg-blue-900/60'
+                              : 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'
+                          }`}
+                        >
+                          <Mail className="w-4 h-4 mr-2" />
+                          Backup Now {ownerEmail ? '(Send to Email)' : ''}
+                        </Button>
 
                         {weeklyBackupEnabled && (
                           <div className={`space-y-2 p-3 rounded ${
