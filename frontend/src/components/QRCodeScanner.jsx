@@ -3,12 +3,14 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { Button } from './ui/button';
 import { X, Camera } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { useConfirm } from '../hooks/use-confirm';
 import localStorageService from '../services/localStorage';
 
 const QRCodeScanner = ({ isDarkMode, onClose, onDataReceived }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanner, setScanner] = useState(null);
   const { toast } = useToast();
+  const { confirm, confirmDialog } = useConfirm();
 
   useEffect(() => {
     // Initialize scanner
@@ -51,7 +53,7 @@ const QRCodeScanner = ({ isDarkMode, onClose, onDataReceived }) => {
     );
   };
 
-  const handleScanSuccess = (decodedText) => {
+  const handleScanSuccess = async (decodedText) => {
     try {
       // Stop scanning
       if (scanner) {
@@ -73,8 +75,15 @@ const QRCodeScanner = ({ isDarkMode, onClose, onDataReceived }) => {
         return;
       }
 
-      // Confirm merge
-      if (window.confirm('Merge the scanned data with your existing data?\n\nIn case of conflicts, your existing data will be preserved.')) {
+      // Confirm merge (window.confirm is blocked in Android WebView)
+      const ok = await confirm({
+        title: 'Merge Scanned Data?',
+        message: 'Merge the scanned data with your existing data?\n\nIn case of conflicts, your existing data will be preserved.',
+        confirmText: 'Yes, Merge',
+        variant: 'primary',
+        isDarkMode,
+      });
+      if (ok) {
         const success = localStorageService.mergeAllData(importedData);
 
         if (success) {
@@ -191,6 +200,7 @@ const QRCodeScanner = ({ isDarkMode, onClose, onDataReceived }) => {
           </div>
         </div>
       </div>
+      {confirmDialog}
     </div>
   );
 };

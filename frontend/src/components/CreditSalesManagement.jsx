@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { CreditCard, Edit, Trash2, ChevronDown, AlertTriangle, IndianRupee, Printer, FileSpreadsheet, Plus } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Checkbox } from './ui/checkbox';
+import { useConfirm } from '../hooks/use-confirm';
 import localStorageService from '../services/localStorage';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -32,6 +33,7 @@ const CreditSalesManagement = ({
   const [selectAll, setSelectAll] = useState(false);
   
   const customerDropdownRef = useRef(null);
+  const { confirm, confirmDialog } = useConfirm();
 
   // Sync date range with selectedDate
   useEffect(() => {
@@ -178,14 +180,10 @@ const CreditSalesManagement = ({
   }, [filteredCreditData, selectedCredits]);
 
   // Delete selected credits
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedCredits.size === 0) return;
-    
-    const message = `Are you sure you want to delete ${selectedCredits.size} selected credit sale(s)?`;
-    
-    // Check if Pro Mode is enabled
-    if (localStorageService.isProModeEnabled()) {
-      // Skip confirmation dialog, delete directly
+
+    const performBulkDelete = () => {
       selectedCredits.forEach(id => {
         if (onDeleteCredit) {
           onDeleteCredit(id);
@@ -193,16 +191,21 @@ const CreditSalesManagement = ({
       });
       setSelectedCredits(new Set());
       setSelectAll(false);
+    };
+
+    // Check if Pro Mode is enabled
+    if (localStorageService.isProModeEnabled()) {
+      // Skip confirmation dialog, delete directly
+      performBulkDelete();
     } else {
-      // Show confirmation dialog
-      if (window.confirm(message)) {
-        selectedCredits.forEach(id => {
-          if (onDeleteCredit) {
-            onDeleteCredit(id);
-          }
-        });
-        setSelectedCredits(new Set());
-        setSelectAll(false);
+      // Show in-app confirmation dialog (window.confirm is blocked in Android WebView)
+      const ok = await confirm({
+        title: `Delete ${selectedCredits.size} Credit Sale${selectedCredits.size === 1 ? '' : 's'}?`,
+        message: `Are you sure you want to delete the ${selectedCredits.size} selected credit sale${selectedCredits.size === 1 ? '' : 's'}?\n\nThis action cannot be undone.`,
+        isDarkMode,
+      });
+      if (ok) {
+        performBulkDelete();
       }
     }
   };
@@ -868,6 +871,7 @@ const CreditSalesManagement = ({
           </Card>
         </div>
       )}
+      {confirmDialog}
     </div>
   );
 };

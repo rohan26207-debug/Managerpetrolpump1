@@ -6,6 +6,7 @@ import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 import { Plus, Trash2, Edit, X, Check } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { useConfirm } from '../hooks/use-confirm';
 import localStorageService from '../services/localStorage';
 
 const IncomeExpenseCategories = ({ 
@@ -24,6 +25,7 @@ const IncomeExpenseCategories = ({
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState('');
   const { toast } = useToast();
+  const { confirm, confirmDialog } = useConfirm();
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) {
@@ -100,7 +102,7 @@ const IncomeExpenseCategories = ({
     });
   };
 
-  const handleDelete = (id, name) => {
+  const handleDelete = async (id, name) => {
     // Check if Pro Mode is enabled
     if (localStorageService.isProModeEnabled()) {
       // Skip confirmation dialog, delete directly
@@ -114,8 +116,13 @@ const IncomeExpenseCategories = ({
         description: `${name} has been removed`,
       });
     } else {
-      // Show confirmation dialog
-      if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+      // Show in-app confirmation dialog (window.confirm is blocked in Android WebView)
+      const ok = await confirm({
+        title: 'Delete Category?',
+        message: `Are you sure you want to delete "${name}"?`,
+        isDarkMode,
+      });
+      if (ok) {
         if (activeType === 'income') {
           onDeleteIncomeCategory(id);
         } else {
@@ -258,6 +265,7 @@ const IncomeExpenseCategories = ({
           </div>
         )}
       </div>
+      {confirmDialog}
     </div>
   );
 };

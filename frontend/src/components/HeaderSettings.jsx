@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { useAutoBackupWeekly } from '../hooks/use-auto-backup-weekly';
+import { useConfirm } from '../hooks/use-confirm';
 import localStorageService, { exportAllData, importAllData, mergeAllData } from '../services/localStorage';
 import CustomerManagement from './CustomerManagement';
 import IncomeExpenseCategories from './IncomeExpenseCategories';
@@ -52,6 +53,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
   const [showProPasswordDialog, setShowProPasswordDialog] = useState(false);
   const [proPassword, setProPassword] = useState('');
   const { toast } = useToast();
+  const { confirm, confirmDialog } = useConfirm();
   
   // Auto-backup weekly hook
   const { toggleAutoBackup, getBackupStatus } = useAutoBackupWeekly(toast);
@@ -73,20 +75,23 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
   // Clear All Data handler
   const handleClearAllData = async () => {
     try {
-      const confirmClear = window.confirm(
-        '⚠️ WARNING: This will DELETE ALL DATA!\n\n' +
-        '• All sales, customers, payments\n' +
-        '• All income, expenses, settlements\n' +
-        '• All fuel settings and categories\n\n' +
-        'This action CANNOT be undone!\n\n' +
-        'Type "DELETE ALL" to confirm:'
-      );
-      
-      if (!confirmClear) return;
-      
-      const finalConfirm = window.prompt('Type "DELETE ALL" to confirm:');
-      
-      if (finalConfirm !== 'DELETE ALL') {
+      // Single in-app modal replacing window.confirm + window.prompt (both are
+      // blocked in Android WebView). User must type "DELETE ALL" to enable the
+      // Yes button, matching the previous two-step safety gate.
+      const ok = await confirm({
+        title: 'Delete ALL Data?',
+        message:
+          'WARNING: This will DELETE ALL DATA!\n\n' +
+          '- All sales, customers, payments\n' +
+          '- All income, expenses, settlements\n' +
+          '- All fuel settings and categories\n\n' +
+          'This action CANNOT be undone!',
+        confirmText: 'Yes, Delete All',
+        requireTypedText: 'DELETE ALL',
+        isDarkMode,
+      });
+
+      if (!ok) {
         toast({
           title: "Cancelled",
           description: "Data deletion cancelled.",
@@ -1018,7 +1023,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           <Button 
                             variant="outline" 
                             className="w-full bg-red-600 hover:bg-red-700 text-white border-red-600"
-                            onClick={() => {
+                            onClick={async () => {
                               const fromDateInput = document.getElementById('delete-from-date');
                               const toDateInput = document.getElementById('delete-to-date');
                               const fromDate = fromDateInput.value;
@@ -1043,11 +1048,15 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                                 return;
                               }
                               
-                              // Confirm deletion - check Pro Mode
-                              const confirmDelete = localStorageService.isProModeEnabled() || 
-                                window.confirm(`⚠️ WARNING: This will PERMANENTLY delete all data from ${fromDate} to ${toDate}.\n\nThis includes:\n- Stock Data\n- Reading Sales Data\n- Credit Sales Data\n- Income/Expense Data\n- Receipt Data\n\nThis action CANNOT be undone!\n\nAre you absolutely sure you want to continue?`);
+                              // Confirm deletion - check Pro Mode (window.confirm blocked in Android WebView)
+                              const proceed = localStorageService.isProModeEnabled() || await confirm({
+                                title: 'Permanently Delete Data?',
+                                message: `WARNING: This will PERMANENTLY delete all data from ${fromDate} to ${toDate}.\n\nThis includes:\n- Stock Data\n- Reading Sales Data\n- Credit Sales Data\n- Income/Expense Data\n- Receipt Data\n\nThis action CANNOT be undone!\n\nAre you absolutely sure you want to continue?`,
+                                confirmText: 'Yes, Delete Permanently',
+                                isDarkMode,
+                              });
                               
-                              if (confirmDelete) {
+                              if (proceed) {
                                 try {
                                   // Get all data
                                   const salesData = localStorageService.getSalesData();
@@ -1837,6 +1846,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
           </div>
         </DialogContent>
       </Dialog>
+      {confirmDialog}
     </>
   );
 };

@@ -22,6 +22,7 @@ import {
   IndianRupee
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { useConfirm } from '../hooks/use-confirm';
 import localStorageService from '../services/localStorage';
 
 const Settlement = ({ 
@@ -48,6 +49,8 @@ const Settlement = ({
   const isMPPVisible = React.useMemo(() => {
     return customers && customers.some(c => c.isMPP === true);
   }, [customers]);
+
+  const { confirm, confirmDialog } = useConfirm();
 
   const [editingId, setEditingId] = useState(null);
   const [settlementTypes, setSettlementTypes] = useState([]);
@@ -155,7 +158,7 @@ const Settlement = ({
     setEditingId(record.id);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     // Check if Pro Mode is enabled
     if (localStorageService.isProModeEnabled()) {
       // Skip confirmation dialog, delete directly
@@ -166,8 +169,13 @@ const Settlement = ({
         variant: "default"
       });
     } else {
-      // Show confirmation dialog
-      if (window.confirm('Are you sure you want to delete this settlement record?')) {
+      // Show confirmation dialog (window.confirm is blocked in Android WebView)
+      const ok = await confirm({
+        title: 'Delete Settlement?',
+        message: 'Are you sure you want to delete this settlement record?\n\nThis action cannot be undone.',
+        isDarkMode,
+      });
+      if (ok) {
         deleteSettlementRecord(id);
         toast({
           title: "Settlement Deleted",
@@ -386,6 +394,7 @@ const Settlement = ({
           </>
         )}
       </CardContent>
+      {confirmDialog}
     </Card>
   );
 };
