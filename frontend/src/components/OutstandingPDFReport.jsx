@@ -8,6 +8,12 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
 const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, selectedDate }) => {
+  // fromDate defaults to the start of the current financial year (1 April)
+  const [fromDate, setFromDate] = useState(() => {
+    const now = new Date();
+    const fyStart = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+    return `${fyStart}-04-01`;
+  });
   const [tillDate, setTillDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [pdfSettings, setPdfSettings] = useState({
     showZeroBalance: false,
@@ -18,25 +24,43 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
     includeTotal: true
   });
 
-  // Calculate outstanding for all customers (up to tillDate)
+  // Calculate outstanding for all customers:
+  //   start       = opening balance on the day BEFORE fromDate
+  //                 = startingBalance + (credits before fromDate) - (receipts before fromDate)
+  //   credit      = credits in [fromDate, tillDate]
+  //   received    = receipts in [fromDate, tillDate]
+  //   outstanding = start + credit - received (balance at end of tillDate)
   const outstandingData = customers.map(customer => {
-    const totalCredit = creditData
-      .filter(c => c.customerName === customer.name && c.date <= tillDate)
-      .reduce((sum, c) => sum + (c.amount || 0), 0);
+    const allCredits = creditData.filter(c => c.customerName === customer.name && c.date <= tillDate);
+    const allPayments = payments.filter(p =>
+      (p.customerId === customer.id || p.customerName === customer.name) && p.date <= tillDate
+    );
 
-    const totalReceived = payments
-      .filter(p => (p.customerId === customer.id || p.customerName === customer.name) && p.date <= tillDate)
+    const creditBefore = allCredits
+      .filter(c => c.date < fromDate)
+      .reduce((sum, c) => sum + (c.amount || 0), 0);
+    const receivedBefore = allPayments
+      .filter(p => p.date < fromDate)
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const creditInRange = allCredits
+      .filter(c => c.date >= fromDate)
+      .reduce((sum, c) => sum + (c.amount || 0), 0);
+    const receivedInRange = allPayments
+      .filter(p => p.date >= fromDate)
       .reduce((sum, p) => sum + (p.amount || 0), 0);
 
     const startingBalance = customer.startingBalance || 0;
-    const outstanding = startingBalance + totalCredit - totalReceived;
+    const start = startingBalance + creditBefore - receivedBefore;
+    const outstanding = start + creditInRange - receivedInRange;
 
     return {
       name: customer.name,
       startingBalance,
-      totalCredit,
-      totalReceived,
-      outstanding
+      start,
+      totalCredit: creditInRange,
+      totalReceived: receivedInRange,
+      outstanding,
     };
   });
 
@@ -58,10 +82,11 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
 
   // Calculate totals
   const totals = sortedData.reduce((acc, d) => ({
+    start: acc.start + d.start,
     totalCredit: acc.totalCredit + d.totalCredit,
     totalReceived: acc.totalReceived + d.totalReceived,
     outstanding: acc.outstanding + d.outstanding
-  }), { totalCredit: 0, totalReceived: 0, outstanding: 0 });
+  }), { start: 0, totalCredit: 0, totalReceived: 0, outstanding: 0 });
 
   // Excel Export functionality
   const handleExcelExport = () => {
@@ -71,20 +96,21 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
         // Title row
         ['Outstanding Report'],
         [],
-        [`As of: ${new Date(selectedDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`],
+        [`From: ${new Date(fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}  To: ${new Date(tillDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`],
         [],
         // Table headers
-        ['Sr. No', 'Customer Name', 'Total Credit (₹)', 'Total Received (₹)', 'Outstanding (₹)'],
+        ['Sr. No', 'Customer Name', 'Start (₹)', 'Credit (₹)', 'Receipt (₹)', 'Outstanding (₹)'],
         // Table data
         ...sortedData.map((customer, index) => [
           index + 1,
           customer.name,
+          customer.start.toFixed(2),
           customer.totalCredit.toFixed(2),
           customer.totalReceived.toFixed(2),
           customer.outstanding.toFixed(2)
         ]),
         // Total row
-        ['Total', '', totals.totalCredit.toFixed(2), totals.totalReceived.toFixed(2), totals.outstanding.toFixed(2)],
+        ['Total', '', totals.start.toFixed(2), totals.totalCredit.toFixed(2), totals.totalReceived.toFixed(2), totals.outstanding.toFixed(2)],
         [],
         // Footer
         [`Generated on: ${new Date().toLocaleString('en-IN')}`]
@@ -98,8 +124,9 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
       ws['!cols'] = [
         { wch: 10 },  // Sr. No
         { wch: 25 },  // Customer Name
-        { wch: 18 },  // Total Credit
-        { wch: 18 },  // Total Received
+        { wch: 15 },  // Start
+        { wch: 15 },  // Credit
+        { wch: 15 },  // Receipt
         { wch: 18 }   // Outstanding
       ];
 
@@ -107,7 +134,7 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
       XLSX.utils.book_append_sheet(wb, ws, 'Outstanding');
 
       // Generate filename with date
-      const filename = `Outstanding_Report_${new Date(selectedDate).toISOString().split('T')[0]}.xlsx`;
+      const filename = `Outstanding_Report_${fromDate}_to_${tillDate}.xlsx`;
 
       // Export file
       XLSX.writeFile(wb, filename);
@@ -148,45 +175,49 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
       doc.text('Outstanding Report', 105, yPos, { align: 'center' });
       yPos += 10;
 
-      // Date (Till Date)
+      // Date (From / Till)
       doc.setFontSize(12);
-      const dateStr = new Date(tillDate).toLocaleDateString('en-IN', { 
-        day: '2-digit', month: 'long', year: 'numeric' 
+      const fromStr = new Date(fromDate).toLocaleDateString('en-IN', {
+        day: '2-digit', month: 'long', year: 'numeric'
       });
-      doc.text(`Till Date: ${dateStr}`, 105, yPos, { align: 'center' });
+      const toStr = new Date(tillDate).toLocaleDateString('en-IN', {
+        day: '2-digit', month: 'long', year: 'numeric'
+      });
+      doc.text(`From: ${fromStr}    To: ${toStr}`, 105, yPos, { align: 'center' });
       yPos += 15;
 
       if (sortedData.length === 0) {
         doc.setFontSize(12);
         doc.text('No data to display based on current filters', 105, yPos, { align: 'center' });
       } else {
-        // Always show all 4 columns: Customer Name, Credit, Receipt, Outstanding
-        const headers = ['Customer Name', 'Credit', 'Receipt', 'Outstanding'];
+        // 5 columns: Customer Name, Start, Credit, Receipt, Outstanding
+        const headers = ['Customer Name', 'Start', 'Credit', 'Receipt', 'Outstanding'];
 
         // Build table data with all columns
         const tableData = sortedData.map((customer) => {
           return [
             customer.name,
+            customer.start.toFixed(2),
             customer.totalCredit.toFixed(2),
             customer.totalReceived.toFixed(2),
             customer.outstanding.toFixed(2)
           ];
         });
 
-        // Add total row with all columns
+        // Add total row
+        const totalStart = sortedData.reduce((sum, c) => sum + c.start, 0);
         const totalCredit = sortedData.reduce((sum, c) => sum + c.totalCredit, 0);
         const totalReceived = sortedData.reduce((sum, c) => sum + c.totalReceived, 0);
         const totalOutstanding = sortedData.reduce((sum, c) => sum + c.outstanding, 0);
-        
+
         const totalRow = [
           'Total',
+          totalStart.toFixed(2),
           totalCredit.toFixed(2),
           totalReceived.toFixed(2),
           totalOutstanding.toFixed(2)
         ];
-        
-        tableData.push(totalRow);
-        
+
         tableData.push(totalRow);
 
         doc.autoTable({
@@ -207,7 +238,7 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
 
       // Convert to base64 and send to Android
       const pdfBase64 = doc.output('dataurlstring').split(',')[1];
-      const fileName = `Outstanding_Report_${selectedDate}.pdf`;
+      const fileName = `Outstanding_Report_${fromDate}_to_${tillDate}.pdf`;
       
       if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.openPdfWithViewer) {
         window.MPumpCalcAndroid.openPdfWithViewer(pdfBase64, fileName);
@@ -247,12 +278,13 @@ td{border:1px solid #000;padding:2px;font-size:10px}
 </head>
 <body>
 <h1>Outstanding Report</h1>
-<p>As of: ${new Date(tillDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+<p>From: ${new Date(fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}&nbsp;&nbsp;To: ${new Date(tillDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
 
 ${sortedData.length > 0 ? `
 <table>
 <tr>
   <th>Customer Name</th>
+  <th>Start</th>
   <th>Credit</th>
   <th>Receipt</th>
   <th>Outstanding</th>
@@ -260,6 +292,7 @@ ${sortedData.length > 0 ? `
 ${sortedData.map(customer => `
 <tr>
   <td>${customer.name}</td>
+  <td class="r">${customer.start.toFixed(2)}</td>
   <td class="r">${customer.totalCredit.toFixed(2)}</td>
   <td class="r">${customer.totalReceived.toFixed(2)}</td>
   <td class="r">${customer.outstanding.toFixed(2)}</td>
@@ -267,6 +300,7 @@ ${sortedData.map(customer => `
 `).join('')}
 <tr class="t">
   <td>Total</td>
+  <td class="r">${sortedData.reduce((sum, c) => sum + c.start, 0).toFixed(2)}</td>
   <td class="r">${sortedData.reduce((sum, c) => sum + c.totalCredit, 0).toFixed(2)}</td>
   <td class="r">${sortedData.reduce((sum, c) => sum + c.totalReceived, 0).toFixed(2)}</td>
   <td class="r">${sortedData.reduce((sum, c) => sum + c.outstanding, 0).toFixed(2)}</td>
@@ -341,19 +375,36 @@ window.onload = function() {
               </div>
             </div>
 
-            {/* Till Date */}
-            <div>
-              <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
-                Till Date
-              </Label>
-              <input
-                type="date"
-                value={tillDate}
-                onChange={(e) => setTillDate(e.target.value)}
-                className={`w-full mt-1 rounded-md border px-3 py-2 ${
-                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
-                }`}
-              />
+            {/* Date Range */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                  From Date
+                </Label>
+                <input
+                  type="date"
+                  data-testid="outstanding-from-date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className={`w-full mt-1 rounded-md border px-3 py-2 ${
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
+                  }`}
+                />
+              </div>
+              <div>
+                <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                  Till Date
+                </Label>
+                <input
+                  type="date"
+                  data-testid="outstanding-till-date"
+                  value={tillDate}
+                  onChange={(e) => setTillDate(e.target.value)}
+                  className={`w-full mt-1 rounded-md border px-3 py-2 ${
+                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
+                  }`}
+                />
+              </div>
             </div>
 
             {/* Sort By */}
@@ -407,7 +458,9 @@ window.onload = function() {
             )}
             {pdfSettings.includeDate && (
               <p className={`text-center mb-6 ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>
-                As of: {new Date(tillDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                From: {new Date(fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {'  '}to{'  '}
+                {new Date(tillDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             )}
 
@@ -423,7 +476,7 @@ window.onload = function() {
                     <tr>
                       <th className={`px-2 py-1 border text-xs font-bold text-left ${
                         isDarkMode ? 'border-gray-600 bg-gray-900 text-white' : 'border-slate-400 bg-slate-200 text-slate-900'
-                      }`} colSpan={5}>
+                      }`} colSpan={6}>
                         Customer Outstanding
                       </th>
                     </tr>
@@ -434,6 +487,9 @@ window.onload = function() {
                       <th className={`px-2 py-1 border text-xs font-bold text-left ${
                         isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-400 bg-slate-100 text-slate-800'
                       }`}>Customer Name</th>
+                      <th className={`px-2 py-1 border text-xs font-bold text-right ${
+                        isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-400 bg-slate-100 text-slate-800'
+                      }`}>Start (₹)</th>
                       <th className={`px-2 py-1 border text-xs font-bold text-right ${
                         isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-400 bg-slate-100 text-slate-800'
                       }`}>Credit (₹)</th>
@@ -461,6 +517,9 @@ window.onload = function() {
                         }`}>{row.name}</td>
                         <td className={`px-2 py-1 border text-xs text-right font-mono ${
                           isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-400 text-slate-800'
+                        }`}>{row.start.toFixed(2)}</td>
+                        <td className={`px-2 py-1 border text-xs text-right font-mono ${
+                          isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-400 text-slate-800'
                         }`}>{row.totalCredit.toFixed(2)}</td>
                         <td className={`px-2 py-1 border text-xs text-right font-mono ${
                           isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-400 text-slate-800'
@@ -477,6 +536,9 @@ window.onload = function() {
                         }`}>
                           TOTAL ({sortedData.length} customer{sortedData.length === 1 ? '' : 's'})
                         </td>
+                        <td className={`px-2 py-1 border text-xs font-bold text-right font-mono ${
+                          isDarkMode ? 'border-gray-600 text-white' : 'border-slate-400 text-slate-900'
+                        }`}>{totals.start.toFixed(2)}</td>
                         <td className={`px-2 py-1 border text-xs font-bold text-right font-mono ${
                           isDarkMode ? 'border-gray-600 text-white' : 'border-slate-400 text-slate-900'
                         }`}>{totals.totalCredit.toFixed(2)}</td>
