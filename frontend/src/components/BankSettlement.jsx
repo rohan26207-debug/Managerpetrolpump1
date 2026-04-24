@@ -299,60 +299,6 @@ window.onload = function() {
           </div>
         </div>
 
-        {/* Summary Table (B&W, Reports-style) */}
-        <table className="w-full border-collapse">
-          <thead>
-            <tr>
-              <th className={`px-2 py-1 border text-xs font-bold text-left ${
-                isDarkMode ? 'border-gray-600 bg-gray-900 text-white' : 'border-slate-400 bg-slate-200 text-slate-900'
-              }`} colSpan={2}>
-                Summary
-              </th>
-            </tr>
-            <tr>
-              <th className={`px-2 py-1 border text-xs font-bold text-left ${
-                isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-400 bg-slate-100 text-slate-800'
-              }`}>Payment Mode</th>
-              <th className={`px-2 py-1 border text-xs font-bold text-right ${
-                isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-400 bg-slate-100 text-slate-800'
-              }`}>Total (₹)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { label: 'Cash', value: totals.cashAmount },
-              { label: 'Card', value: totals.cardAmount },
-              { label: 'Paytm', value: totals.paytmAmount },
-              { label: 'PhonePe', value: totals.phonepeAmount },
-              { label: 'DTP', value: totals.dtpAmount },
-            ].map((row, i) => (
-              <tr
-                key={row.label}
-                className={i % 2 === 1
-                  ? (isDarkMode ? 'bg-gray-800' : 'bg-slate-50')
-                  : (isDarkMode ? 'bg-gray-700' : 'bg-white')}
-              >
-                <td className={`px-2 py-1 border text-xs ${
-                  isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-400 text-slate-800'
-                }`}>{row.label}</td>
-                <td className={`px-2 py-1 border text-xs text-right font-mono ${
-                  isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-400 text-slate-800'
-                }`}>{row.value.toFixed(2)}</td>
-              </tr>
-            ))}
-            <tr className={isDarkMode ? 'bg-gray-900' : 'bg-slate-200'}>
-              <td className={`px-2 py-1 border text-xs font-bold ${
-                isDarkMode ? 'border-gray-600 text-white' : 'border-slate-400 text-slate-900'
-              }`}>Grand Total</td>
-              <td className={`px-2 py-1 border text-xs font-bold text-right font-mono ${
-                isDarkMode ? 'border-gray-600 text-white' : 'border-slate-400 text-slate-900'
-              }`}>
-                {(totals.cashAmount + totals.cardAmount + totals.paytmAmount + totals.phonepeAmount + totals.dtpAmount).toFixed(2)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
         {/* Daily Breakdown Table (B&W, Reports-style) */}
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">

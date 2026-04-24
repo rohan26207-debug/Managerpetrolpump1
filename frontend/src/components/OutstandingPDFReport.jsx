@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
-import { FileText, Printer, FileSpreadsheet } from 'lucide-react';
+import { FileText, Printer, FileSpreadsheet, Calendar } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -334,137 +334,140 @@ window.onload = function() {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Outstanding Report Settings */}
+    <div className="space-y-2">
+      {/* Outstanding Report controls (compact, matches Bank Settlement) */}
       <Card className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'}`}>
-        <CardContent className="p-4">
-          <div className="space-y-4">
+        <CardContent className="p-2 sm:p-3 space-y-2">
+          <h2 className={`text-lg sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+            Outstanding Report
+          </h2>
+
+          {/* Settings */}
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
             <div className="flex items-center gap-2">
-              <FileText className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
-              <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                Outstanding Report Settings
-              </h3>
-            </div>
-
-            {/* Settings */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="showZeroBalance"
-                  checked={pdfSettings.showZeroBalance}
-                  onChange={(e) => setPdfSettings({...pdfSettings, showZeroBalance: e.target.checked})}
-                  className="w-4 h-4"
-                />
-                <Label htmlFor="showZeroBalance" className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>
-                  Show Zero Balance Customers
-                </Label>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="showNegativeBalance"
-                  checked={pdfSettings.showNegativeBalance}
-                  onChange={(e) => setPdfSettings({...pdfSettings, showNegativeBalance: e.target.checked})}
-                  className="w-4 h-4"
-                />
-                <Label htmlFor="showNegativeBalance" className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>
-                  Show Negative Balance (Overpaid)
-                </Label>
-              </div>
-            </div>
-
-            {/* Date Range */}
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
-                  From Date
-                </Label>
-                <input
-                  type="date"
-                  data-testid="outstanding-from-date"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  className={`w-full mt-1 rounded-md border px-3 py-2 ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
-                  }`}
-                />
-              </div>
-              <div>
-                <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
-                  Till Date
-                </Label>
-                <input
-                  type="date"
-                  data-testid="outstanding-till-date"
-                  value={tillDate}
-                  onChange={(e) => setTillDate(e.target.value)}
-                  className={`w-full mt-1 rounded-md border px-3 py-2 ${
-                    isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
-                  }`}
-                />
-              </div>
-            </div>
-
-            {/* Sort By */}
-            <div>
-              <Label className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
-                Sort By
+              <input
+                type="checkbox"
+                id="showZeroBalance"
+                checked={pdfSettings.showZeroBalance}
+                onChange={(e) => setPdfSettings({...pdfSettings, showZeroBalance: e.target.checked})}
+                className="w-4 h-4"
+              />
+              <Label htmlFor="showZeroBalance" className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                Show Zero Balance Customers
               </Label>
-              <select
-                value={pdfSettings.sortBy}
-                onChange={(e) => setPdfSettings({...pdfSettings, sortBy: e.target.value})}
-                className={`w-full mt-1 rounded-md border px-3 py-2 ${
-                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
-                }`}
-              >
-                <option value="amount">Outstanding Amount (Highest First)</option>
-                <option value="name">Customer Name (A-Z)</option>
-              </select>
             </div>
 
-            {/* Action Buttons — black & white */}
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <Button
-                onClick={handlePrint}
-                variant="outline"
-                className={isDarkMode ? 'border-gray-500 text-gray-200 hover:bg-gray-700' : 'border-slate-400 text-slate-800 hover:bg-slate-100'}
-              >
-                <Printer className="w-4 h-4 mr-2" />
-                Print Outs
-              </Button>
-              <Button
-                onClick={handleExcelExport}
-                variant="outline"
-                className={isDarkMode ? 'border-gray-500 text-gray-200 hover:bg-gray-700' : 'border-slate-400 text-slate-800 hover:bg-slate-100'}
-              >
-                <FileSpreadsheet className="w-4 h-4 mr-2" />
-                Excel
-              </Button>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="showNegativeBalance"
+                checked={pdfSettings.showNegativeBalance}
+                onChange={(e) => setPdfSettings({...pdfSettings, showNegativeBalance: e.target.checked})}
+                className="w-4 h-4"
+              />
+              <Label htmlFor="showNegativeBalance" className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                Show Negative Balance (Overpaid)
+              </Label>
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Report Preview */}
-      <Card className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'}`}>
-        <CardContent className="p-4">
-          <div id="outstanding-pdf-content" className="print-content">
-            {pdfSettings.includeHeader && (
-              <h1 className={`text-2xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                Outstanding Report
-              </h1>
-            )}
-            {pdfSettings.includeDate && (
-              <p className={`text-center mb-6 ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>
-                From: {new Date(fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                {'  '}to{'  '}
-                {new Date(tillDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-            )}
+          {/* Date Range — compact, matches Bank Settlement size */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label className={`text-xs sm:text-sm font-medium flex items-center gap-1 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                <Calendar className="w-3 h-3" />
+                From Date
+              </Label>
+              <input
+                type="date"
+                data-testid="outstanding-from-date"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className={`w-full rounded-md border px-2 py-1 text-xs sm:text-sm ${
+                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
+                }`}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className={`text-xs sm:text-sm font-medium flex items-center gap-1 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                <Calendar className="w-3 h-3" />
+                Till Date
+              </Label>
+              <input
+                type="date"
+                data-testid="outstanding-till-date"
+                value={tillDate}
+                onChange={(e) => setTillDate(e.target.value)}
+                className={`w-full rounded-md border px-2 py-1 text-xs sm:text-sm ${
+                  isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
+                }`}
+              />
+            </div>
+          </div>
 
-            {sortedData.length === 0 ? (
+          {/* Sort By — compact */}
+          <div className="space-y-1">
+            <Label className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+              Sort By
+            </Label>
+            <select
+              value={pdfSettings.sortBy}
+              onChange={(e) => setPdfSettings({...pdfSettings, sortBy: e.target.value})}
+              className={`w-full rounded-md border px-2 py-1 text-xs sm:text-sm ${
+                isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300'
+              }`}
+            >
+              <option value="amount">Outstanding Amount (Highest First)</option>
+              <option value="name">Customer Name (A-Z)</option>
+            </select>
+          </div>
+
+          {/* Print + Excel Buttons — compact outline, same as Bank Settlement */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={handlePrint}
+              variant="outline"
+              className={`text-xs sm:text-sm ${
+                isDarkMode
+                  ? 'border-gray-500 text-gray-200 hover:bg-gray-700'
+                  : 'border-slate-400 text-slate-800 hover:bg-slate-100'
+              }`}
+            >
+              <Printer className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Print Outs
+            </Button>
+            <Button
+              onClick={handleExcelExport}
+              variant="outline"
+              className={`text-xs sm:text-sm ${
+                isDarkMode
+                  ? 'border-gray-500 text-gray-200 hover:bg-gray-700'
+                  : 'border-slate-400 text-slate-800 hover:bg-slate-100'
+              }`}
+            >
+              <FileSpreadsheet className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Excel
+            </Button>
+          </div>
+
+          {/* Single-line heading: "Outstanding Report From <date> to <date>" */}
+          <p className={`text-xs sm:text-sm font-medium flex items-center gap-1 ${
+            isDarkMode ? 'text-gray-200' : 'text-slate-800'
+          }`}>
+            Outstanding Report From {new Date(fromDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} to {new Date(tillDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </p>
+
+          {/* Hidden clone used by Print handler. DOM is anchored to #outstanding-pdf-content. */}
+          <div id="outstanding-pdf-content" style={{ display: 'none' }}>
+            <h1>Outstanding Report</h1>
+            <p>
+              From: {new Date(fromDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {' to '}
+              {new Date(tillDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+
+          {sortedData.length === 0 ? (
               <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                 <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>No data to display based on current filters</p>
@@ -554,7 +557,6 @@ window.onload = function() {
                 </table>
               </div>
             )}
-          </div>
         </CardContent>
       </Card>
     </div>
