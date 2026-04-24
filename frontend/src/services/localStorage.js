@@ -612,20 +612,60 @@ class LocalStorageService {
       if (importedData.creditData) this.setCreditData(mergeArrays(this.getCreditData(), importedData.creditData));
       if (importedData.incomeData) this.setIncomeData(mergeArrays(this.getIncomeData(), importedData.incomeData));
       if (importedData.expenseData) this.setExpenseData(mergeArrays(this.getExpenseData(), importedData.expenseData));
-      if (importedData.customers) this.setCustomers(mergeArrays(this.getCustomers(), importedData.customers));
       if (importedData.payments) this.setPayments(mergeArrays(this.getPayments(), importedData.payments));
       if (importedData.settlements) this.setSettlements(mergeArrays(this.getSettlements(), importedData.settlements));
 
-      // Settings & types - merge by ID (add new types, keep existing)
-      if (importedData.settlementTypes) this.setSettlementTypes(mergeArrays(this.getSettlementTypes(), importedData.settlementTypes));
+      // Customers - merge by ID AND by name (case-insensitive) to avoid duplicates across devices
+      if (importedData.customers) {
+        const existing = this.getCustomers() || [];
+        const existingIds = new Set(existing.map(c => c.id));
+        const existingNames = new Set(existing.map(c => (c.name || '').trim().toLowerCase()));
+        const additions = (importedData.customers || []).filter(c =>
+          !existingIds.has(c.id) &&
+          !existingNames.has((c.name || '').trim().toLowerCase())
+        );
+        if (additions.length) {
+          const merged = [...existing, ...additions].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          this.setCustomers(merged);
+          console.log('mergeAllData: customers added=' + additions.length);
+        }
+      }
+
+      // Settlement types - merge by ID AND by name (case-insensitive)
+      if (importedData.settlementTypes) {
+        const existing = this.getSettlementTypes() || [];
+        const existingIds = new Set(existing.map(t => t.id));
+        const existingNames = new Set(existing.map(t => (t.name || '').trim().toLowerCase()));
+        const additions = (importedData.settlementTypes || []).filter(t =>
+          !existingIds.has(t.id) &&
+          !existingNames.has((t.name || '').trim().toLowerCase())
+        );
+        if (additions.length) {
+          this.setSettlementTypes([...existing, ...additions]);
+          console.log('mergeAllData: settlementTypes added=' + additions.length);
+        }
+      }
+
+      // Income/Expense categories - merge by ID (existing tolerance)
       if (importedData.incomeCategories) this.setIncomeCategories(mergeArrays(this.getIncomeCategories(), importedData.incomeCategories));
       if (importedData.expenseCategories) this.setExpenseCategories(mergeArrays(this.getExpenseCategories(), importedData.expenseCategories));
 
-      // Fuel settings - keep current if exists, use imported if not
-      if (importedData.fuelSettings) {
-        const current = this.getFuelSettings();
-        if (!current || Object.keys(current).length === 0) {
-          this.setFuelSettings(importedData.fuelSettings);
+      // Fuel settings - DEEP MERGE:
+      //   - Existing fuel types kept as-is (price/nozzleCount not overwritten)
+      //   - New fuel types from backup (e.g., "Power") are ADDED with their nozzleCount/price
+      if (importedData.fuelSettings && typeof importedData.fuelSettings === 'object') {
+        const current = this.getFuelSettings() || {};
+        const merged = { ...current };
+        let added = 0;
+        Object.keys(importedData.fuelSettings).forEach(ft => {
+          if (!merged[ft]) {
+            merged[ft] = importedData.fuelSettings[ft];
+            added += 1;
+          }
+        });
+        if (added > 0 || Object.keys(current).length === 0) {
+          this.setFuelSettings(merged);
+          console.log('mergeAllData: fuelSettings new types added=' + added);
         }
       }
 
