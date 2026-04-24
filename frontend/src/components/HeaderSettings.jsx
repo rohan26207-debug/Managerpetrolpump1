@@ -254,14 +254,22 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
     pumpName: 'Vishnu Parvati Petroleum',
     dealerName: 'Rohan.R.Khandve',
     address: 'Station Road, Near City Mall, Mumbai - 400001',
-    email: 'vishnuparvatipetroleum@gmail.com'
+    email: 'vishnuparvatipetroleum@gmail.com',
+    website: 'https://managerpetrolpump.vercel.app/'
   });
 
   // Load contact info from localStorage on mount
   React.useEffect(() => {
     const savedContactInfo = localStorage.getItem('mpump_contact_info');
     if (savedContactInfo) {
-      setContactInfo(JSON.parse(savedContactInfo));
+      try {
+        const parsed = JSON.parse(savedContactInfo);
+        // Backfill website for users who saved contact info before the field existed
+        if (!parsed.website) parsed.website = 'https://managerpetrolpump.vercel.app/';
+        setContactInfo(parsed);
+      } catch (e) {
+        // ignore corrupt value
+      }
     }
   }, []);
 
@@ -775,6 +783,30 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           </div>
                         </div>
                       </div>
+
+                      <Separator className={isDarkMode ? 'bg-gray-600' : 'bg-slate-200'} />
+
+                      <div className="flex items-start gap-3">
+                        <Globe className="w-5 h-5 text-green-600 mt-0.5" />
+                        <div>
+                          <div className={`text-xs font-medium ${
+                            isDarkMode ? 'text-gray-400' : 'text-slate-600'
+                          }`}>
+                            Website
+                          </div>
+                          <a
+                            href={contactInfo.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-testid="contact-website-link"
+                            className={`font-medium break-all underline ${
+                              isDarkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-700'
+                            }`}
+                          >
+                            {contactInfo.website}
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -807,7 +839,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                         type="url"
                         value={onlineUrl}
                         onChange={(e) => setOnlineUrl(e.target.value)}
-                        placeholder="https://example.com/your-app"
+                        placeholder="https://managerpetrolpump.vercel.app/"
                         className={isDarkMode ? 'bg-gray-600 border-gray-500' : ''}
                       />
                       <Button 
@@ -842,9 +874,15 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                         <p className={`text-xs font-medium mb-1 ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
                           Default URL:
                         </p>
-                        <p className={`text-sm ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>
-                          https://mobilepetrolpump.vercel.app/
-                        </p>
+                        <a
+                          href="https://managerpetrolpump.vercel.app/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-testid="default-online-url-link"
+                          className={`text-sm underline break-all ${isDarkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-700'}`}
+                        >
+                          https://managerpetrolpump.vercel.app/
+                        </a>
                       </div>
                     </div>
                   </div>
