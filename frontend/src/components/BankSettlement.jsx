@@ -50,6 +50,9 @@ const BankSettlement = ({
   const receiptLabel = (p) => (p.settlementType || p.mode || p.paymentType || '').trim();
 
   // Discover all unique settlement-type column keys present in the chosen window
+  const EXCLUDED_KEYWORDS = ['neft', 'rtgs', 'cheque'];
+  const isExcluded = (key) => EXCLUDED_KEYWORDS.some((kw) => key.includes(kw));
+
   const dynamicTypes = useMemo(() => {
     const map = new Map(); // key (lowercase) -> displayLabel (first-seen original casing)
     const dateSet = new Set(dateArray);
@@ -60,6 +63,7 @@ const BankSettlement = ({
         const lbl = settlementLabel(s);
         if (!lbl) return;
         const key = lbl.toLowerCase();
+        if (isExcluded(key)) return;
         if (!map.has(key)) map.set(key, lbl);
       });
     }
@@ -69,6 +73,7 @@ const BankSettlement = ({
         const lbl = receiptLabel(p);
         if (!lbl) return;
         const key = lbl.toLowerCase();
+        if (isExcluded(key)) return;
         if (!map.has(key)) map.set(key, lbl);
       });
     }
