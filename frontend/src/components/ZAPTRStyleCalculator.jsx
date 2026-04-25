@@ -513,71 +513,6 @@ const ZAPTRStyleCalculator = () => {
     return () => window.removeEventListener('popstate', onBack);
   }, [wiggleMode]);
 
-  // Global Android back-button handler — keeps the user inside the app and
-  // walks the navigation hierarchy: wiggle → open dialogs → balance subpage →
-  // balance grid → today summary (home). Pressing back on home does NOTHING
-  // (the user must use Home button / swipe-up to leave the app).
-  const backStateRef = useRef({});
-  backStateRef.current = {
-    wiggleMode, setWiggleMode,
-    pdfSettingsOpen, setPdfSettingsOpen,
-    backupDialogOpen, setBackupDialogOpen,
-    salesDialogOpen, setSalesDialogOpen,
-    creditDialogOpen, setCreditDialogOpen,
-    settleIncExpDialogOpen, setSettleIncExpDialogOpen,
-    settlementDialogOpen, setSettlementDialogOpen,
-    incomeExpenseDialogOpen, setIncomeExpenseDialogOpen,
-    stockDialogOpen, setStockDialogOpen,
-    rateDialogOpen, setRateDialogOpen,
-    parentTab, setParentTab,
-    showBalanceBlocks, setShowBalanceBlocks,
-  };
-
-  useEffect(() => {
-    window.MPumpAppHandleBack = () => {
-      // 1) Let any external open dialog (HeaderSettings, Record Receipt sheet,
-      //    etc.) handle the back press first by listening for this event and
-      //    calling event.preventDefault().
-      try {
-        const evt = new CustomEvent('mpump-back', { cancelable: true });
-        window.dispatchEvent(evt);
-        if (evt.defaultPrevented) return true;
-      } catch { /* ignore */ }
-
-      const s = backStateRef.current;
-
-      // 2) Wiggle (drag-reorder) mode
-      if (s.wiggleMode) { s.setWiggleMode(false); return true; }
-
-      // 3) Modal sheets owned by the main calculator screen
-      if (s.pdfSettingsOpen)        { s.setPdfSettingsOpen(false); return true; }
-      if (s.backupDialogOpen)       { s.setBackupDialogOpen(false); return true; }
-      if (s.stockDialogOpen)        { s.setStockDialogOpen(false); return true; }
-      if (s.rateDialogOpen)         { s.setRateDialogOpen(false); return true; }
-      if (s.salesDialogOpen)        { s.setSalesDialogOpen(false); return true; }
-      if (s.creditDialogOpen)       { s.setCreditDialogOpen(false); return true; }
-      if (s.settleIncExpDialogOpen) { s.setSettleIncExpDialogOpen(false); return true; }
-      if (s.settlementDialogOpen)   { s.setSettlementDialogOpen(false); return true; }
-      if (s.incomeExpenseDialogOpen){ s.setIncomeExpenseDialogOpen(false); return true; }
-
-      // 4) Balance sub-page → Balance grid
-      if (s.parentTab === 'outstanding' && !s.showBalanceBlocks) {
-        s.setShowBalanceBlocks(true);
-        return true;
-      }
-
-      // 5) Balance grid → Today Summary (home)
-      if (s.parentTab === 'outstanding') {
-        s.setParentTab('today');
-        return true;
-      }
-
-      // 6) Already at home — never exit the app
-      return false;
-    };
-    return () => { try { delete window.MPumpAppHandleBack; } catch { /* noop */ } };
-  }, []);
-
   // Auto-backup hook - automatically saves to folder when data changes
   useAutoBackup(salesData, creditData, incomeData, expenseData, fuelSettings);
 
@@ -1186,6 +1121,70 @@ const ZAPTRStyleCalculator = () => {
   const [showBalanceBlocks, setShowBalanceBlocks] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [savedScrollPosition, setSavedScrollPosition] = useState(0);
+
+  // Global Android back-button handler — keeps the user inside the app and
+  // walks the navigation hierarchy: wiggle → open dialogs → balance subpage →
+  // balance grid → today summary (home). Pressing back on home does NOTHING
+  // (the user must use Home button / swipe-up to leave the app).
+  const backStateRef = useRef({});
+  backStateRef.current = {
+    wiggleMode, setWiggleMode,
+    pdfSettingsOpen, setPdfSettingsOpen,
+    backupDialogOpen, setBackupDialogOpen,
+    salesDialogOpen, setSalesDialogOpen,
+    creditDialogOpen, setCreditDialogOpen,
+    settleIncExpDialogOpen, setSettleIncExpDialogOpen,
+    settlementDialogOpen, setSettlementDialogOpen,
+    incomeExpenseDialogOpen, setIncomeExpenseDialogOpen,
+    stockDialogOpen, setStockDialogOpen,
+    rateDialogOpen, setRateDialogOpen,
+    parentTab, setParentTab,
+    showBalanceBlocks, setShowBalanceBlocks,
+  };
+
+  useEffect(() => {
+    window.MPumpAppHandleBack = () => {
+      // 1) Let any open dialog (HeaderSettings, Record Receipt sheet, etc.)
+      //    handle the back press first via the 'mpump-back' event.
+      try {
+        const evt = new CustomEvent('mpump-back', { cancelable: true });
+        window.dispatchEvent(evt);
+        if (evt.defaultPrevented) return true;
+      } catch { /* ignore */ }
+
+      const s = backStateRef.current;
+
+      // 2) Wiggle (drag-reorder) mode
+      if (s.wiggleMode) { s.setWiggleMode(false); return true; }
+
+      // 3) Modal sheets owned by the main calculator screen
+      if (s.pdfSettingsOpen)        { s.setPdfSettingsOpen(false); return true; }
+      if (s.backupDialogOpen)       { s.setBackupDialogOpen(false); return true; }
+      if (s.stockDialogOpen)        { s.setStockDialogOpen(false); return true; }
+      if (s.rateDialogOpen)         { s.setRateDialogOpen(false); return true; }
+      if (s.salesDialogOpen)        { s.setSalesDialogOpen(false); return true; }
+      if (s.creditDialogOpen)       { s.setCreditDialogOpen(false); return true; }
+      if (s.settleIncExpDialogOpen) { s.setSettleIncExpDialogOpen(false); return true; }
+      if (s.settlementDialogOpen)   { s.setSettlementDialogOpen(false); return true; }
+      if (s.incomeExpenseDialogOpen){ s.setIncomeExpenseDialogOpen(false); return true; }
+
+      // 4) Balance sub-page → Balance grid
+      if (s.parentTab === 'outstanding' && !s.showBalanceBlocks) {
+        s.setShowBalanceBlocks(true);
+        return true;
+      }
+
+      // 5) Balance grid → Today Summary (home)
+      if (s.parentTab === 'outstanding') {
+        s.setParentTab('today');
+        return true;
+      }
+
+      // 6) Already at home — never exit the app
+      return false;
+    };
+    return () => { try { delete window.MPumpAppHandleBack; } catch { /* noop */ } };
+  }, []);
   
   // Initialize localStorage namespace (offline mode - no auth)
   useEffect(() => {
