@@ -267,7 +267,11 @@ const BankSettlement = ({
 
     const base64 = doc.output('dataurlstring').split(',')[1];
     const fileName = `Bank_Settlement_${fromDate}_to_${toDate}.pdf`;
-    window.MPumpCalcAndroid.openPdfWithViewer(base64, fileName);
+    if (typeof window.MPumpCalcAndroid.saveFileToDownloads === 'function') {
+      window.MPumpCalcAndroid.saveFileToDownloads(base64, fileName, 'application/pdf');
+    } else {
+      window.MPumpCalcAndroid.openPdfWithViewer(base64, fileName);
+    }
   };
 
   const generateHTMLForWeb = () => {

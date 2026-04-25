@@ -478,7 +478,9 @@ const PaymentReceived = ({
       const pdfBase64 = doc.output('dataurlstring').split(',')[1];
       const fileName = `Payment_Receipts_${fromDate}_to_${toDate}.pdf`;
       
-      if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.openPdfWithViewer) {
+      if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.saveFileToDownloads) {
+        window.MPumpCalcAndroid.saveFileToDownloads(pdfBase64, fileName, 'application/pdf');
+      } else if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.openPdfWithViewer) {
         window.MPumpCalcAndroid.openPdfWithViewer(pdfBase64, fileName);
       } else {
         console.error('Android interface not available');

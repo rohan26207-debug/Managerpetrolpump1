@@ -249,7 +249,9 @@ const OutstandingPDFReport = ({ customers, creditData, payments, isDarkMode, sel
       const pdfBase64 = doc.output('dataurlstring').split(',')[1];
       const fileName = `Outstanding_Report_${fromDate}_to_${tillDate}.pdf`;
       
-      if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.openPdfWithViewer) {
+      if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.saveFileToDownloads) {
+        window.MPumpCalcAndroid.saveFileToDownloads(pdfBase64, fileName, 'application/pdf');
+      } else if (window.MPumpCalcAndroid && window.MPumpCalcAndroid.openPdfWithViewer) {
         window.MPumpCalcAndroid.openPdfWithViewer(pdfBase64, fileName);
       } else {
         console.error('Android interface not available');
