@@ -125,8 +125,8 @@ const PaymentReceived = ({
     setEditCustomerSearch(payment.customerName);
     setEditAmount(payment.amount.toString());
     setEditPaymentDate(payment.date);
-    setEditSettlementType(payment.settlementType || '');
-    setEditPaymentType(payment.paymentType || payment.mode || '');
+    setEditSettlementType(payment.settlementType || payment.mode || payment.paymentType || '');
+    setEditPaymentType(payment.settlementType || payment.paymentType || payment.mode || '');
     setEditDialogOpen(true);
   };
 
@@ -134,14 +134,15 @@ const PaymentReceived = ({
     if (editCustomerId && editAmount && parseFloat(editAmount) > 0 && editPaymentDate && editingPayment) {
       const customer = customers.find(c => c.id === editCustomerId);
       if (customer) {
+        const selectedType = editPaymentType || '';
         onUpdatePayment(editingPayment.id, {
           customerId: editCustomerId,
           customerName: customer.name,
           amount: parseFloat(editAmount),
           date: editPaymentDate,
-          paymentType: editPaymentType,
-          mode: editPaymentType === 'Settlement' ? editSettlementType : editPaymentType,
-          settlementType: editPaymentType === 'Settlement' ? editSettlementType : ''
+          paymentType: selectedType,
+          mode: selectedType,
+          settlementType: selectedType
         });
         setEditDialogOpen(false);
         setEditingPayment(null);
@@ -181,14 +182,15 @@ const PaymentReceived = ({
     if (customerId && amount && parseFloat(amount) > 0 && paymentDate) {
       const customer = customers.find(c => c.id === customerId);
       if (customer) {
+        const selectedType = paymentType || '';
         onAddPayment({
           customerId,
           customerName: customer.name,
           amount: parseFloat(amount),
           date: paymentDate,
-          paymentType: paymentType,
-          mode: paymentType === 'Settlement' ? settlementType : paymentType,
-          settlementType: paymentType === 'Settlement' ? settlementType : ''
+          paymentType: selectedType,
+          mode: selectedType,
+          settlementType: selectedType
         });
         // Save the current payment date before clearing
         const currentDate = paymentDate;
@@ -224,12 +226,6 @@ const PaymentReceived = ({
       else next.add(key);
       return next;
     });
-  };
-  const setOnlySettlementType = (key) => {
-    // Tick only this one (exclude every other)
-    const next = new Set();
-    availableSettlementTypes.forEach((t) => { if (t.key !== key) next.add(t.key); });
-    setExcludedTypeKeys(next);
   };
   const setAllSettlementTypes = (checked) => {
     if (checked) setExcludedTypeKeys(new Set());
@@ -745,14 +741,6 @@ const PaymentReceived = ({
                             data-testid={`receipt-type-cb-${t.key}`}
                           />
                           <span>{t.label}</span>
-                          <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); setOnlySettlementType(t.key); }}
-                            data-testid={`receipt-type-only-${t.key}`}
-                            className={`ml-1 text-[10px] underline ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}
-                          >
-                            only
-                          </button>
                         </label>
                       );
                     })}
@@ -1067,17 +1055,17 @@ const PaymentReceived = ({
                 </div>
                 <div>
                   <Label className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>
-                    Payment Type
+                    Settlement Type
                   </Label>
                   <Select
                     value={paymentType}
                     onValueChange={(value) => {
                       setPaymentType(value);
-                      if (value !== 'Settlement') setSettlementType('');
+                      setSettlementType(value);
                     }}
                   >
                     <SelectTrigger data-testid="payment-type-select" className={`mt-1 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}>
-                      <SelectValue placeholder="Select payment type..." />
+                      <SelectValue placeholder="Select settlement type..." />
                     </SelectTrigger>
                     <SelectContent className={isDarkMode ? 'bg-gray-700 border-gray-600' : ''}>
                       <SelectGroup>
@@ -1085,48 +1073,20 @@ const PaymentReceived = ({
                         <SelectItem value="NEFT" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>NEFT</SelectItem>
                         <SelectItem value="RTGS" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>RTGS</SelectItem>
                         <SelectItem value="Cheque" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>Cheque</SelectItem>
-                        <SelectItem value="Settlement" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>Settlement</SelectItem>
+                        {settlementTypes.map((type) => (
+                          <SelectItem
+                            key={type.id}
+                            value={type.name}
+                            className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}
+                          >
+                            {type.name}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-
-              {/* Settlement Type - only shown when Payment Type is Settlement */}
-              {paymentType === 'Settlement' && (
-                <div>
-                  <Label className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>
-                    Settlement Type
-                  </Label>
-                  <Select
-                    value={settlementType}
-                    onValueChange={(value) => setSettlementType(value)}
-                  >
-                    <SelectTrigger className={`mt-1 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}>
-                      <SelectValue placeholder="Select settlement type..." />
-                    </SelectTrigger>
-                    <SelectContent className={isDarkMode ? 'bg-gray-700 border-gray-600' : ''}>
-                      <SelectGroup>
-                        {settlementTypes.length > 0 ? (
-                          settlementTypes.map((type) => (
-                            <SelectItem 
-                              key={type.id} 
-                              value={type.name}
-                              className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}
-                            >
-                              {type.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-types" disabled className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
-                            No settlement types available. Add from Settings.
-                          </SelectItem>
-                        )}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
 
               {/* Record Receipt & Add More */}
               <Button
@@ -1271,17 +1231,17 @@ const PaymentReceived = ({
               </div>
               <div>
                 <Label className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>
-                  Payment Type
+                  Settlement Type
                 </Label>
                 <Select
                   value={editPaymentType}
                   onValueChange={(value) => {
                     setEditPaymentType(value);
-                    if (value !== 'Settlement') setEditSettlementType('');
+                    setEditSettlementType(value);
                   }}
                 >
                   <SelectTrigger className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}>
-                    <SelectValue placeholder="Select payment type..." />
+                    <SelectValue placeholder="Select settlement type..." />
                   </SelectTrigger>
                   <SelectContent className={isDarkMode ? 'bg-gray-700 border-gray-600' : ''}>
                     <SelectGroup>
@@ -1289,48 +1249,20 @@ const PaymentReceived = ({
                       <SelectItem value="NEFT" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>NEFT</SelectItem>
                       <SelectItem value="RTGS" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>RTGS</SelectItem>
                       <SelectItem value="Cheque" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>Cheque</SelectItem>
-                      <SelectItem value="Settlement" className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}>Settlement</SelectItem>
+                      {settlementTypes.map((type) => (
+                        <SelectItem
+                          key={type.id}
+                          value={type.name}
+                          className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}
+                        >
+                          {type.name}
+                        </SelectItem>
+                      ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-
-            {/* Settlement Type - only when Payment Type is Settlement */}
-            {editPaymentType === 'Settlement' && (
-              <div>
-                <Label className={isDarkMode ? 'text-gray-300' : 'text-slate-700'}>
-                  Settlement Type
-                </Label>
-                <Select
-                  value={editSettlementType}
-                  onValueChange={(value) => setEditSettlementType(value)}
-                >
-                  <SelectTrigger className={isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}>
-                    <SelectValue placeholder="Select settlement type..." />
-                  </SelectTrigger>
-                  <SelectContent className={isDarkMode ? 'bg-gray-700 border-gray-600' : ''}>
-                    <SelectGroup>
-                      {settlementTypes.length > 0 ? (
-                        settlementTypes.map((type) => (
-                          <SelectItem 
-                            key={type.id} 
-                            value={type.name}
-                            className={isDarkMode ? 'text-white hover:bg-gray-600' : ''}
-                          >
-                            {type.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-types" disabled className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
-                          No settlement types available. Add from Settings.
-                        </SelectItem>
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
 
             <div className="flex gap-2 pt-4">
               <Button
