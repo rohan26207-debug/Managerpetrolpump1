@@ -6,6 +6,8 @@ import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { Calendar, Printer, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 /**
  * Bank Settlement
@@ -195,15 +197,80 @@ const BankSettlement = ({
       ];
       XLSX.utils.book_append_sheet(wb, ws, 'Bank Settlement');
       const filename = `Bank_Settlement_${fromDate}_to_${toDate}.xlsx`;
-      XLSX.writeFile(wb, filename);
+
+      // Native download in Android WebView, browser download otherwise
+      if (window.MPumpCalcAndroid && typeof window.MPumpCalcAndroid.saveFileToDownloads === 'function') {
+        const base64 = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
+        window.MPumpCalcAndroid.saveFileToDownloads(
+          base64,
+          filename,
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+      } else {
+        XLSX.writeFile(wb, filename);
+      }
     } catch (error) {
       console.error('Excel export error:', error);
       alert('Error exporting to Excel: ' + error.message);
     }
   };
 
-  // ---------------- Print ----------------
+  // ---------------- Print / PDF ----------------
   const handlePrint = () => {
+    try {
+      // Use jsPDF + native viewer in Android, browser print window on web
+      if (window.MPumpCalcAndroid && typeof window.MPumpCalcAndroid.openPdfWithViewer === 'function') {
+        generatePDFForAndroid();
+      } else {
+        generateHTMLForWeb();
+      }
+    } catch (error) {
+      console.error('Print error:', error);
+      alert('Error generating report: ' + error.message);
+    }
+  };
+
+  const generatePDFForAndroid = () => {
+    const doc = new jsPDF({ orientation: 'landscape' });
+    let yPos = 14;
+    doc.setFontSize(16);
+    doc.text('Bank Settlement Report', doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+    yPos += 7;
+    doc.setFontSize(10);
+    const dateStr = `${new Date(fromDate).toLocaleDateString('en-IN')} to ${new Date(toDate).toLocaleDateString('en-IN')}`;
+    doc.text(dateStr, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+    yPos += 5;
+    const filterStr = `Filter: ${[includeDaywise && 'Operating Daywise', includeReceipts && 'Customer Receipt'].filter(Boolean).join(' + ') || '(none)'}`;
+    doc.text(filterStr, doc.internal.pageSize.width / 2, yPos, { align: 'center' });
+    yPos += 6;
+
+    const head = [['#', 'Date', 'Cash in Hand', ...dynamicTypes.map(c => c.label)]];
+    const body = rows.map(r => [
+      r.srNo,
+      new Date(r.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+      fmt(r.cashInHand),
+      ...dynamicTypes.map(c => fmt(r.colSums[c.key]))
+    ]);
+    body.push(['Total', '', totals.cashInHand.toFixed(2), ...dynamicTypes.map(c => totals.cols[c.key].toFixed(2))]);
+
+    doc.autoTable({
+      startY: yPos,
+      head, body,
+      theme: 'grid',
+      headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0] },
+      styles: { fontSize: 8 },
+    });
+
+    const footerY = doc.internal.pageSize.height - 8;
+    doc.setFontSize(8);
+    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, doc.internal.pageSize.width / 2, footerY, { align: 'center' });
+
+    const base64 = doc.output('dataurlstring').split(',')[1];
+    const fileName = `Bank_Settlement_${fromDate}_to_${toDate}.pdf`;
+    window.MPumpCalcAndroid.openPdfWithViewer(base64, fileName);
+  };
+
+  const generateHTMLForWeb = () => {
     const headerCells = `<th>Sr.No<th>Date<th>Cash in Hand${dynamicTypes.map((c) => `<th>${c.label}`).join('')}`;
     const bodyRows = rows.map((r) =>
       `<tr><td class="c">${r.srNo}<td class="c">${r.date}<td class="r">${fmt(r.cashInHand)}${dynamicTypes.map((c) => `<td class="r">${fmt(r.colSums[c.key])}`).join('')}</tr>`

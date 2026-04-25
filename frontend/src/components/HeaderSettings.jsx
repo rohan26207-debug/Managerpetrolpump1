@@ -52,6 +52,10 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
   });
   const [showProPasswordDialog, setShowProPasswordDialog] = useState(false);
   const [proPassword, setProPassword] = useState('');
+
+  // Inline confirmation state (avoids nested-modal issues in Android WebView)
+  const [clearAllConfirm, setClearAllConfirm] = useState({ open: false, typed: '' });
+  const [rangeDeleteConfirm, setRangeDeleteConfirm] = useState({ open: false, fromDate: '', toDate: '' });
   const [fyBackupBusy, setFyBackupBusy] = useState(false);
   const [fyBackupYear, setFyBackupYear] = useState(() => {
     // Default to current FY (1 Apr through 31 Mar). If today is on/after Apr 1
@@ -85,33 +89,73 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
     setSettlementTypes(localStorageService.getSettlementTypes());
   }, []);
 
-  // Clear All Data handler
-  const handleClearAllData = async () => {
+  // Date-range deletion (after inline confirmation gate)
+  const performRangeDelete = (fromDate, toDate) => {
     try {
-      // Single in-app modal replacing window.confirm + window.prompt (both are
-      // blocked in Android WebView). User must type "DELETE ALL" to enable the
-      // Yes button, matching the previous two-step safety gate.
-      const ok = await confirm({
-        title: 'Delete ALL Data?',
-        message:
-          'WARNING: This will DELETE ALL DATA!\n\n' +
-          '- All sales, customers, payments\n' +
-          '- All income, expenses, settlements\n' +
-          '- All fuel settings and categories\n\n' +
-          'This action CANNOT be undone!',
-        confirmText: 'Yes, Delete All',
-        requireTypedText: 'DELETE ALL',
-        isDarkMode,
+      const salesData = localStorageService.getSalesData();
+      const creditData = localStorageService.getCreditData();
+      const incomeData = localStorageService.getIncomeData();
+      const expenseData = localStorageService.getExpenseData();
+      const payments = localStorageService.getPayments();
+
+      const filteredSales = salesData.filter(item => item.date < fromDate || item.date > toDate);
+      const filteredCredits = creditData.filter(item => item.date < fromDate || item.date > toDate);
+      const filteredIncome = incomeData.filter(item => item.date < fromDate || item.date > toDate);
+      const filteredExpenses = expenseData.filter(item => item.date < fromDate || item.date > toDate);
+      const filteredPayments = payments.filter(item => item.date < fromDate || item.date > toDate);
+
+      const deletedSales = salesData.length - filteredSales.length;
+      const deletedCredits = creditData.length - filteredCredits.length;
+      const deletedIncome = incomeData.length - filteredIncome.length;
+      const deletedExpenses = expenseData.length - filteredExpenses.length;
+      const deletedPayments = payments.length - filteredPayments.length;
+
+      let deletedStockRecords = 0;
+      const stockKeys = Object.keys(localStorage).filter(key => key.includes('StockData'));
+      stockKeys.forEach(key => {
+        const baseKey = key.includes(':') ? key.split(':').pop() : key;
+        const stockData = localStorageService.getItem(baseKey) || {};
+        Object.keys(stockData).forEach(date => {
+          if (date >= fromDate && date <= toDate) {
+            deletedStockRecords++;
+            delete stockData[date];
+          }
+        });
+        localStorageService.setItem(baseKey, stockData);
       });
 
-      if (!ok) {
-        toast({
-          title: "Cancelled",
-          description: "Data deletion cancelled.",
-        });
-        return;
-      }
+      const totalDeleted = deletedSales + deletedCredits + deletedIncome + deletedExpenses + deletedPayments + deletedStockRecords;
 
+      localStorageService.setSalesData(filteredSales);
+      localStorageService.setCreditData(filteredCredits);
+      localStorageService.setIncomeData(filteredIncome);
+      localStorageService.setExpenseData(filteredExpenses);
+      localStorageService.setPayments(filteredPayments);
+
+      toast({
+        title: "Data Deleted Successfully",
+        description: `Deleted ${totalDeleted} records (Stock: ${deletedStockRecords}, Sales: ${deletedSales}, Credits: ${deletedCredits}, Income: ${deletedIncome}, Expenses: ${deletedExpenses}, Receipts: ${deletedPayments}). Refreshing...`,
+      });
+
+      const fromInput = document.getElementById('delete-from-date');
+      const toInput = document.getElementById('delete-to-date');
+      if (fromInput) fromInput.value = '';
+      if (toInput) toInput.value = '';
+
+      setTimeout(() => { window.location.reload(); }, 2000);
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Clear All Data handler (called after inline confirmation gate)
+  const handleClearAllData = async () => {
+    try {
       // Clear localStorage
       const keysToRemove = Object.keys(localStorage).filter(key => 
         key.startsWith('mpp:') || 
@@ -121,7 +165,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
       );
       
       keysToRemove.forEach(key => localStorage.removeItem(key));
-      console.log('✅ localStorage cleared:', keysToRemove.length, 'keys');
+      console.log('localStorage cleared:', keysToRemove.length, 'keys');
 
       toast({
         title: "All Data Cleared!",
@@ -131,10 +175,10 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
       // Reload page to reset state
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 1500);
 
     } catch (error) {
-      console.error('❌ Clear data error:', error);
+      console.error('Clear data error:', error);
       toast({
         title: "Error Clearing Data",
         description: error.message || "Failed to clear all data.",
@@ -1032,122 +1076,79 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                             </div>
                           </div>
                           
-                          {/* Permanent Delete Button */}
-                          <Button 
-                            variant="outline" 
-                            className="w-full bg-red-600 hover:bg-red-700 text-white border-red-600"
-                            onClick={async () => {
-                              const fromDateInput = document.getElementById('delete-from-date');
-                              const toDateInput = document.getElementById('delete-to-date');
-                              const fromDate = fromDateInput.value;
-                              const toDate = toDateInput.value;
-                              
-                              // Validate dates
-                              if (!fromDate || !toDate) {
-                                toast({
-                                  title: "Invalid Date Range",
-                                  description: "Please select both from and to dates",
-                                  variant: "destructive",
-                                });
-                                return;
-                              }
-                              
-                              if (fromDate > toDate) {
-                                toast({
-                                  title: "Invalid Date Range",
-                                  description: "From date cannot be after To date",
-                                  variant: "destructive",
-                                });
-                                return;
-                              }
-                              
-                              // Confirm deletion - check Pro Mode (window.confirm blocked in Android WebView)
-                              const proceed = localStorageService.isProModeEnabled() || await confirm({
-                                title: 'Permanently Delete Data?',
-                                message: `WARNING: This will PERMANENTLY delete all data from ${fromDate} to ${toDate}.\n\nThis includes:\n- Stock Data\n- Reading Sales Data\n- Credit Sales Data\n- Income/Expense Data\n- Receipt Data\n\nThis action CANNOT be undone!\n\nAre you absolutely sure you want to continue?`,
-                                confirmText: 'Yes, Delete Permanently',
-                                isDarkMode,
-                              });
-                              
-                              if (proceed) {
-                                try {
-                                  // Get all data
-                                  const salesData = localStorageService.getSalesData();
-                                  const creditData = localStorageService.getCreditData();
-                                  const incomeData = localStorageService.getIncomeData();
-                                  const expenseData = localStorageService.getExpenseData();
-                                  const payments = localStorageService.getPayments();
-                                  
-                                  // Filter out data within the date range (keep data outside range)
-                                  const filteredSales = salesData.filter(item => item.date < fromDate || item.date > toDate);
-                                  const filteredCredits = creditData.filter(item => item.date < fromDate || item.date > toDate);
-                                  const filteredIncome = incomeData.filter(item => item.date < fromDate || item.date > toDate);
-                                  const filteredExpenses = expenseData.filter(item => item.date < fromDate || item.date > toDate);
-                                  const filteredPayments = payments.filter(item => item.date < fromDate || item.date > toDate);
-                                  
-                                  // Calculate deleted counts
-                                  const deletedSales = salesData.length - filteredSales.length;
-                                  const deletedCredits = creditData.length - filteredCredits.length;
-                                  const deletedIncome = incomeData.length - filteredIncome.length;
-                                  const deletedExpenses = expenseData.length - filteredExpenses.length;
-                                  const deletedPayments = payments.length - filteredPayments.length;
-                                  
-                                  // Delete stock data for date range
-                                  let deletedStockRecords = 0;
-                                  const stockKeys = Object.keys(localStorage).filter(key => key.includes('StockData'));
-                                  stockKeys.forEach(key => {
-                                    // Extract the base key (without namespace prefix)
-                                    const baseKey = key.includes(':') ? key.split(':').pop() : key;
-                                    const stockData = localStorageService.getItem(baseKey) || {};
-                                    
-                                    // Filter stock data by date
-                                    Object.keys(stockData).forEach(date => {
-                                      if (date >= fromDate && date <= toDate) {
-                                        deletedStockRecords++;
-                                        delete stockData[date];
-                                      }
-                                    });
-                                    
-                                    // Update stock data in localStorage
-                                    localStorageService.setItem(baseKey, stockData);
-                                  });
-                                  
-                                  const totalDeleted = deletedSales + deletedCredits + deletedIncome + deletedExpenses + deletedPayments + deletedStockRecords;
-                                  
-                                  // Update localStorage
-                                  localStorageService.setSalesData(filteredSales);
-                                  localStorageService.setCreditData(filteredCredits);
-                                  localStorageService.setIncomeData(filteredIncome);
-                                  localStorageService.setExpenseData(filteredExpenses);
-                                  localStorageService.setPayments(filteredPayments);
-                                  
-                                  // Show success message
+                          {/* Permanent Delete Button (with inline confirmation) */}
+                          {!rangeDeleteConfirm.open ? (
+                            <Button 
+                              variant="outline" 
+                              data-testid="settings-range-delete-btn"
+                              className="w-full bg-red-600 hover:bg-red-700 text-white border-red-600"
+                              onClick={() => {
+                                const fromDateInput = document.getElementById('delete-from-date');
+                                const toDateInput = document.getElementById('delete-to-date');
+                                const fromDate = fromDateInput?.value;
+                                const toDate = toDateInput?.value;
+
+                                if (!fromDate || !toDate) {
                                   toast({
-                                    title: "Data Deleted Successfully",
-                                    description: `Deleted ${totalDeleted} records (Stock: ${deletedStockRecords}, Sales: ${deletedSales}, Credits: ${deletedCredits}, Income: ${deletedIncome}, Expenses: ${deletedExpenses}, Receipts: ${deletedPayments}). Refreshing...`,
-                                  });
-                                  
-                                  // Clear date inputs
-                                  fromDateInput.value = '';
-                                  toDateInput.value = '';
-                                  
-                                  // Refresh page after 3 seconds
-                                  setTimeout(() => {
-                                    window.location.reload();
-                                  }, 3000);
-                                } catch (error) {
-                                  console.error('Delete error:', error);
-                                  toast({
-                                    title: "Delete Failed",
-                                    description: "Failed to delete data. Please try again.",
+                                    title: "Invalid Date Range",
+                                    description: "Please select both from and to dates",
                                     variant: "destructive",
                                   });
+                                  return;
                                 }
-                              }
-                            }}
-                          >
-                            🗑️ Permanent Delete
-                          </Button>
+                                if (fromDate > toDate) {
+                                  toast({
+                                    title: "Invalid Date Range",
+                                    description: "From date cannot be after To date",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+
+                                if (proMode) {
+                                  // Pro mode: skip confirmation entirely
+                                  performRangeDelete(fromDate, toDate);
+                                } else {
+                                  // Inline confirmation prompt
+                                  setRangeDeleteConfirm({ open: true, fromDate, toDate });
+                                }
+                              }}
+                            >
+                              Permanent Delete
+                            </Button>
+                          ) : (
+                            <div className={`p-3 rounded border-2 space-y-2 ${
+                              isDarkMode ? 'border-red-600 bg-red-900/20' : 'border-red-500 bg-red-50'
+                            }`}>
+                              <p className={`text-xs font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                                Permanently delete data from <strong>{rangeDeleteConfirm.fromDate}</strong> to <strong>{rangeDeleteConfirm.toDate}</strong>?
+                                This cannot be undone.
+                              </p>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="flex-1 bg-red-600 hover:bg-red-700"
+                                  data-testid="settings-range-delete-confirm"
+                                  onClick={() => {
+                                    performRangeDelete(rangeDeleteConfirm.fromDate, rangeDeleteConfirm.toDate);
+                                    setRangeDeleteConfirm({ open: false, fromDate: '', toDate: '' });
+                                  }}
+                                >
+                                  Yes, Delete
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1"
+                                  data-testid="settings-range-delete-cancel"
+                                  onClick={() => setRangeDeleteConfirm({ open: false, fromDate: '', toDate: '' })}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </>
@@ -1249,12 +1250,61 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           
                           <Button 
                             variant="destructive"
+                            data-testid="settings-clear-all-btn"
                             className="w-full bg-red-600 hover:bg-red-700"
-                            onClick={handleClearAllData}
+                            onClick={() => {
+                              if (proMode) {
+                                // Pro mode: skip confirmation entirely
+                                handleClearAllData();
+                              } else {
+                                setClearAllConfirm({ open: true, typed: '' });
+                              }
+                            }}
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Clear All Data
                           </Button>
+                          {clearAllConfirm.open && (
+                            <div className={`mt-2 p-3 rounded border-2 space-y-2 ${
+                              isDarkMode ? 'border-red-600 bg-red-900/30' : 'border-red-500 bg-red-100'
+                            }`}>
+                              <p className={`text-xs font-medium ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
+                                Type <strong>DELETE ALL</strong> to confirm:
+                              </p>
+                              <Input
+                                type="text"
+                                value={clearAllConfirm.typed}
+                                onChange={(e) => setClearAllConfirm(prev => ({ ...prev, typed: e.target.value }))}
+                                placeholder="DELETE ALL"
+                                data-testid="settings-clear-all-input"
+                                className={isDarkMode ? 'bg-gray-700 border-gray-500 text-white' : ''}
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                                  data-testid="settings-clear-all-confirm"
+                                  disabled={clearAllConfirm.typed.trim() !== 'DELETE ALL'}
+                                  onClick={() => {
+                                    setClearAllConfirm({ open: false, typed: '' });
+                                    handleClearAllData();
+                                  }}
+                                >
+                                  Yes, Delete All
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1"
+                                  data-testid="settings-clear-all-cancel"
+                                  onClick={() => setClearAllConfirm({ open: false, typed: '' })}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </>

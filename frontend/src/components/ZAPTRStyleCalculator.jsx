@@ -48,7 +48,6 @@ import OutstandingReport from './OutstandingReport';
 import OutstandingPDFReport from './OutstandingPDFReport';
 import CustomerInitialBalance from './CustomerInitialBalance';
 import SalesReport from './SalesReport';
-import CustomerReceiptUnseen from './CustomerReceiptUnseen';
 import {
   DndContext,
   PointerSensor,
@@ -3648,7 +3647,6 @@ window.onload = function() {
                             'backup':               { Icon: Wallet,      label: 'Backup',            testid: 'balance-block-backup' },
                             'cust-initial':         { Icon: Users,       label: 'Initial Balance',   testid: 'balance-block-cust-initial' },
                             'sales-report':         { Icon: TrendingUp,  label: 'Sales',             testid: 'balance-block-sales-report' },
-                            'customer-receipt':     { Icon: Receipt,     label: 'Customer Receipt',  testid: 'balance-block-customer-receipt' },
                           })[id];
                           if (!cfg) return null;
                           const { Icon, label, testid } = cfg;
@@ -3730,7 +3728,6 @@ window.onload = function() {
                           'backup':               { Icon: Wallet,      label: 'Backup',       testid: 'tab-backup' },
                           'cust-initial':         { Icon: Users,       label: 'Initial Bal.', testid: 'tab-cust-initial' },
                           'sales-report':         { Icon: TrendingUp,  label: 'Sales',        testid: 'tab-sales-report' },
-                          'customer-receipt':     { Icon: Receipt,     label: 'Cust. Receipt', testid: 'tab-customer-receipt' },
                         })[id];
                         if (!cfg) return null;
                         const { Icon, label, testid } = cfg;
@@ -3883,14 +3880,6 @@ window.onload = function() {
                       creditData={creditData}
                       fuelSettings={fuelSettings}
                       isDarkMode={isDarkMode}
-                    />
-                  )}
-
-                  {outstandingSubTab === 'customer-receipt' && (
-                    <CustomerReceiptUnseen
-                      isDarkMode={isDarkMode}
-                      payments={payments}
-                      selectedDate={selectedDate}
                     />
                   )}
                 </>

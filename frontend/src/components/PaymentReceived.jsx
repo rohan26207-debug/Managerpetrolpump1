@@ -40,6 +40,10 @@ const PaymentReceived = ({
   // Date range filter state
   const [fromDate, setFromDate] = useState(selectedDate);
   const [toDate, setToDate] = useState(selectedDate);
+
+  // Settlement-type filter state (Set of lowercase keys of types that ARE included).
+  // Default: all types included (computed lazily once `payments` is available).
+  const [excludedTypeKeys, setExcludedTypeKeys] = useState(() => new Set());
   
   // Record Receipt Sheet state
   const [recordReceiptOpen, setRecordReceiptOpen] = useState(false);
@@ -201,6 +205,37 @@ const PaymentReceived = ({
     }
   };
 
+  // Available settlement-type options derived from current data (default: all)
+  const availableSettlementTypes = (() => {
+    const map = new Map(); // key -> label
+    payments.forEach((p) => {
+      const lbl = (p.settlementType || p.mode || p.paymentType || '').trim();
+      if (!lbl) return;
+      const key = lbl.toLowerCase();
+      if (!map.has(key)) map.set(key, lbl);
+    });
+    return Array.from(map.entries()).map(([key, label]) => ({ key, label })).sort((a, b) => a.label.localeCompare(b.label));
+  })();
+
+  const toggleSettlementType = (key) => {
+    setExcludedTypeKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+  const setOnlySettlementType = (key) => {
+    // Tick only this one (exclude every other)
+    const next = new Set();
+    availableSettlementTypes.forEach((t) => { if (t.key !== key) next.add(t.key); });
+    setExcludedTypeKeys(next);
+  };
+  const setAllSettlementTypes = (checked) => {
+    if (checked) setExcludedTypeKeys(new Set());
+    else setExcludedTypeKeys(new Set(availableSettlementTypes.map(t => t.key)));
+  };
+
   // Filter payments for date range
   const filteredPayments = payments.filter(p => {
     // Filter by date range
@@ -216,8 +251,12 @@ const PaymentReceived = ({
           p.customerName === selectedCustomerObj.name;
       }
     }
-    
-    return matchesDateRange && matchesCustomer;
+
+    // Filter by settlement type
+    const lbl = (p.settlementType || p.mode || p.paymentType || '').trim().toLowerCase();
+    const matchesType = !excludedTypeKeys.has(lbl);
+
+    return matchesDateRange && matchesCustomer && matchesType;
   });
 
   // Calculate total received in date range
@@ -345,8 +384,17 @@ const PaymentReceived = ({
       // Generate filename with date
       const filename = `Payment_Receipts_${fromDate}_to_${toDate}.xlsx`;
 
-      // Export file
-      XLSX.writeFile(wb, filename);
+      // Export file (Android bridge if available, else browser download)
+      if (window.MPumpCalcAndroid && typeof window.MPumpCalcAndroid.saveFileToDownloads === 'function') {
+        const base64 = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
+        window.MPumpCalcAndroid.saveFileToDownloads(
+          base64,
+          filename,
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+      } else {
+        XLSX.writeFile(wb, filename);
+      }
       
       console.log('Excel file exported successfully');
     } catch (error) {
@@ -649,6 +697,68 @@ const PaymentReceived = ({
             
             {/* Date Range Filters with Select All and Delete */}
             <div className="space-y-3">
+              {/* Settlement Type checkboxes (default: all ticked) */}
+              {availableSettlementTypes.length > 0 && (
+                <div className={`p-2 rounded border ${
+                  isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-slate-300 bg-slate-50'
+                }`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <Label className={`text-xs font-medium ${isDarkMode ? 'text-gray-200' : 'text-slate-700'}`}>
+                      Settlement Types
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setAllSettlementTypes(true)}
+                        data-testid="receipt-types-select-all"
+                        className={`text-[10px] underline ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}
+                      >
+                        All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAllSettlementTypes(false)}
+                        data-testid="receipt-types-clear"
+                        className={`text-[10px] underline ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}
+                      >
+                        None
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {availableSettlementTypes.map((t) => {
+                      const checked = !excludedTypeKeys.has(t.key);
+                      return (
+                        <label
+                          key={t.key}
+                          className={`flex items-center gap-1 px-2 py-1 rounded border cursor-pointer text-xs ${
+                            checked
+                              ? (isDarkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-slate-400 text-slate-800')
+                              : (isDarkMode ? 'bg-gray-800 border-gray-600 text-gray-400' : 'bg-slate-100 border-slate-300 text-slate-500')
+                          }`}
+                          data-testid={`receipt-type-chip-${t.key}`}
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={() => toggleSettlementType(t.key)}
+                            className={isDarkMode ? 'border-gray-400' : ''}
+                            data-testid={`receipt-type-cb-${t.key}`}
+                          />
+                          <span>{t.label}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); setOnlySettlementType(t.key); }}
+                            data-testid={`receipt-type-only-${t.key}`}
+                            className={`ml-1 text-[10px] underline ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}
+                          >
+                            only
+                          </button>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="fromDate" className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>

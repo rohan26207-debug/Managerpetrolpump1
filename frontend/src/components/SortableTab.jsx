@@ -112,7 +112,6 @@ export const DEFAULT_BALANCE_TAB_ORDER = [
   'backup',
   'cust-initial',
   'sales-report',
-  'customer-receipt',
 ];
 
 const STORAGE_KEY = 'mpump_balance_tab_order';

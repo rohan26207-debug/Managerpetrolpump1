@@ -266,8 +266,17 @@ const CreditSalesManagement = ({
       // Generate filename with date
       const filename = `Credit_Sales_${fromDate}_to_${toDate}.xlsx`;
 
-      // Export file
-      XLSX.writeFile(wb, filename);
+      // Export file (Android bridge if available, else browser download)
+      if (window.MPumpCalcAndroid && typeof window.MPumpCalcAndroid.saveFileToDownloads === 'function') {
+        const base64 = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
+        window.MPumpCalcAndroid.saveFileToDownloads(
+          base64,
+          filename,
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+      } else {
+        XLSX.writeFile(wb, filename);
+      }
       
       console.log('Excel file exported successfully');
     } catch (error) {
