@@ -202,6 +202,11 @@ class LocalStorageService {
     if (!this.getPayments()) this.setPayments([]);
     if (!this.getSettlements()) this.setSettlements([]);
 
+    // One-time migration (v2.3): Fuel Sales now includes testing in litres &
+    // amount. Old records stored `liters = end-start-testing` (net). If an
+    // existing record's `liters` matches the net formula, convert it to gross.
+    this._migrateTestingIncludedInLiters();
+
     // Initialize default income/expense categories
     if (!this.getIncomeCategories()) {
       this.setIncomeCategories([
@@ -296,6 +301,41 @@ class LocalStorageService {
   // ===== Sales Data Methods =====
   getSalesData() { return this.getItem(this.keys.salesData) || []; }
   setSalesData(data) { return this.setItem(this.keys.salesData, data); }
+
+  // One-time migration (idempotent) — run on app init. Converts legacy
+  // sale records where liters = (end - start - testing) into the new
+  // "gross" format where liters = (end - start) and amount reflects that.
+  _migrateTestingIncludedInLiters() {
+    try {
+      const FLAG = 'mpump_mig_testing_in_liters_v1';
+      if (localStorage.getItem(nsKey(FLAG)) === '1') return;
+
+      const sales = this.getSalesData();
+      let changed = false;
+      sales.forEach((s) => {
+        const testing = parseFloat(s.testing) || 0;
+        if (testing <= 0) return; // nothing to migrate
+        const start = parseFloat(s.startReading) || 0;
+        const end = parseFloat(s.endReading) || 0;
+        const rate = parseFloat(s.rate) || 0;
+        const storedLiters = parseFloat(s.liters) || 0;
+        const gross = end - start;
+        const net = gross - testing;
+        // Only migrate rows where the stored liters match the OLD net formula
+        // (within floating point tolerance). Rows already at gross are left
+        // untouched.
+        if (Math.abs(storedLiters - net) < 0.005 && Math.abs(storedLiters - gross) > 0.005) {
+          s.liters = parseFloat(gross.toFixed(2));
+          s.amount = parseFloat((gross * rate).toFixed(2));
+          changed = true;
+        }
+      });
+      if (changed) this.setSalesData(sales);
+      localStorage.setItem(nsKey(FLAG), '1');
+    } catch (err) {
+      console.warn('Testing migration failed:', err);
+    }
+  }
   addSaleRecord(saleData) {
     const sales = this.getSalesData();
     const newSale = {
