@@ -118,20 +118,41 @@ const BankSettlement = ({
         });
       }
 
-      // Cash in Hand (mirror ZAPTRStyleCalculator formula, toggled)
-      // Operating piece: fuel sales − credit + income − expenses − settlement
+      // Cash in Hand — mirrors the Summary formula on the Operating Date:
+      //   CiH = totalFuelAmount − creditTotalAmount + otherIncome − totalExpenses
+      //         − totalSettlement + cashReceipts
+      // Income & expenses must include entries embedded inside credit records
+      // (credit.incomeEntries / credit.expenseEntries); otherwise the figure
+      // won't match the Summary on days with such records.
       const todayFuelAmount = salesData
         .filter((s) => s.date === date && (s.type === 'cash' || !s.type))
         .reduce((sum, s) => sum + (s.amount || 0), 0);
-      const todayCredit = creditData
-        .filter((c) => c.date === date)
-        .reduce((sum, c) => sum + (c.amount || 0), 0);
-      const todayIncome = incomeData
+
+      const dayCredits = creditData.filter((c) => c.date === date);
+      const todayCredit = dayCredits.reduce((sum, c) => sum + (c.amount || 0), 0);
+
+      const directIncome = incomeData
         .filter((i) => i.date === date)
         .reduce((sum, i) => sum + (i.amount || 0), 0);
-      const todayExpense = expenseData
+      const creditEmbeddedIncome = dayCredits.reduce((sum, c) => {
+        if (c.incomeEntries && c.incomeEntries.length > 0) {
+          return sum + c.incomeEntries.reduce((s2, e) => s2 + (e.amount || 0), 0);
+        }
+        return sum;
+      }, 0);
+      const todayIncome = directIncome + creditEmbeddedIncome;
+
+      const directExpense = expenseData
         .filter((e) => e.date === date)
         .reduce((sum, e) => sum + (e.amount || 0), 0);
+      const creditEmbeddedExpense = dayCredits.reduce((sum, c) => {
+        if (c.expenseEntries && c.expenseEntries.length > 0) {
+          return sum + c.expenseEntries.reduce((s2, e) => s2 + (e.amount || 0), 0);
+        }
+        return sum;
+      }, 0);
+      const todayExpense = directExpense + creditEmbeddedExpense;
+
       const todaySettlementTotal = daySettlements.reduce((sum, s) => sum + (s.amount || 0), 0);
       const todayCashReceipts = dayPayments
         .filter((p) => (p.paymentType || p.mode || p.settlementType || '').toLowerCase() === 'cash')
