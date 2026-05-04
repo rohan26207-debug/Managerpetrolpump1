@@ -152,23 +152,25 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
   const nozzles = generateNozzles();
 
   // Function to get yesterday's end reading for a specific nozzle
-  const getYesterdayEndReading = (nozzleId) => {
+  const getYesterdayEndReading = (nozzleId, fuelType) => {
     const yesterday = new Date(selectedDate);
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
-    
-    // Find all sales for this nozzle from yesterday
+
+    // Find all sales for this nozzle + fuel type from yesterday. Filtering by
+    // fuel type as well is critical: multiple fuel types can share a nozzle
+    // prefix (e.g. "Petrol" and "Power Petrol" both start with "P" → both
+    // produce nozzle id "P1"). Without the fuel-type filter the starting
+    // reading for a custom fuel would leak from a different fuel's sale.
     const yesterdaySales = salesData.filter(
-      sale => sale.date === yesterdayStr && sale.nozzle === nozzleId
+      sale =>
+        sale.date === yesterdayStr &&
+        sale.nozzle === nozzleId &&
+        (!fuelType || sale.fuelType === fuelType)
     );
-    
-    if (yesterdaySales.length === 0) {
-      return 0; // No previous data, start from 0
-    }
-    
-    // Get the highest end reading from yesterday for this nozzle
-    const maxEndReading = Math.max(...yesterdaySales.map(sale => sale.endReading));
-    return maxEndReading;
+
+    if (yesterdaySales.length === 0) return 0;
+    return Math.max(...yesterdaySales.map(sale => sale.endReading));
   };
 
   const handleFuelChange = (fuelType) => {
@@ -201,8 +203,8 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
   };
 
   const handleNozzleChange = (nozzleId) => {
-    const yesterdayEndReading = getYesterdayEndReading(nozzleId);
-    
+    const yesterdayEndReading = getYesterdayEndReading(nozzleId, formData.fuelType);
+
     setFormData(prev => ({
       ...prev,
       nozzle: nozzleId,
@@ -211,15 +213,16 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
   };
 
   const calculateSale = () => {
-    const { startReading, endReading, testing, rate } = formData;
+    const { startReading, endReading, rate } = formData;
     if (!startReading || !endReading || !rate) return null;
-    
-    const testingAmount = parseFloat(testing) || 0;
-    const netLiters = parseFloat(endReading) - parseFloat(startReading) - testingAmount;
-    const amount = netLiters * parseFloat(rate);
-    
-    // Allow zero or negative values without error
-    return { liters: netLiters.toFixed(2), amount: amount.toFixed(2) };
+
+    // Total litres dispensed (end - start) INCLUDES testing — testing fuel is
+    // still fuel pumped from the tank, so it counts in Fuel Sales. Testing is
+    // shown as its own informational field, not subtracted here.
+    const grossLiters = parseFloat(endReading) - parseFloat(startReading);
+    const amount = grossLiters * parseFloat(rate);
+
+    return { liters: grossLiters.toFixed(2), amount: amount.toFixed(2) };
   };
 
   const validateAndCreateSaleRecord = () => {

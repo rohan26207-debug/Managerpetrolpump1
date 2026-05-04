@@ -117,6 +117,10 @@ const UnifiedRecords = ({
             <span>{sale.endReading}</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:gap-1">
+            <span className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Testing:</span>
+            <span>{sale.testing || 0}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:gap-1">
             <span className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Litres:</span>
             <span>{sale.liters}</span>
           </div>
