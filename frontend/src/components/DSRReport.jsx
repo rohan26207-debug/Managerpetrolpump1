@@ -14,7 +14,7 @@ import localStorageService from '../services/localStorage';
  *   Opening         = <fuel>StockData[d].startStock
  *   Receipt         = <fuel>StockData[d].purchase
  *   Total           = Opening + Receipt
- *   SalesByMeter    = sum(liters) of sales[d][fuel] where !mpp  (liters now includes testing)
+ *   SalesByMeter    = sum(liters + testing) of sales[d][fuel] where !mpp
  *   PumpTest        = sum(testing) of all sales[d][fuel]
  *   NetSalesByMeter = SalesByMeter - PumpTest
  *   CumulativeSales = running sum of NetSalesByMeter
@@ -50,7 +50,7 @@ const DSRReport = ({ isDarkMode, fuelSettings, salesData }) => {
 
       const daySales = salesData.filter(s => s.date === dateStr && s.fuelType === fuelType);
       const nonMpp = daySales.filter(s => !s.mpp && s.mpp !== true && s.mpp !== 'true');
-      const salesByMeter = nonMpp.reduce((a, s) => a + (parseFloat(s.liters) || 0), 0);
+      const salesByMeter = nonMpp.reduce((a, s) => a + (parseFloat(s.liters) || 0) + (parseFloat(s.testing) || 0), 0);
       const pumpTest = daySales.reduce((a, s) => a + (parseFloat(s.testing) || 0), 0);
       const netSales = salesByMeter - pumpTest;
 

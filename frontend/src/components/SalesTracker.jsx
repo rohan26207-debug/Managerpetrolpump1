@@ -213,16 +213,20 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
   };
 
   const calculateSale = () => {
-    const { startReading, endReading, rate } = formData;
+    const { startReading, endReading, testing, rate } = formData;
     if (!startReading || !endReading || !rate) return null;
 
-    // Total litres dispensed (end - start) INCLUDES testing — testing fuel is
-    // still fuel pumped from the tank, so it counts in Fuel Sales. Testing is
-    // shown as its own informational field, not subtracted here.
-    const grossLiters = parseFloat(endReading) - parseFloat(startReading);
-    const amount = grossLiters * parseFloat(rate);
+    // Stored `liters` is the NET quantity sold to paying customers:
+    //   net = (end - start) - testing
+    // The Summary card's "Fuel Sales" row shows this net — it is the money
+    // the pump actually collected. Testing litres are captured separately
+    // (sale.testing) and the right-column breakdown adds them back when
+    // computing the gross per-fuel volume dispensed.
+    const testingAmount = parseFloat(testing) || 0;
+    const netLiters = parseFloat(endReading) - parseFloat(startReading) - testingAmount;
+    const amount = netLiters * parseFloat(rate);
 
-    return { liters: grossLiters.toFixed(2), amount: amount.toFixed(2) };
+    return { liters: netLiters.toFixed(2), amount: amount.toFixed(2) };
   };
 
   const validateAndCreateSaleRecord = () => {

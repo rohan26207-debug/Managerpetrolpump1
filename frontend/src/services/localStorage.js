@@ -302,38 +302,42 @@ class LocalStorageService {
   getSalesData() { return this.getItem(this.keys.salesData) || []; }
   setSalesData(data) { return this.setItem(this.keys.salesData, data); }
 
-  // One-time migration (idempotent) — run on app init. Converts legacy
-  // sale records where liters = (end - start - testing) into the new
-  // "gross" format where liters = (end - start) and amount reflects that.
+  // Migration cleanup — the earlier "testing-in-liters" migration (v1) was
+  // reverted per user feedback. If v1 ran and converted records to gross,
+  // this runs once to restore them to net (liters = end - start - testing).
   _migrateTestingIncludedInLiters() {
     try {
-      const FLAG = 'mpump_mig_testing_in_liters_v1';
-      if (localStorage.getItem(nsKey(FLAG)) === '1') return;
+      const V1_FLAG = 'mpump_mig_testing_in_liters_v1';
+      const REVERT_FLAG = 'mpump_mig_testing_in_liters_revert_v1';
+      const v1Ran = localStorage.getItem(nsKey(V1_FLAG)) === '1';
+      const revertRan = localStorage.getItem(nsKey(REVERT_FLAG)) === '1';
 
-      const sales = this.getSalesData();
-      let changed = false;
-      sales.forEach((s) => {
-        const testing = parseFloat(s.testing) || 0;
-        if (testing <= 0) return; // nothing to migrate
-        const start = parseFloat(s.startReading) || 0;
-        const end = parseFloat(s.endReading) || 0;
-        const rate = parseFloat(s.rate) || 0;
-        const storedLiters = parseFloat(s.liters) || 0;
-        const gross = end - start;
-        const net = gross - testing;
-        // Only migrate rows where the stored liters match the OLD net formula
-        // (within floating point tolerance). Rows already at gross are left
-        // untouched.
-        if (Math.abs(storedLiters - net) < 0.005 && Math.abs(storedLiters - gross) > 0.005) {
-          s.liters = parseFloat(gross.toFixed(2));
-          s.amount = parseFloat((gross * rate).toFixed(2));
-          changed = true;
-        }
-      });
-      if (changed) this.setSalesData(sales);
-      localStorage.setItem(nsKey(FLAG), '1');
+      if (v1Ran && !revertRan) {
+        const sales = this.getSalesData();
+        let changed = false;
+        sales.forEach((s) => {
+          const testing = parseFloat(s.testing) || 0;
+          if (testing <= 0) return;
+          const start = parseFloat(s.startReading) || 0;
+          const end = parseFloat(s.endReading) || 0;
+          const rate = parseFloat(s.rate) || 0;
+          const storedLiters = parseFloat(s.liters) || 0;
+          const gross = end - start;
+          const net = gross - testing;
+          // Only revert rows that were migrated forward (currently at gross).
+          if (Math.abs(storedLiters - gross) < 0.005 && Math.abs(storedLiters - net) > 0.005) {
+            s.liters = parseFloat(net.toFixed(2));
+            s.amount = parseFloat((net * rate).toFixed(2));
+            changed = true;
+          }
+        });
+        if (changed) this.setSalesData(sales);
+      }
+      // Mark as handled either way so we don't run again on every load.
+      localStorage.setItem(nsKey(REVERT_FLAG), '1');
+      localStorage.setItem(nsKey(V1_FLAG), '1');
     } catch (err) {
-      console.warn('Testing migration failed:', err);
+      console.warn('Testing migration revert failed:', err);
     }
   }
   addSaleRecord(saleData) {

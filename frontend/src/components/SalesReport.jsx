@@ -47,23 +47,19 @@ const SalesReport = ({ salesData = [], creditData = [], fuelSettings = {}, isDar
       fuelTypes.forEach(f => { perFuel[f] = { total: 0, test: 0, net: 0 }; });
       let mppTotal = 0, mppTest = 0, mppNet = 0;
 
-      // Reading sales: `s.liters` is GROSS (end - start), includes testing.
-      //   total = gross litres dispensed
-      //   test  = testing litres
-      //   net   = gross - testing (actually sold to customers)
+      // Reading sales: `s.liters` is NET of testing. Gross = liters + testing.
       salesData
         .filter(s => s.date === date)
         .forEach(s => {
           const fuel = s.fuelType;
-          const grossLiters = parseFloat(s.liters) || 0;
+          const netLiters = parseFloat(s.liters) || 0;
           const testing = parseFloat(s.testing) || 0;
-          const netLiters = grossLiters - testing;
           if (isMpp(s)) {
-            mppTotal += grossLiters;
+            mppTotal += netLiters + testing;
             mppTest += testing;
             mppNet += netLiters;
           } else if (perFuel[fuel]) {
-            perFuel[fuel].total += grossLiters;
+            perFuel[fuel].total += netLiters + testing;
             perFuel[fuel].test += testing;
             perFuel[fuel].net += netLiters;
           }

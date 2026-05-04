@@ -682,13 +682,16 @@ const ZAPTRStyleCalculator = () => {
     const todayIncome = incomeData.filter(income => income.date === selectedDate);
     const todayExpenses = expenseData.filter(expense => expense.date === selectedDate);
 
-    // Calculate fuel sales by fuel type (excluding MPP-tagged sales)
+    // Calculate fuel sales by fuel type (excluding MPP-tagged sales). The
+    // right-column "Fuel Sales" breakdown shows GROSS litres dispensed per
+    // fuel type, i.e. (liters + testing). Amount stays net (money collected)
+    // so it still reconciles with the Summary total.
     const fuelSalesByType = {};
     todaySales.filter(sale => !sale.mpp).forEach(sale => {
       if (!fuelSalesByType[sale.fuelType]) {
         fuelSalesByType[sale.fuelType] = { liters: 0, amount: 0 };
       }
-      fuelSalesByType[sale.fuelType].liters += sale.liters;
+      fuelSalesByType[sale.fuelType].liters += (parseFloat(sale.liters) || 0) + (parseFloat(sale.testing) || 0);
       fuelSalesByType[sale.fuelType].amount += sale.amount;
     });
     
