@@ -107,7 +107,8 @@ const UnifiedRecords = ({
         </div>
       </div>
       <div className="space-y-1 text-xs sm:text-sm">
-        <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+        {/* Row 1 — Start / End / Testing */}
+        <div className="grid grid-cols-3 gap-x-2 gap-y-1">
           <div className="flex flex-col sm:flex-row sm:gap-1">
             <span className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Start:</span>
             <span>{sale.startReading}</span>
@@ -120,6 +121,9 @@ const UnifiedRecords = ({
             <span className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Testing:</span>
             <span>{sale.testing || 0}</span>
           </div>
+        </div>
+        {/* Row 2 — Litres / Rate */}
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1">
           <div className="flex flex-col sm:flex-row sm:gap-1">
             <span className={`font-medium ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>Litres:</span>
             <span>{sale.liters}</span>
