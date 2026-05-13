@@ -110,18 +110,24 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
       const incomeData = localStorageService.getIncomeData();
       const expenseData = localStorageService.getExpenseData();
       const payments = localStorageService.getPayments();
+      const settlements = localStorageService.getSettlements();
+      const cashOwnerEntries = localStorageService.getCashOwnerEntries();
 
       const filteredSales = salesData.filter(item => item.date < fromDate || item.date > toDate);
       const filteredCredits = creditData.filter(item => item.date < fromDate || item.date > toDate);
       const filteredIncome = incomeData.filter(item => item.date < fromDate || item.date > toDate);
       const filteredExpenses = expenseData.filter(item => item.date < fromDate || item.date > toDate);
       const filteredPayments = payments.filter(item => item.date < fromDate || item.date > toDate);
+      const filteredSettlements = settlements.filter(item => item.date < fromDate || item.date > toDate);
+      const filteredCashOwner = cashOwnerEntries.filter(item => item.date < fromDate || item.date > toDate);
 
       const deletedSales = salesData.length - filteredSales.length;
       const deletedCredits = creditData.length - filteredCredits.length;
       const deletedIncome = incomeData.length - filteredIncome.length;
       const deletedExpenses = expenseData.length - filteredExpenses.length;
       const deletedPayments = payments.length - filteredPayments.length;
+      const deletedSettlements = settlements.length - filteredSettlements.length;
+      const deletedCashOwner = cashOwnerEntries.length - filteredCashOwner.length;
 
       let deletedStockRecords = 0;
       const stockKeys = Object.keys(localStorage).filter(key => key.includes('StockData'));
@@ -137,17 +143,19 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
         localStorageService.setItem(baseKey, stockData);
       });
 
-      const totalDeleted = deletedSales + deletedCredits + deletedIncome + deletedExpenses + deletedPayments + deletedStockRecords;
+      const totalDeleted = deletedSales + deletedCredits + deletedIncome + deletedExpenses + deletedPayments + deletedSettlements + deletedCashOwner + deletedStockRecords;
 
       localStorageService.setSalesData(filteredSales);
       localStorageService.setCreditData(filteredCredits);
       localStorageService.setIncomeData(filteredIncome);
       localStorageService.setExpenseData(filteredExpenses);
       localStorageService.setPayments(filteredPayments);
+      localStorageService.setSettlements(filteredSettlements);
+      localStorageService.setCashOwnerEntries(filteredCashOwner);
 
       toast({
         title: "Data Deleted Successfully",
-        description: `Deleted ${totalDeleted} records (Stock: ${deletedStockRecords}, Sales: ${deletedSales}, Credits: ${deletedCredits}, Income: ${deletedIncome}, Expenses: ${deletedExpenses}, Receipts: ${deletedPayments}). Refreshing...`,
+        description: `Deleted ${totalDeleted} records (Stock: ${deletedStockRecords}, Sales: ${deletedSales}, Credits: ${deletedCredits}, Income: ${deletedIncome}, Expenses: ${deletedExpenses}, Receipts: ${deletedPayments}, Settlements: ${deletedSettlements}, Cash Tally: ${deletedCashOwner}). Refreshing...`,
       });
 
       const fromInput = document.getElementById('delete-from-date');
