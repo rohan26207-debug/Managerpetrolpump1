@@ -537,7 +537,33 @@ class LocalStorageService {
     const credits = this.getCreditData();
     const idx = credits.findIndex(c => c.id === id);
     if (idx !== -1) {
-      credits[idx] = { ...credits[idx], ...updatedData };
+      const merged = { ...credits[idx], ...updatedData };
+
+      // Keep legacy aggregate fields (liters / rate / fuelType) in sync with
+      // the canonical fuelEntries[] array. Older parts of the app (PDF, report
+      // preview, credit list) still read c.liters & c.rate directly, so we
+      // must overwrite — not preserve — these on every update; otherwise an
+      // edit that changes litres would leave stale values behind.
+      if (Array.isArray(merged.fuelEntries) && merged.fuelEntries.length > 0) {
+        const totalLiters = merged.fuelEntries.reduce(
+          (s, e) => s + (parseFloat(e.liters) || 0), 0
+        );
+        merged.liters = totalLiters;
+        // Single-fuel record: keep canonical rate & fuelType.
+        // Multi-fuel record: rate is ambiguous — clear so UI shows "-".
+        if (merged.fuelEntries.length === 1) {
+          merged.rate = parseFloat(merged.fuelEntries[0].rate) || 0;
+          merged.fuelType = merged.fuelEntries[0].fuelType || merged.fuelType;
+        } else {
+          merged.rate = 0;
+        }
+      } else if (updatedData && Object.prototype.hasOwnProperty.call(updatedData, 'fuelEntries')) {
+        // Caller explicitly set fuelEntries to empty/undefined → reset legacy too
+        merged.liters = 0;
+        merged.rate = 0;
+      }
+
+      credits[idx] = merged;
       this.setCreditData(credits);
       return credits[idx];
     }
