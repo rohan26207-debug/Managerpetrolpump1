@@ -3948,7 +3948,6 @@ window.onload = function() {
                   {outstandingSubTab === 'sales-report' && (
                     <SalesReport
                       salesData={salesData}
-                      creditData={creditData}
                       fuelSettings={fuelSettings}
                       isDarkMode={isDarkMode}
                     />
