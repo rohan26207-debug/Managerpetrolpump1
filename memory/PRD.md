@@ -69,3 +69,10 @@ React-based petrol pump management application. 100% offline with localStorage o
   7. `HeaderSettings.jsx:1026` — Permanent-delete-by-date-range
 - Verification: `grep 'window\.confirm(\|window\.prompt('` returns zero hits across `src/`. Lint + build clean. Android assets synced.
 
+
+## Reports → Inline Sales View (Jun 2026)
+- Added "Sales" button in Balance → Reports header (left of Share/PDF/Copy), data-testid="reports-sales-btn".
+- Clicking it swaps the Reports preview for the SalesReport component scoped to the currently selected report date (from = till = selectedDate).
+- SalesReport now accepts optional `initialFromDate`, `initialTillDate`, `onBack` props; renders a Back button (data-testid="sales-report-back-btn") when `onBack` is provided.
+- Android hardware back also closes the Sales view first (listens to the 'mpump-back' CustomEvent).
+- Verified via screenshot flow; Android assets synced (yarn build → assets/www).

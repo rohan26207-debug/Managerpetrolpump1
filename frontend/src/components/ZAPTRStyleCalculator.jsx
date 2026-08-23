@@ -99,6 +99,17 @@ const ReportPreviewTab = ({
   goToPreviousDay, goToNextDay, generateDirectPDF, copyToClipboard,
   stats, salesData, creditData, settlementData, incomeData, expenseData, payments, fuelSettings
 }) => {
+  // Inline Sales view (same table as Balance → Sales tab, scoped to selectedDate)
+  const [showSalesView, setShowSalesView] = useState(false);
+
+  // Android hardware back: close the Sales view first, back to Reports
+  useEffect(() => {
+    if (!showSalesView) return;
+    const onBack = (e) => { e.preventDefault(); setShowSalesView(false); };
+    window.addEventListener('mpump-back', onBack);
+    return () => window.removeEventListener('mpump-back', onBack);
+  }, [showSalesView]);
+
   const daySales = salesData.filter(s => s.date === selectedDate);
   const dayCredits = creditData.filter(c => c.date === selectedDate);
   const daySettlements = settlementData.filter(s => s.date === selectedDate);
@@ -131,6 +142,22 @@ const ReportPreviewTab = ({
 
   const cardCls = `rounded-lg border p-3 mb-3 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-slate-200'}`;
 
+  if (showSalesView) {
+    return (
+      <div data-testid="reports-sales-view">
+        <SalesReport
+          key={selectedDate}
+          salesData={salesData}
+          fuelSettings={fuelSettings}
+          isDarkMode={isDarkMode}
+          initialFromDate={selectedDate}
+          initialTillDate={selectedDate}
+          onBack={() => setShowSalesView(false)}
+        />
+      </div>
+    );
+  }
+
   return (
     <div data-testid="reports-view">
       {/* Operating Date header (identical layout to main summary) */}
@@ -148,6 +175,17 @@ const ReportPreviewTab = ({
             </div>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSalesView(true)}
+              data-testid="reports-sales-btn"
+              className={`text-xs h-7 px-2 ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}
+              title="Sales for this date"
+              aria-label="Sales"
+            >
+              Sales
+            </Button>
             <Button
               variant="outline"
               size="sm"

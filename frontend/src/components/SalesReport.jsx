@@ -3,7 +3,7 @@ import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
-import { Calendar, Printer, FileSpreadsheet } from 'lucide-react';
+import { Calendar, Printer, FileSpreadsheet, ArrowLeft } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -28,7 +28,7 @@ import { useToast } from '../hooks/use-toast';
  *
  * All numbers rendered to 2 decimal places. All values are in LITRES.
  */
-const SalesReport = ({ salesData = [], fuelSettings = {}, isDarkMode }) => {
+const SalesReport = ({ salesData = [], fuelSettings = {}, isDarkMode, initialFromDate, initialTillDate, onBack }) => {
   const { toast } = useToast();
   const fuelTypes = useMemo(
     () => Object.keys(fuelSettings || {}).sort((a, b) => a.localeCompare(b)),
@@ -38,8 +38,8 @@ const SalesReport = ({ salesData = [], fuelSettings = {}, isDarkMode }) => {
   // Default From = 1st of current month, Till = today
   const today = new Date();
   const toStr = (d) => d.toISOString().split('T')[0];
-  const [fromDate, setFromDate] = useState(() => toStr(new Date(today.getFullYear(), today.getMonth(), 1)));
-  const [tillDate, setTillDate] = useState(() => toStr(today));
+  const [fromDate, setFromDate] = useState(() => initialFromDate || toStr(new Date(today.getFullYear(), today.getMonth(), 1)));
+  const [tillDate, setTillDate] = useState(() => initialTillDate || toStr(today));
 
   const isMpp = (row) => row?.mpp === true || row?.mpp === 'true';
 
@@ -231,9 +231,24 @@ const SalesReport = ({ salesData = [], fuelSettings = {}, isDarkMode }) => {
   return (
     <Card className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'} shadow-lg`}>
       <CardContent className="p-2 sm:p-3 space-y-2">
-        <h2 className={`text-lg sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-          Sales
-        </h2>
+        <div className="flex items-center gap-2">
+          {onBack && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onBack}
+              data-testid="sales-report-back-btn"
+              aria-label="Back to Reports"
+              className={`h-8 px-2 ${isDarkMode ? 'border-gray-500 text-gray-200 hover:bg-gray-700' : 'border-slate-400 text-slate-800 hover:bg-slate-100'}`}
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Back
+            </Button>
+          )}
+          <h2 className={`text-lg sm:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+            Sales
+          </h2>
+        </div>
 
         {/* Date Range (compact, matches Bank Settlement sizing) */}
         <div className="grid grid-cols-2 gap-2">
