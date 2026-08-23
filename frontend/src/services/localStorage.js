@@ -207,6 +207,12 @@ class LocalStorageService {
     // existing record's `liters` matches the net formula, convert it to gross.
     this._migrateTestingIncludedInLiters();
 
+    // One-time migration (v2.4): Fix legacy credit records where the top-level
+    // `liters` field only reflects the first fuelEntry (add-time bug). Recompute
+    // it as the sum of all fuelEntries.liters so Report Preview / PDF / Balance
+    // tabs display the correct aggregate.
+    this._migrateCreditLegacyLiters();
+
     // Initialize default income/expense categories
     if (!this.getIncomeCategories()) {
       this.setIncomeCategories([
@@ -366,20 +372,38 @@ class LocalStorageService {
   setCreditData(data) { return this.setItem(this.keys.creditData, data); }
   addCreditRecord(creditData) {
     const credits = this.getCreditData();
+
+    // Derive legacy aggregate fields (liters / rate / fuelType) from
+    // fuelEntries so downstream consumers (Report Preview, PDF, Credit Manage
+    // list) that still read `credit.liters` directly always see the correct
+    // aggregate. Single-fuel record keeps a canonical rate & fuelType;
+    // multi-fuel records set rate=0 so the UI renders "-".
+    const entries = Array.isArray(creditData.fuelEntries) ? creditData.fuelEntries : [];
+    const derivedLiters = entries.length
+      ? entries.reduce((s, e) => s + (parseFloat(e.liters) || 0), 0)
+      : (parseFloat(creditData.liters) || 0);
+    const derivedRate =
+      entries.length === 1 ? (parseFloat(entries[0].rate) || 0)
+      : entries.length > 1  ? 0
+      : (parseFloat(creditData.rate) || 0);
+    const derivedFuelType =
+      entries.length === 1 ? (entries[0].fuelType || creditData.fuelType || 'N/A')
+      : (creditData.fuelType || (entries[0] && entries[0].fuelType) || 'N/A');
+
     const newCredit = {
       id: Date.now().toString(),
       date: creditData.date,
       customerId: creditData.customerId,
       customerName: creditData.customerName,
-      fuelEntries: creditData.fuelEntries || [],
+      fuelEntries: entries,
       incomeEntries: creditData.incomeEntries || [],
       expenseEntries: creditData.expenseEntries || [],
       amount: parseFloat(creditData.amount),
       totalAmount: parseFloat(creditData.amount),
       vehicleNumber: creditData.vehicleNumber || 'N/A',
-      fuelType: creditData.fuelType || (creditData.fuelEntries && creditData.fuelEntries[0] ? creditData.fuelEntries[0].fuelType : 'N/A'),
-      liters: creditData.liters || (creditData.fuelEntries && creditData.fuelEntries[0] ? creditData.fuelEntries[0].liters : 0),
-      rate: creditData.rate || (creditData.fuelEntries && creditData.fuelEntries[0] ? creditData.fuelEntries[0].rate : 0),
+      fuelType: derivedFuelType,
+      liters: derivedLiters,
+      rate: derivedRate,
       dueDate: creditData.dueDate || creditData.date,
       status: creditData.status || 'pending',
       mpp: creditData.mpp || false,
@@ -388,6 +412,33 @@ class LocalStorageService {
     credits.push(newCredit);
     this.setCreditData(credits);
     return newCredit;
+  }
+
+  // Fixes credit records where legacy `liters` only reflects the first
+  // fuelEntry (multi-fuel add-time bug). Recomputes as the sum of all
+  // fuelEntries.liters. Runs once, marked with a namespaced flag.
+  _migrateCreditLegacyLiters() {
+    try {
+      const FLAG = 'mpump_mig_credit_legacy_liters_v1';
+      if (localStorage.getItem(nsKey(FLAG)) === '1') return;
+
+      const credits = this.getCreditData();
+      let changed = false;
+      credits.forEach((c) => {
+        const entries = Array.isArray(c.fuelEntries) ? c.fuelEntries : [];
+        if (!entries.length) return;
+        const totalLiters = entries.reduce((s, e) => s + (parseFloat(e.liters) || 0), 0);
+        if (Math.abs((parseFloat(c.liters) || 0) - totalLiters) > 0.005) {
+          c.liters = parseFloat(totalLiters.toFixed(3));
+          if (entries.length > 1) c.rate = 0; // multi-fuel rate is ambiguous
+          changed = true;
+        }
+      });
+      if (changed) this.setCreditData(credits);
+      localStorage.setItem(nsKey(FLAG), '1');
+    } catch (err) {
+      console.warn('Credit legacy liters migration failed:', err);
+    }
   }
 
   // ===== Income Methods =====
@@ -564,6 +615,11 @@ class LocalStorageService {
       }
 
       credits[idx] = merged;
+      // Keep totalAmount in sync with amount (both fields exist historically;
+      // some consumers read totalAmount and would otherwise see stale values).
+      if (Object.prototype.hasOwnProperty.call(updatedData, 'amount')) {
+        merged.totalAmount = parseFloat(updatedData.amount);
+      }
       this.setCreditData(credits);
       return credits[idx];
     }

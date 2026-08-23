@@ -1,0 +1,48 @@
+{
+  "summary": "Frontend-only verification of credit-sales litres aggregation fix in the offline localStorage petrol pump app. Verified (a) one-time migration of legacy multi-fuel credit records, (b) add-credit path (single fuel via UI), (c) edit-credit path for both single-fuel (20L->30L) and multi-fuel (25L->35L) records, and propagation into Balance -> Reports (Report Preview) and Balance -> Credit Manage. All three requested scenarios that are reachable through the UI PASS. Found that multi-fuel credits cannot be created or fully edited through the UI (only fuelEntries[0] is rendered), plus 4 pre-existing defects.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "CreditSales.jsx (form)", "issue": "Form renders ONLY fuelEntries[0] (Fuel Type / Liters / Rate). addFuelEntry()/removeFuelEntry() exist but are never wired to any button, so a MULTI-FUEL credit can never be created via the UI (BUG FIX #1 add-path is unreachable from the UI; verified only by code review + migration path). Worse, when EDITING an existing multi-fuel record only the first fuel row is shown/editable while 'Final' total silently includes the hidden entries (form showed 10L @100 but Final: Rs.2350) - hidden entries cannot be viewed, corrected or removed.", "selector": "input[placeholder='0.00'] / select (fuel type) inside Add/Edit Credit Record sheet", "priority": "HIGH"},
+      {"component": "ZAPTRStyleCalculator.jsx Balance tab strip", "issue": "On the Balance landing page (block grid) clicking any quick-tab in the bottom strip (data-testid=tab-reports/tab-dsr/...) only highlights the tab; the section never opens because content is gated by !showBalanceBlocks and the Tabs onValueChange (line ~3777) never calls setShowBalanceBlocks(false). Repeat clicks do not help. Only the grid cards (balance-block-*) work. Pre-existing, not caused by this fix.", "selector": "[data-testid='tab-reports']", "priority": "MEDIUM"},
+      {"component": "CreditSales.jsx", "issue": "React console warning on every open: 'A component is changing a controlled input to be uncontrolled'. Root cause: the formResetKey reset effect (lines 128-135) rebuilds formData WITHOUT creditDate, so the date <Input value> becomes undefined.", "selector": "input[type='date'] in credit form", "priority": "LOW"},
+      {"component": "Testability", "issue": "No data-testid on credit form fields, Add/Update buttons, Credit Manage block/tab, credit rows or edit/delete icons. The testid quoted in the review request ('tab-credit-manage') does NOT exist; existing balance testids are only reports/dsr/backup/cust-initial/sales-report/cash-tally.", "selector": "n/a", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [
+      {"flow": "Edit credit sale", "issue": "After an edit, record.amount is updated (3000) but record.totalAmount stays stale (2000) because updateCreditRecord merges updatedData which has no totalAmount. Currently masked in Credit Manage (it recomputes from fuelEntries), but any consumer reading totalAmount gets wrong data. Additionally CreditSales.jsx line 1030 does credit?.totalAmount.toFixed(2) without a guard -> TypeError for records lacking totalAmount (e.g. restored/legacy data).", "affected_selectors": ["Balance -> Credit -> row Amount", "delete confirmation dialog"]},
+      {"flow": "Report Preview credit row", "issue": "ZAPTRStyleCalculator line ~300 uses c.liters.toFixed(2). The migration only rewrites liters when it differs from the fuelEntries sum, so a legacy record storing liters as a STRING equal to the sum keeps a string and would throw. Use parseFloat(c.liters||0).toFixed(2).", "affected_selectors": ["Report Preview credit table"]},
+      {"flow": "Edit from CreditSales internal record list (editCredit, line 392)", "issue": "Rebuilds formData without creditDate and without mpp, so saving via that path silently resets the record date to selectedDate and clears the MPP flag. (Not hit by the Today Summary edit path, which uses the editingRecord prop and is correct.)", "affected_selectors": ["internal credit list edit pencil"]}
+    ],
+    "design_issues": []
+  },
+  "verification_details": {
+    "regression_page_load": "PASS - app loads, no page/console errors (only the React controlled-input warning listed above).",
+    "migration_legacy_multifuel": "PASS - seeded record {fuelEntries: Petrol 10L@100 + Diesel 15L@90, liters:10, rate:100} -> after reload liters=25, rate=0. Report Preview row: 'TEST_MultiCust | - | 25.00 | 0.00 | 2350.00'; summary row 'Credit Sales 25.00 / 2350.00'. Credit Manage shows 'Petrol: 10L @ 100 / Diesel: 15L @ 90', total 2350.",
+    "add_single_fuel_via_UI": "PASS - Petrol 20L, rate auto-filled 102.5 -> stored liters=20, rate=102.5, amount=2050; Report Preview '102.5 | 20.00 | 2050.00'; Today Summary 20.00L / Rs.2050.",
+    "edit_single_fuel_20_to_30": "PASS (BUG FIX #2) - edited from Today Summary pencil; stored liters=30, rate=100, amount=3000; Report Preview '100 | 30.00 | 3000.00'; Balance -> Credit shows 'Petrol: 30L @ 100' / 3000.00.",
+    "edit_multi_fuel_25_to_35": "PASS - edited entry0 10L->20L on a 2-fuel record; stored liters=35, rate=0, amount=3350, both entries preserved; Report Preview '- | 35.00 | 3350.00'.",
+    "add_multi_fuel_via_UI": "NOT TESTABLE - no UI affordance to add a second fuel entry (see HIGH ui_bug). addCreditRecord aggregation code reviewed and is logically correct."
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Expose multi-fuel entry in CreditSales form (wire addFuelEntry/removeFuelEntry, render all fuelEntries) so multi-fuel credits can be created AND fully edited; today the hidden 2nd+ entries are invisible yet counted in the total.",
+    "Keep totalAmount in sync with amount in updateCreditRecord and guard credit?.totalAmount?.toFixed(2) in the delete dialog.",
+    "Fix Balance landing tab strip: call setShowBalanceBlocks(false) in the Tabs onValueChange so tab-* buttons open their section.",
+    "Include creditDate (and mpp) in the formResetKey reset effect and in editCredit() to remove the controlled/uncontrolled React warning and avoid silent date/MPP loss.",
+    "Use parseFloat(c.liters||0).toFixed(2) in Report Preview to be safe against string litres from legacy/imported data.",
+    "Add data-testid attributes to the credit form fields, Add/Update Credit buttons, Credit Manage tab/block and credit row edit/delete icons."
+  ],
+  "critical_code_review_comments": [
+    "localStorage.js addCreditRecord/updateCreditRecord/_migrateCreditLegacyLiters aggregation logic is correct (sum of fuelEntries, rate=0 for multi-fuel, single-fuel rate/fuelType preserved) and behaves as designed at runtime.",
+    "ZAPTRStyleCalculator.jsx is 4191 lines and CreditSales.jsx 1066 lines - both exceed the 700-line guideline; the report-preview/PDF/Excel/text exporters duplicate the same credit-litres reduce logic in 6+ places. Extract a single getCreditLiters(credit) helper to prevent this class of bug from reappearing.",
+    "Migration flag mpump_mig_credit_legacy_liters_v1 is one-shot; any record repaired incorrectly later (or written by an older build) will not be re-migrated. Consider deriving litres at read time via the shared helper instead of relying on a stored legacy field."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend only, no backend)", "frontend": "100% of reachable target scenarios passed (4/4); multi-fuel ADD path not reachable via UI"},
+  "seed_data_creation": "Injected into localStorage namespace 'mpp:local:': customers TEST_MultiCust / TEST_SingleCust and credit records cr1/cr9/crm for 2026-08-23. Data is per-browser-session in the automation harness (not persisted for the user).",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "None required (offline app, no auth). /app/memory/test_credentials.md not needed.",
+  "context_for_next_testing_agent": "Preview URL https://data-management-hub-3.preview.emergentagent.com, viewport 1280x1400. localStorage namespace prefix is 'mpp:local:' (keys mpump_credit_data, mpump_customers). Seed data must be injected and verified inside the SAME automation run - each run starts with a fresh profile. Navigation: header tab 'Balance' -> click card [data-testid='balance-block-reports'] (the bottom tab strip does NOT work from the grid view); once inside a section the strip buttons (button:has-text('Credit')) work. Credit form: click div.bg-orange-600:has-text('Credit Sales') on Today Summary; fields are input[placeholder='Search customer...'], select, input[placeholder='0.00'] (first=liters, second=rate); buttons 'Add Credit & Close' / 'Update Credit'. Edit from Today Summary via svg.lucide-square-pen.",
+  "rca_of_the_issue": "Original user bug (litres edits not reflected in Balance -> Credit/Reports) is fixed: Report Preview and PDF/Excel readers consume the legacy top-level credit.liters field, which addCreditRecord now sets to the SUM of fuelEntries, updateCreditRecord overwrites on every edit, and _migrateCreditLegacyLiters repairs once for existing records. Verified end-to-end for add(single), edit(single), edit(multi) and migration(multi). Residual gap: the credit form itself only renders fuelEntries[0], so multi-fuel records can neither be created nor fully edited from the UI."
+}
