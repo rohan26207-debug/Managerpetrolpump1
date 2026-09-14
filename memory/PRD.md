@@ -76,3 +76,10 @@ React-based petrol pump management application. 100% offline with localStorage o
 - SalesReport now accepts optional `initialFromDate`, `initialTillDate`, `onBack` props; renders a Back button (data-testid="sales-report-back-btn") when `onBack` is provided.
 - Android hardware back also closes the Sales view first (listens to the 'mpump-back' CustomEvent).
 - Verified via screenshot flow; Android assets synced (yarn build → assets/www).
+
+## Reports Calendar Green Highlights (Jun 2026)
+- Balance → Reports date field is now a Popover + shadcn Calendar (data-testid="reports-date-input" trigger, "reports-date-calendar" popup).
+- Any date having ANY record (sales/credit/settlement/income/expense/receipt) is highlighted GREEN; empty dates render plain so pending entry dates are obvious. Legend inside popup.
+- Selected day shows a blue ring; today is underlined. Local-tz safe parseYmd/toYmd helpers added.
+- Android hardware back closes the calendar popup first ('mpump-back' listener).
+- Verified via screenshot (green days 5 & 10 with seeded data); Android assets re-synced + external scripts stripped.

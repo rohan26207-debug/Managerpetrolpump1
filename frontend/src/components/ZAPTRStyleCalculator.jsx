@@ -6,6 +6,8 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from './ui/sheet';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar as CalendarPicker } from './ui/calendar';
 import { 
   Calculator, 
   CreditCard, 
@@ -93,6 +95,10 @@ const formatCreditIE = (credit) => {
   return `${sign}${Math.abs(net).toFixed(2)}`;
 };
 
+// Local-timezone-safe YYYY-MM-DD <-> Date helpers for the calendar popup
+const parseYmd = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const toYmd = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+
 // Inline Reports tab — date picker with Share/PDF/Copy + live HTML preview of the PDF
 const ReportPreviewTab = ({
   isDarkMode, selectedDate, setSelectedDate, formatDisplayDate,
@@ -101,6 +107,24 @@ const ReportPreviewTab = ({
 }) => {
   // Inline Sales view (same table as Balance → Sales tab, scoped to selectedDate)
   const [showSalesView, setShowSalesView] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+
+  // Every date that has ANY record (sales/credit/settlement/income/expense/receipt)
+  // → shown GREEN in the calendar so pending/skipped dates stand out.
+  const hasDataDates = React.useMemo(() => {
+    const set = new Set();
+    [salesData, creditData, settlementData, incomeData, expenseData, payments]
+      .forEach(arr => (arr || []).forEach(r => { if (r.date) set.add(r.date); }));
+    return [...set].map(parseYmd);
+  }, [salesData, creditData, settlementData, incomeData, expenseData, payments]);
+
+  // Android hardware back: close the calendar popup first
+  useEffect(() => {
+    if (!datePickerOpen) return;
+    const onBack = (e) => { e.preventDefault(); setDatePickerOpen(false); };
+    window.addEventListener('mpump-back', onBack);
+    return () => window.removeEventListener('mpump-back', onBack);
+  }, [datePickerOpen]);
 
   // Android hardware back: close the Sales view first, back to Reports
   useEffect(() => {
@@ -229,13 +253,44 @@ const ReportPreviewTab = ({
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <Input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            data-testid="reports-date-input"
-            className={`flex-1 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
-          />
+          <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                data-testid="reports-date-input"
+                className={`flex-1 justify-center font-medium ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' : ''}`}
+              >
+                <Calendar className="w-4 h-4 mr-2 opacity-70" />
+                {new Date(parseYmd(selectedDate)).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="center"
+              className={`w-auto p-0 ${isDarkMode ? 'bg-gray-800 border-gray-600 text-white' : ''}`}
+              data-testid="reports-date-calendar"
+            >
+              <CalendarPicker
+                mode="single"
+                selected={parseYmd(selectedDate)}
+                defaultMonth={parseYmd(selectedDate)}
+                onSelect={(d) => { if (d) { setSelectedDate(toYmd(d)); setDatePickerOpen(false); } }}
+                modifiers={{ hasData: hasDataDates }}
+                modifiersClassNames={{ hasData: 'bg-green-500 text-white font-semibold hover:bg-green-600 hover:text-white rounded-md' }}
+                classNames={{
+                  day_selected: 'ring-2 ring-blue-600 ring-offset-1 bg-primary text-primary-foreground',
+                  day_today: 'underline underline-offset-2 font-bold',
+                }}
+              />
+              <div className={`flex items-center gap-3 px-3 pb-2 text-[10px] ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-3 h-3 rounded bg-green-500" /> Data added
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className={`inline-block w-3 h-3 rounded border ${isDarkMode ? 'border-gray-500' : 'border-slate-400'}`} /> Pending
+                </span>
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button
             variant="outline"
             size="sm"
