@@ -631,7 +631,6 @@ class LocalStorageService {
     if (idx !== -1) {
       income[idx] = { ...income[idx], ...updatedData };
       this.setIncomeData(income);
-      if (fs) fs.syncIncomeExpense(income[idx], 'update');
       return income[idx];
     }
     return null;
@@ -642,7 +641,6 @@ class LocalStorageService {
     if (idx !== -1) {
       expenses[idx] = { ...expenses[idx], ...updatedData };
       this.setExpenseData(expenses);
-      if (fs) fs.syncIncomeExpense(expenses[idx], 'update');
       return expenses[idx];
     }
     return null;
