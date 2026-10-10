@@ -103,7 +103,8 @@ const toYmd = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(
 const ReportPreviewTab = ({
   isDarkMode, selectedDate, setSelectedDate, formatDisplayDate,
   goToPreviousDay, goToNextDay, generateDirectPDF, copyToClipboard,
-  stats, salesData, creditData, settlementData, incomeData, expenseData, payments, fuelSettings
+  stats, salesData, creditData, settlementData, incomeData, expenseData, payments, fuelSettings,
+  previewOnly = false
 }) => {
   // Inline Sales view (same table as Balance → Sales tab, scoped to selectedDate)
   const [showSalesView, setShowSalesView] = useState(false);
@@ -185,6 +186,7 @@ const ReportPreviewTab = ({
   return (
     <div data-testid="reports-view">
       {/* Operating Date header (identical layout to main summary) */}
+      {!previewOnly && (
       <div className={cardCls}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -302,6 +304,7 @@ const ReportPreviewTab = ({
           </Button>
         </div>
       </div>
+      )}
 
       {/* Report preview (mirrors PDF layout) */}
       <div className={cardCls}>
@@ -3180,150 +3183,28 @@ window.onload = function() {
         } shadow-lg mb-2`}>
           <CardContent className="p-2 sm:p-3">
             <div className="grid grid-cols-2 gap-3">
-              {/* LEFT COLUMN - Summary */}
-              <div className="space-y-1.5 sm:space-y-2">
-                {/* Summary Header */}
-                <h2 className={`text-lg sm:text-2xl font-bold mb-2 ${
-                  isDarkMode ? 'text-white' : 'text-slate-800'
-                }`}>
-                  Summary
-                </h2>
-                {/* Fuel Sales (No MPP) */}
-                <div className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${
-                  isDarkMode ? 'bg-gray-700' : 'bg-blue-50'
-                }`}>
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
-                      1
-                    </div>
-                    <span className={`font-medium text-xs sm:text-base truncate ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      Fuel Sales
-                    </span>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      {stats.totalLiters.toFixed(2)}L • ₹{stats.totalFuelAmount.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Credit Sales */}
-                <div className={`flex justify-between items-center p-2 sm:p-3 rounded-lg border-l-4 border-orange-500 ${
-                  isDarkMode ? 'bg-gray-700' : 'bg-orange-50'
-                }`}>
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
-                      2
-                    </div>
-                    <span className={`font-medium text-xs sm:text-base truncate ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      Credit Sales
-                    </span>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      {stats.creditLiters.toFixed(2)}L • ₹{stats.creditAmount.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Income */}
-                <div className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${
-                  isDarkMode ? 'bg-gray-700' : 'bg-green-50'
-                }`}>
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
-                      3
-                    </div>
-                    <span className={`font-medium text-xs sm:text-base truncate ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      Income
-                    </span>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      ₹{stats.otherIncome.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Expenses */}
-                <div className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${
-                  isDarkMode ? 'bg-gray-700' : 'bg-red-50'
-                }`}>
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
-                      4
-                    </div>
-                    <span className={`font-medium text-xs sm:text-base truncate ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      Expenses
-                    </span>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      ₹{stats.totalExpenses.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Settlement */}
-                <div className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${
-                  isDarkMode ? 'bg-gray-700' : 'bg-yellow-50'
-                }`}>
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
-                      5
-                    </div>
-                    <span className={`font-medium text-xs sm:text-base truncate ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      Settlement
-                    </span>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      ₹{stats.totalSettlement.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Cash in Hand */}
-                <div className={`flex justify-between items-center p-2 sm:p-3 rounded-lg border-l-4 border-purple-500 ${
-                  isDarkMode ? 'bg-gray-700' : 'bg-purple-50'
-                }`}>
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0">
-                      6
-                    </div>
-                    <span className={`font-medium text-xs sm:text-base truncate ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      Cash in Hand
-                    </span>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
-                      isDarkMode ? 'text-white' : 'text-slate-800'
-                    }`}>
-                      ₹{stats.cashInHand.toFixed(2)}
-                    </div>
-                  </div>
+              {/* LEFT COLUMN - B&W report (same as Balance -> Reports) */}
+              <div data-testid="today-summary-report" className="overflow-x-auto">
+                <div className="min-w-[300px]">
+                <ReportPreviewTab
+                  previewOnly
+                  isDarkMode={isDarkMode}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  formatDisplayDate={formatDisplayDate}
+                  goToPreviousDay={goToPreviousDay}
+                  goToNextDay={goToNextDay}
+                  generateDirectPDF={generateDirectPDF}
+                  copyToClipboard={copyToClipboard}
+                  stats={stats}
+                  salesData={salesData}
+                  creditData={creditData}
+                  settlementData={settlementData}
+                  incomeData={incomeData}
+                  expenseData={expenseData}
+                  payments={payments}
+                  fuelSettings={fuelSettings}
+                />
                 </div>
               </div>
 

@@ -83,3 +83,8 @@ React-based petrol pump management application. 100% offline with localStorage o
 - Selected day shows a blue ring; today is underlined. Local-tz safe parseYmd/toYmd helpers added.
 - Android hardware back closes the calendar popup first ('mpump-back' listener).
 - Verified via screenshot (green days 5 & 10 with seeded data); Android assets re-synced + external scripts stripped.
+
+## Today Summary = B&W Report View (Oct 2026)
+- Replaced the colorful left Summary column on Today Summary with the exact Balance → Reports B&W preview (Manager Pump header, STOCK/FUEL SALES lines, Category table, full record tables, Bank Settlement Report).
+- Implementation: ReportPreviewTab got a `previewOnly` prop (hides Operating Date header/buttons); Today Summary renders <ReportPreviewTab previewOnly .../> inside data-testid="today-summary-report" with overflow-x-auto + min-w-[300px] guard for narrow phones.
+- Right column (Fuel Type Breakdown) unchanged per user choice. Verified via screenshots; Android assets synced + cleaned.
