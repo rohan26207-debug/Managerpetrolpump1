@@ -814,8 +814,8 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                   
                   {/* Contact Information Display */}
                   <div className="text-center mb-4">
-                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-blue-100 rounded-full">
-                      <Phone className="w-8 h-8 text-blue-600" />
+                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-full">
+                      <Phone className="w-8 h-8 text-gray-600" />
                     </div>
                     <h3 className={`text-lg font-semibold ${
                       isDarkMode ? 'text-white' : 'text-slate-800'
@@ -829,7 +829,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                   }`}>
                     <div className="space-y-3">
                       <div className="flex items-start gap-3">
-                        <User className="w-5 h-5 text-blue-600 mt-0.5" />
+                        <User className="w-5 h-5 text-gray-600 mt-0.5" />
                         <div>
                           <div className={`text-xs font-medium ${
                             isDarkMode ? 'text-gray-400' : 'text-slate-600'
@@ -852,7 +852,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                       <Separator className={isDarkMode ? 'bg-gray-600' : 'bg-slate-200'} />
                       
                       <div className="flex items-start gap-3">
-                        <Mail className="w-5 h-5 text-red-600 mt-0.5" />
+                        <Mail className="w-5 h-5 text-gray-600 mt-0.5" />
                         <div>
                           <div className={`text-xs font-medium ${
                             isDarkMode ? 'text-gray-400' : 'text-slate-600'
@@ -870,7 +870,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                       <Separator className={isDarkMode ? 'bg-gray-600' : 'bg-slate-200'} />
 
                       <div className="flex items-start gap-3">
-                        <Globe className="w-5 h-5 text-green-600 mt-0.5" />
+                        <Globe className="w-5 h-5 text-gray-600 mt-0.5" />
                         <div>
                           <div className={`text-xs font-medium ${
                             isDarkMode ? 'text-gray-400' : 'text-slate-600'
@@ -883,7 +883,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                             rel="noopener noreferrer"
                             data-testid="contact-website-link"
                             className={`font-medium break-all underline ${
-                              isDarkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-700'
+                              isDarkMode ? 'text-gray-300 hover:text-gray-200' : 'text-gray-600 hover:text-gray-700'
                             }`}
                           >
                             {contactInfo.website}
@@ -897,8 +897,8 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                   <Separator className={isDarkMode ? 'bg-gray-600' : 'bg-slate-200'} />
                   
                   <div className="text-center mb-4">
-                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full">
-                      <Globe className="w-8 h-8 text-green-600" />
+                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-3 bg-gray-100 rounded-full">
+                      <Globe className="w-8 h-8 text-gray-600" />
                     </div>
                     <h3 className={`text-lg font-semibold ${
                       isDarkMode ? 'text-white' : 'text-slate-800'
@@ -926,7 +926,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                         className={isDarkMode ? 'bg-gray-600 border-gray-500' : ''}
                       />
                       <Button 
-                        className="w-full bg-green-600 hover:bg-green-700"
+                        className="w-full bg-gray-600 hover:bg-gray-700"
                         onClick={() => {
                           if (!onlineUrl.trim()) {
                             toast({
@@ -952,9 +952,9 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                       
                       {/* Default Vercel URL */}
                       <div className={`mt-3 p-3 rounded-lg border ${
-                        isDarkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
+                        isDarkMode ? 'bg-gray-900/20 border-gray-800' : 'bg-gray-50 border-gray-200'
                       }`}>
-                        <p className={`text-xs font-medium mb-1 ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+                        <p className={`text-xs font-medium mb-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
                           Default URL:
                         </p>
                         <a
@@ -962,7 +962,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           target="_blank"
                           rel="noopener noreferrer"
                           data-testid="default-online-url-link"
-                          className={`text-sm underline break-all ${isDarkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-700'}`}
+                          className={`text-sm underline break-all ${isDarkMode ? 'text-gray-300 hover:text-gray-200' : 'text-gray-600 hover:text-gray-700'}`}
                         >
                           https://managerpetrolpump.vercel.app/
                         </a>
@@ -1021,7 +1021,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           >
                             <div className="flex items-center justify-between">
                               <span className={`text-sm break-all ${
-                                isDarkMode ? 'text-blue-300' : 'text-blue-600'
+                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
                               }`}>
                                 {savedOnlineUrl}
                               </span>
@@ -1041,7 +1041,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           <Button
                             variant="outline"
                             data-testid="delete-saved-url-btn"
-                            className="w-full mt-3 bg-red-600 hover:bg-red-700 text-white border-red-600"
+                            className="w-full mt-3 bg-gray-600 hover:bg-gray-700 text-white border-gray-600"
                             onClick={() => {
                               // Delete directly — window.confirm is blocked in Android WebView
                               // so using it would cause this button to silently do nothing.
@@ -1102,7 +1102,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                             <Button 
                               variant="outline" 
                               data-testid="settings-range-delete-btn"
-                              className="w-full bg-red-600 hover:bg-red-700 text-white border-red-600"
+                              className="w-full bg-gray-600 hover:bg-gray-700 text-white border-gray-600"
                               onClick={() => {
                                 const fromDateInput = document.getElementById('delete-from-date');
                                 const toDateInput = document.getElementById('delete-to-date');
@@ -1139,9 +1139,9 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                             </Button>
                           ) : (
                             <div className={`p-3 rounded border-2 space-y-2 ${
-                              isDarkMode ? 'border-red-600 bg-red-900/20' : 'border-red-500 bg-red-50'
+                              isDarkMode ? 'border-gray-600 bg-gray-900/20' : 'border-gray-500 bg-gray-50'
                             }`}>
-                              <p className={`text-xs font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
+                              <p className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 Permanently delete data from <strong>{rangeDeleteConfirm.fromDate}</strong> to <strong>{rangeDeleteConfirm.toDate}</strong>?
                                 This cannot be undone.
                               </p>
@@ -1149,7 +1149,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                                 <Button
                                   size="sm"
                                   variant="destructive"
-                                  className="flex-1 bg-red-600 hover:bg-red-700"
+                                  className="flex-1 bg-gray-600 hover:bg-gray-700"
                                   data-testid="settings-range-delete-confirm"
                                   onClick={() => {
                                     performRangeDelete(rangeDeleteConfirm.fromDate, rangeDeleteConfirm.toDate);
@@ -1212,9 +1212,9 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                       
                       {proMode && (
                         <div className={`mt-3 p-3 rounded-lg border ${
-                          isDarkMode ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200'
+                          isDarkMode ? 'bg-gray-900/20 border-gray-800' : 'bg-gray-50 border-gray-200'
                         }`}>
-                          <p className={`text-xs ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>
+                          <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
                             ⚡ Pro Mode is active. Delete confirmations are disabled.
                           </p>
                         </div>
@@ -1228,26 +1228,26 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                       <Separator className={isDarkMode ? 'bg-gray-600' : 'bg-slate-200'} />
                       
                       <div className={`border-2 rounded-lg p-4 ${
-                        isDarkMode ? 'border-red-600 bg-red-900/20' : 'border-red-500 bg-red-50'
+                        isDarkMode ? 'border-gray-600 bg-gray-900/20' : 'border-gray-500 bg-gray-50'
                       }`}>
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
-                            <Trash2 className="w-5 h-5 text-red-600" />
+                            <Trash2 className="w-5 h-5 text-gray-600" />
                             <h4 className={`font-bold ${
-                              isDarkMode ? 'text-red-400' : 'text-red-700'
+                              isDarkMode ? 'text-gray-400' : 'text-gray-700'
                             }`}>
                               ⚠️ Danger Zone
                             </h4>
                           </div>
                           
                           <p className={`text-sm ${
-                            isDarkMode ? 'text-red-300' : 'text-red-700'
+                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
                           }`}>
                             <strong>Pro Mode Only:</strong> Permanently delete all data from this account.
                           </p>
                           
                           <div className={`text-xs space-y-1 ${
-                            isDarkMode ? 'text-red-200' : 'text-red-600'
+                            isDarkMode ? 'text-gray-200' : 'text-gray-600'
                           }`}>
                             <p>This will delete:</p>
                             <ul className="list-disc list-inside pl-2">
@@ -1260,10 +1260,10 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           </div>
 
                           <div className={`p-3 rounded ${
-                            isDarkMode ? 'bg-red-800/30' : 'bg-red-100'
+                            isDarkMode ? 'bg-gray-800/30' : 'bg-gray-100'
                           }`}>
                             <p className={`text-xs font-bold ${
-                              isDarkMode ? 'text-red-300' : 'text-red-700'
+                              isDarkMode ? 'text-gray-300' : 'text-gray-700'
                             }`}>
                               ⚠️ This action CANNOT be undone!
                             </p>
@@ -1272,7 +1272,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           <Button 
                             variant="destructive"
                             data-testid="settings-clear-all-btn"
-                            className="w-full bg-red-600 hover:bg-red-700"
+                            className="w-full bg-gray-600 hover:bg-gray-700"
                             onClick={() => {
                               if (proMode) {
                                 // Pro mode: skip confirmation entirely
@@ -1287,9 +1287,9 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           </Button>
                           {clearAllConfirm.open && (
                             <div className={`mt-2 p-3 rounded border-2 space-y-2 ${
-                              isDarkMode ? 'border-red-600 bg-red-900/30' : 'border-red-500 bg-red-100'
+                              isDarkMode ? 'border-gray-600 bg-gray-900/30' : 'border-gray-500 bg-gray-100'
                             }`}>
-                              <p className={`text-xs font-medium ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
+                              <p className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
                                 Type <strong>DELETE ALL</strong> to confirm:
                               </p>
                               <Input
@@ -1304,7 +1304,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                                 <Button
                                   size="sm"
                                   variant="destructive"
-                                  className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                                  className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:opacity-50"
                                   data-testid="settings-clear-all-confirm"
                                   disabled={clearAllConfirm.typed.trim() !== 'DELETE ALL'}
                                   onClick={() => {
@@ -1364,7 +1364,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                       isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-slate-200 bg-slate-50'
                     }`}>
                       <div className="flex items-center justify-between mb-2">
-                        <Badge className="bg-blue-100 text-blue-800 border-0">
+                        <Badge className="bg-gray-100 text-gray-800 border-0">
                           {fuelType}
                         </Badge>
                         {fuelType.toUpperCase() !== 'MPP' && (
@@ -1372,7 +1372,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                             variant="ghost"
                             size="sm"
                             onClick={() => removeFuelType(fuelType)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
@@ -1669,7 +1669,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                                 }
                               }, 50);
                             }}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-60"
+                            className="w-full bg-gray-600 hover:bg-gray-700 text-white disabled:opacity-60"
                           >
                             {fyBackupBusy ? 'Generating…' : `Backup FY ${fyBackupYear}–${fyBackupYear + 1}`}
                           </Button>
@@ -1684,8 +1684,8 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           const barColor = pct < 60
                             ? (isDarkMode ? 'bg-gray-300' : 'bg-slate-700')
                             : pct < 85
-                              ? (isDarkMode ? 'bg-yellow-400' : 'bg-yellow-500')
-                              : (isDarkMode ? 'bg-red-400' : 'bg-red-600');
+                              ? (isDarkMode ? 'bg-gray-400' : 'bg-gray-500')
+                              : (isDarkMode ? 'bg-gray-400' : 'bg-gray-600');
                           return (
                             <div
                               data-testid="storage-gauge"
@@ -1741,7 +1741,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                       
                       <Button 
                         variant="outline" 
-                        className="w-full bg-orange-600 hover:bg-orange-700 text-white border-orange-600"
+                        className="w-full bg-gray-600 hover:bg-gray-700 text-white border-gray-600"
                         onClick={() => {
                           // Create file input and append to DOM (required for mobile browsers)
                           const fileInput = document.createElement('input');
@@ -1836,7 +1836,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
 
                       <Button
                         variant="outline"
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
+                        className="w-full bg-gray-600 hover:bg-gray-700 text-white border-gray-600"
                         data-testid="merge-pdf-btn"
                         onClick={() => {
                           const fileInput = document.createElement('input');
@@ -1979,8 +1979,8 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                           }}
                           className={`w-full ${
                             isDarkMode
-                              ? 'bg-blue-900/40 border-blue-700 text-blue-300 hover:bg-blue-900/60'
-                              : 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'
+                              ? 'bg-gray-900/40 border-gray-700 text-gray-300 hover:bg-gray-900/60'
+                              : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100'
                           }`}
                         >
                           <Mail className="w-4 h-4 mr-2" />
@@ -1989,7 +1989,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
 
                         {weeklyBackupEnabled && (
                           <div className={`space-y-2 p-3 rounded ${
-                            isDarkMode ? 'bg-gray-600' : 'bg-blue-50'
+                            isDarkMode ? 'bg-gray-600' : 'bg-gray-50'
                           }`}>
                             <div className={`text-xs ${
                               isDarkMode ? 'text-gray-300' : 'text-slate-700'
@@ -2104,7 +2104,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
               </Button>
               <Button
                 onClick={handleProPasswordSubmit}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-gray-600 hover:bg-gray-700"
               >
                 Enable Pro Mode
               </Button>

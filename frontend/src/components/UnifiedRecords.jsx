@@ -71,18 +71,18 @@ const UnifiedRecords = ({
     }`}>
       <div className="flex items-center justify-between gap-2 mb-1">
         <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-          <Badge className="bg-blue-100 text-blue-800 border-0 text-xs">
+          <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
             {sale.nozzle}
           </Badge>
-          <Badge className="bg-purple-100 text-purple-800 border-0 text-xs">
+          <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
             {sale.fuelType}
           </Badge>
           {sale.mpp && (
-            <Badge data-testid="mpp-tag-badge" className="bg-amber-100 text-amber-800 border-0 text-xs font-bold">
+            <Badge data-testid="mpp-tag-badge" className="bg-gray-100 text-gray-800 border-0 text-xs font-bold">
               MPP
             </Badge>
           )}
-          <div className="flex items-center gap-1 text-green-600 font-bold">
+          <div className="flex items-center gap-1 text-gray-600 font-bold">
             <IndianRupee className="w-4 h-4" />
             <span className="text-base sm:text-lg">{sale.amount.toFixed(2)}</span>
           </div>
@@ -143,10 +143,10 @@ const UnifiedRecords = ({
     }`}>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
-          <Badge className="bg-orange-100 text-orange-800 border-0 text-xs">
+          <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
             Credit
           </Badge>
-          <div className="flex items-center gap-1 text-orange-600 font-bold">
+          <div className="flex items-center gap-1 text-gray-600 font-bold">
             <IndianRupee className="w-4 h-4" />
             <span className="text-base sm:text-lg">{credit.amount.toFixed(2)}</span>
           </div>
@@ -181,13 +181,13 @@ const UnifiedRecords = ({
         <div className="space-y-2 mb-2">
           {credit.fuelEntries.map((entry, index) => (
             <div key={entry.id || `fuel-${index}`} className={`p-2 rounded border ${
-              isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-purple-50 border-purple-200'
+              isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-gray-50 border-gray-200'
             }`}>
               <div className="flex items-center justify-between mb-1">
-                <Badge className="bg-purple-100 text-purple-800 border-0 text-xs">
+                <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                   {entry.fuelType}
                 </Badge>
-                <span className="text-xs font-medium text-purple-600">
+                <span className="text-xs font-medium text-gray-600">
                   ₹{entry.amount.toFixed(2)}
                 </span>
               </div>
@@ -209,7 +209,7 @@ const UnifiedRecords = ({
         credit.liters && (
           <div className="space-y-1 mb-2">
             <div className="flex items-center gap-2">
-              <Badge className="bg-purple-100 text-purple-800 border-0 text-xs">
+              <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                 {credit.fuelType}
               </Badge>
             </div>
@@ -232,11 +232,11 @@ const UnifiedRecords = ({
         <div className="space-y-2 mb-2">
           {credit.incomeEntries.map((entry, index) => (
             <div key={entry.id || `inc-${index}`} className={`p-2 rounded border ${
-              isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-green-50 border-green-200'
+              isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-gray-50 border-gray-200'
             }`}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium">{entry.description}</span>
-                <span className="text-xs font-medium text-green-600">
+                <span className="text-xs font-medium text-gray-600">
                   +₹{entry.amount.toFixed(2)}
                 </span>
               </div>
@@ -250,11 +250,11 @@ const UnifiedRecords = ({
         <div className="space-y-2">
           {credit.expenseEntries.map((entry, index) => (
             <div key={entry.id || `exp-${index}`} className={`p-2 rounded border ${
-              isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-red-50 border-red-200'
+              isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-gray-50 border-gray-200'
             }`}>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium">{entry.description}</span>
-                <span className="text-xs font-medium text-red-600">
+                <span className="text-xs font-medium text-gray-600">
                   -₹{entry.amount.toFixed(2)}
                 </span>
               </div>
@@ -278,7 +278,7 @@ const UnifiedRecords = ({
           )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1 text-green-600 font-bold">
+          <div className="flex items-center gap-1 text-gray-600 font-bold">
             <IndianRupee className="w-4 h-4" />
             <span className="text-base sm:text-lg">{income.amount.toFixed(2)}</span>
           </div>
@@ -316,7 +316,7 @@ const UnifiedRecords = ({
           )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1 text-red-600 font-bold">
+          <div className="flex items-center gap-1 text-gray-600 font-bold">
             <IndianRupee className="w-4 h-4" />
             <span className="text-base sm:text-lg">{expense.amount.toFixed(2)}</span>
           </div>
@@ -354,7 +354,7 @@ const UnifiedRecords = ({
           )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1 text-yellow-600 font-bold">
+          <div className="flex items-center gap-1 text-gray-600 font-bold">
             <IndianRupee className="w-4 h-4" />
             <span className="text-base sm:text-lg">{settlement.amount.toFixed(2)}</span>
           </div>
@@ -383,7 +383,7 @@ const UnifiedRecords = ({
     <Card className={`${
       isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
     } shadow-lg mt-2`}>
-      <CardHeader className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-t-lg py-2">
+      <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg py-2">
         <CardTitle className="flex items-center gap-2 text-base">
           <Receipt className="w-5 h-5" />
           All Records for {selectedDate === new Date().toISOString().split('T')[0] ? 'Today' : selectedDate} ({totalRecords})
@@ -401,7 +401,7 @@ const UnifiedRecords = ({
               title="Fuel Sales"
               icon={Calculator}
               records={filteredSales}
-              color="text-blue-600"
+              color="text-gray-600"
               renderRecord={renderSalesRecord}
             />
             
@@ -409,7 +409,7 @@ const UnifiedRecords = ({
               title="Credit Sales"
               icon={CreditCard}
               records={filteredCredits}
-              color="text-orange-600"
+              color="text-gray-600"
               renderRecord={renderCreditRecord}
             />
             
@@ -417,7 +417,7 @@ const UnifiedRecords = ({
               title="Income"
               icon={TrendingUp}
               records={filteredIncome}
-              color="text-green-600"
+              color="text-gray-600"
               renderRecord={renderIncomeRecord}
             />
             
@@ -425,7 +425,7 @@ const UnifiedRecords = ({
               title="Expenses"
               icon={TrendingDown}
               records={filteredExpenses}
-              color="text-red-600"
+              color="text-gray-600"
               renderRecord={renderExpenseRecord}
             />
             
@@ -433,7 +433,7 @@ const UnifiedRecords = ({
               title="Settlement"
               icon={Wallet}
               records={filteredSettlements}
-              color="text-yellow-600"
+              color="text-gray-600"
               renderRecord={renderSettlementRecord}
             />
           </>

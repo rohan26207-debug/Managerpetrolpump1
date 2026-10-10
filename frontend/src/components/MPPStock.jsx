@@ -201,7 +201,7 @@ const MPPStock = ({ isDarkMode, selectedDate, salesData, fuelSettings, onClose, 
   return (
     <div className="space-y-4">
       <Card className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'}`}>
-        <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg py-2">
+        <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg py-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Package className="w-5 h-5" />
             Stock Entry
@@ -254,7 +254,7 @@ const MPPStock = ({ isDarkMode, selectedDate, salesData, fuelSettings, onClose, 
             {/* Purchase */}
             <div className="space-y-1">
               <Label className="text-xs font-semibold flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-600" />
+                <TrendingUp className="w-4 h-4 text-gray-600" />
                 Purchase (Liters)
               </Label>
               <Input
@@ -270,11 +270,11 @@ const MPPStock = ({ isDarkMode, selectedDate, salesData, fuelSettings, onClose, 
             {/* Sales (Read-only) */}
             <div className="space-y-1">
               <Label className="text-xs font-semibold flex items-center gap-2">
-                <TrendingDown className="w-4 h-4 text-red-600" />
+                <TrendingDown className="w-4 h-4 text-gray-600" />
                 Sales (Liters)
               </Label>
               <div className={`px-4 py-2 rounded-md border text-base sm:text-lg font-bold ${
-                isDarkMode ? 'bg-red-900 bg-opacity-30 text-red-400 border-red-800' : 'bg-red-50 text-red-600 border-red-200'
+                isDarkMode ? 'bg-gray-900 bg-opacity-30 text-gray-400 border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'
               }`}>
                 {stockData.sales.toFixed(2)} L
               </div>
@@ -283,13 +283,13 @@ const MPPStock = ({ isDarkMode, selectedDate, salesData, fuelSettings, onClose, 
             {/* End Stock (Read-only) */}
             <div className="space-y-1">
               <Label className="text-xs font-semibold flex items-center gap-2">
-                <Package className="w-4 h-4 text-blue-600" />
+                <Package className="w-4 h-4 text-gray-600" />
                 End Stock (Liters)
               </Label>
               <div className={`px-4 py-2 rounded-md border text-base sm:text-lg font-bold ${
                 stockData.endStock < 0 
-                  ? isDarkMode ? 'bg-red-900 bg-opacity-30 text-red-400 border-red-800' : 'bg-red-50 text-red-600 border-red-200'
-                  : isDarkMode ? 'bg-blue-900 bg-opacity-30 text-blue-400 border-blue-800' : 'bg-blue-50 text-blue-600 border-blue-200'
+                  ? isDarkMode ? 'bg-gray-900 bg-opacity-30 text-gray-400 border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'
+                  : isDarkMode ? 'bg-gray-900 bg-opacity-30 text-gray-400 border-gray-800' : 'bg-gray-50 text-gray-600 border-gray-200'
               }`}>
                 {stockData.endStock.toFixed(2)} L
               </div>
@@ -299,7 +299,7 @@ const MPPStock = ({ isDarkMode, selectedDate, salesData, fuelSettings, onClose, 
             <div className="grid grid-cols-2 gap-2">
               <Button 
                 onClick={handleSaveAndContinue}
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-gray-600 hover:bg-gray-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Save & Add More
@@ -307,7 +307,7 @@ const MPPStock = ({ isDarkMode, selectedDate, salesData, fuelSettings, onClose, 
               
               <Button 
                 onClick={handleSave}
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-gray-600 hover:bg-gray-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Save Stock & Exit

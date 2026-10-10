@@ -106,7 +106,7 @@ const QRCodeSender = ({ isDarkMode, data, onClose }) => {
           <div className="space-y-4">
             {isGenerating ? (
               <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600"></div>
               </div>
             ) : qrCodeUrl ? (
               <div className="flex flex-col items-center space-y-4">
@@ -121,14 +121,14 @@ const QRCodeSender = ({ isDarkMode, data, onClose }) => {
                 </div>
                 
                 <div className={`text-center space-y-2 p-4 rounded-lg border ${
-                  isDarkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
+                  isDarkMode ? 'bg-gray-900/20 border-gray-800' : 'bg-gray-50 border-gray-200'
                 }`}>
                   <p className={`text-sm font-medium ${
-                    isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>
                     📱 Instructions
                   </p>
-                  <p className={`text-xs ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                  <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     1. Receiver opens Settings → Contact tab<br/>
                     2. Click "Receive via QR Code"<br/>
                     3. Point camera at this QR code<br/>
@@ -138,7 +138,7 @@ const QRCodeSender = ({ isDarkMode, data, onClose }) => {
 
                 <Button
                   onClick={downloadQRCode}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                  className="w-full bg-gray-600 hover:bg-gray-700 text-white"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Download QR Code

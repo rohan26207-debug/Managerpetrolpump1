@@ -114,11 +114,11 @@ const DescriptionSuggestInput = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900"
+                    className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-900"
                     onClick={(e) => handleDelete(e, desc)}
                     aria-label={`Remove suggestion ${desc}`}
                   >
-                    <X className="h-3 w-3 text-red-600 dark:text-red-400" />
+                    <X className="h-3 w-3 text-gray-600 dark:text-gray-400" />
                   </Button>
                 </div>
               ))}

@@ -100,7 +100,7 @@ const Settings = ({ fuelSettings, onSettingsUpdate }) => {
 
   return (
     <Card className="shadow-lg border-0 bg-white">
-      <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg">
+      <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-2 text-xl">
           <SettingsIcon className="w-6 h-6" />
           Pump Settings
@@ -115,14 +115,14 @@ const Settings = ({ fuelSettings, onSettingsUpdate }) => {
             <div key={fuelType} className="bg-slate-50 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Fuel className="w-4 h-4 text-blue-600" />
+                  <Fuel className="w-4 h-4 text-gray-600" />
                   <span className="font-medium text-slate-800">{fuelType}</span>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => removeFuelType(fuelType)}
-                  className="text-red-600 hover:bg-red-50 border-red-200"
+                  className="text-gray-600 hover:bg-gray-50 border-gray-200"
                 >
                   <Trash2 className="w-3 h-3" />
                 </Button>
@@ -228,7 +228,7 @@ const Settings = ({ fuelSettings, onSettingsUpdate }) => {
           
           <Button 
             onClick={addFuelType}
-            className="w-full h-10 bg-blue-600 hover:bg-blue-700"
+            className="w-full h-10 bg-gray-600 hover:bg-gray-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Fuel Type
@@ -240,7 +240,7 @@ const Settings = ({ fuelSettings, onSettingsUpdate }) => {
         {/* Save Settings */}
         <Button 
           onClick={saveSettings}
-          className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium"
+          className="w-full h-12 bg-gray-600 hover:bg-gray-700 text-white font-medium"
         >
           <Save className="w-4 h-4 mr-2" />
           Save All Settings

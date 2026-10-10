@@ -412,8 +412,8 @@ const CreditSalesManagement = ({
         'td{border:1px solid #333;padding:6px}' +
         '.r{text-align:right}' +
         '.total-row{font-weight:bold;background:#f8f8f8}' +
-        '.print-btn{background:#007bff;color:white;border:none;padding:10px 20px;font-size:16px;cursor:pointer;border-radius:5px;margin:10px auto;display:block;box-shadow:0 2px 4px rgba(0,0,0,0.2)}' +
-        '.print-btn:hover{background:#0056b3}' +
+        '.print-btn{background:#1f2937;color:white;border:none;padding:10px 20px;font-size:16px;cursor:pointer;border-radius:5px;margin:10px auto;display:block;box-shadow:0 2px 4px rgba(0,0,0,0.2)}' +
+        '.print-btn:hover{background:#111827}' +
         '.no-print{display:block}' +
         '@media print{body{margin:8mm}.no-print{display:none}}' +
         '</style>' +
@@ -521,7 +521,7 @@ const CreditSalesManagement = ({
                               isDarkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-100'
                             } ${
                               selectedCustomer === customer.id 
-                                ? isDarkMode ? 'bg-blue-600' : 'bg-blue-100' 
+                                ? isDarkMode ? 'bg-gray-600' : 'bg-gray-100' 
                                 : ''
                             }`}
                             onClick={() => {
@@ -815,7 +815,7 @@ const CreditSalesManagement = ({
             <CardContent className="p-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className={`p-2 rounded-full ${
-                  isDarkMode ? 'bg-red-900 text-red-400' : 'bg-red-100 text-red-600'
+                  isDarkMode ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-600'
                 }`}>
                   <AlertTriangle className="w-6 h-6" />
                 </div>
@@ -852,7 +852,7 @@ const CreditSalesManagement = ({
                 </Button>
                 <Button
                   onClick={confirmDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-gray-600 hover:bg-gray-700 text-white"
                 >
                   Yes, Delete
                 </Button>

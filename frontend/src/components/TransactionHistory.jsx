@@ -12,10 +12,10 @@ const TransactionHistory = ({ transactions }) => {
 
   const getFuelTypeColor = (fuelType) => {
     const colors = {
-      'Petrol': 'bg-blue-100 text-blue-800',
-      'Diesel': 'bg-green-100 text-green-800',
-      'CNG': 'bg-purple-100 text-purple-800',
-      'Premium': 'bg-orange-100 text-orange-800'
+      'Petrol': 'bg-gray-100 text-gray-800',
+      'Diesel': 'bg-gray-100 text-gray-800',
+      'CNG': 'bg-gray-100 text-gray-800',
+      'Premium': 'bg-gray-100 text-gray-800'
     };
     return colors[fuelType] || 'bg-gray-100 text-gray-800';
   };
@@ -34,15 +34,15 @@ const TransactionHistory = ({ transactions }) => {
           <div className="flex items-center justify-between">
             <span className="text-sm text-slate-600">Total Sales Today:</span>
             <div className="flex items-center gap-1">
-              <IndianRupee className="w-4 h-4 text-green-600" />
-              <span className="font-semibold text-green-600">
+              <IndianRupee className="w-4 h-4 text-gray-600" />
+              <span className="font-semibold text-gray-600">
                 {getTotalSales().toFixed(2)}
               </span>
             </div>
           </div>
           <div className="flex items-center justify-between mt-1">
             <span className="text-sm text-slate-600">Transactions:</span>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
               {transactions.length}
             </Badge>
           </div>
@@ -65,12 +65,12 @@ const TransactionHistory = ({ transactions }) => {
                         {transaction.fuelType}
                       </Badge>
                       {transaction.calculationMode === 'meter' && (
-                        <Gauge className="w-3 h-3 text-blue-500" title="Meter Reading" />
+                        <Gauge className="w-3 h-3 text-gray-500" title="Meter Reading" />
                       )}
                       {transaction.paymentMethod === 'card' ? (
-                        <CreditCard className="w-3 h-3 text-purple-500" title="Card Payment" />
+                        <CreditCard className="w-3 h-3 text-gray-500" title="Card Payment" />
                       ) : (
-                        <Banknote className="w-3 h-3 text-green-500" title="Cash Payment" />
+                        <Banknote className="w-3 h-3 text-gray-500" title="Cash Payment" />
                       )}
                     </div>
                     <span className="text-xs text-slate-500">{transaction.timestamp}</span>
@@ -104,12 +104,12 @@ const TransactionHistory = ({ transactions }) => {
                     <Separator className="my-2" />
                     <div className="flex justify-between font-semibold">
                       <span className="text-slate-700">Total:</span>
-                      <span className="text-green-600">₹{transaction.totalCost.toFixed(2)}</span>
+                      <span className="text-gray-600">₹{transaction.totalCost.toFixed(2)}</span>
                     </div>
                     {transaction.changeAmount > 0 && (
                       <div className="flex justify-between text-xs">
                         <span className="text-slate-600">Change:</span>
-                        <span className="text-orange-600">₹{transaction.changeAmount.toFixed(2)}</span>
+                        <span className="text-gray-600">₹{transaction.changeAmount.toFixed(2)}</span>
                       </div>
                     )}
                   </div>

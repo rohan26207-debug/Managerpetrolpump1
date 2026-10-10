@@ -145,14 +145,14 @@ const IncomeExpenseCategories = ({
         <Button
           variant={activeType === 'income' ? 'default' : 'outline'}
           onClick={() => setActiveType('income')}
-          className={activeType === 'income' ? 'bg-green-600 hover:bg-green-700' : ''}
+          className={activeType === 'income' ? 'bg-gray-600 hover:bg-gray-700' : ''}
         >
           Income Categories
         </Button>
         <Button
           variant={activeType === 'expense' ? 'default' : 'outline'}
           onClick={() => setActiveType('expense')}
-          className={activeType === 'expense' ? 'bg-red-600 hover:bg-red-700' : ''}
+          className={activeType === 'expense' ? 'bg-gray-600 hover:bg-gray-700' : ''}
         >
           Expense Categories
         </Button>
@@ -218,7 +218,7 @@ const IncomeExpenseCategories = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => saveEditing(category.id)}
-                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                      className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                     >
                       <Check className="w-4 h-4" />
                     </Button>
@@ -235,8 +235,8 @@ const IncomeExpenseCategories = ({
                   <div className="flex items-center justify-between">
                     <Badge className={
                       activeType === 'income' 
-                        ? 'bg-green-100 text-green-800 border-0' 
-                        : 'bg-red-100 text-red-800 border-0'
+                        ? 'bg-gray-100 text-gray-800 border-0' 
+                        : 'bg-gray-100 text-gray-800 border-0'
                     }>
                       {category.name}
                     </Badge>
@@ -245,7 +245,7 @@ const IncomeExpenseCategories = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => startEditing(category.id, category.name)}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                       >
                         <Edit className="w-3 h-3" />
                       </Button>
@@ -253,7 +253,7 @@ const IncomeExpenseCategories = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(category.id, category.name)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>

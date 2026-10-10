@@ -548,7 +548,7 @@ window.onload = function() {
           <Card className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'}`}>
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-4">
-                <FileText className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                <FileText className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                 <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
                   Customer Ledger Report
                 </h3>
@@ -593,7 +593,7 @@ window.onload = function() {
                                 isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
                               } ${
                                 customerId === customer.id 
-                                  ? isDarkMode ? 'bg-blue-600' : 'bg-blue-100' 
+                                  ? isDarkMode ? 'bg-gray-600' : 'bg-gray-100' 
                                   : ''
                               }`}
                               onClick={() => {
@@ -649,7 +649,7 @@ window.onload = function() {
                 <Button
                   onClick={generateReport}
                   disabled={!customerId || !fromDate || !toDate}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-gray-600 hover:bg-gray-700 text-white"
                 >
                   <Search className="w-4 h-4 mr-2" />
                   Generate Report
@@ -668,7 +668,7 @@ window.onload = function() {
             <CardContent className="p-4">
               <Button
                 onClick={handlePrint}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white"
               >
                 <Printer className="w-4 h-4 mr-2" />
                 PDF

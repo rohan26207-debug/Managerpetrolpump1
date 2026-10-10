@@ -181,7 +181,7 @@ const CustomerInitialBalance = ({ isDarkMode, customers, onCustomerChanged }) =>
                           disabled={!isDirty}
                           onClick={() => handleSave(c)}
                           data-testid={`cib-save-btn-${c.id}`}
-                          className={`h-7 ${isDirty ? 'bg-blue-600 hover:bg-blue-700 text-white' : (
+                          className={`h-7 ${isDirty ? 'bg-gray-600 hover:bg-gray-700 text-white' : (
                             isDarkMode ? 'border-gray-500 text-gray-200' : 'border-slate-400 text-slate-700'
                           )}`}
                         >

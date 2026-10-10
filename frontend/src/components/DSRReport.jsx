@@ -122,8 +122,8 @@ const DSRReport = ({ isDarkMode, fuelSettings, salesData }) => {
 
   const variationCls = (v) => {
     if (v == null) return tdRight;
-    if (v > 0) return `${tdRight} ${isDarkMode ? 'text-green-400' : 'text-green-700'}`;
-    if (v < 0) return `${tdRight} ${isDarkMode ? 'text-red-400' : 'text-red-700'}`;
+    if (v > 0) return `${tdRight} ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`;
+    if (v < 0) return `${tdRight} ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`;
     return tdRight;
   };
 

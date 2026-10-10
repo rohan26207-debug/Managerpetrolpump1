@@ -298,7 +298,7 @@ const CashOwnerTally = ({ isDarkMode, settlementData = [], selectedDate }) => {
                             type="button"
                             onClick={() => handleDelete(r.id)}
                             data-testid={`cash-tally-del-${r.id}`}
-                            className={`p-1 rounded ${isDarkMode ? 'hover:bg-gray-600 text-red-300' : 'hover:bg-red-50 text-red-600'}`}
+                            className={`p-1 rounded ${isDarkMode ? 'hover:bg-gray-600 text-gray-300' : 'hover:bg-gray-50 text-gray-600'}`}
                             title="Delete entry"
                           >
                             <Trash2 className="w-3 h-3" />

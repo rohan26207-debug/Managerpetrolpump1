@@ -250,7 +250,7 @@ const PetrolPumpCalculator = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-blue-600 rounded-full">
+            <div className="p-3 bg-gray-600 rounded-full">
               <Fuel className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-slate-800">FuelCalc Pro</h1>
@@ -280,7 +280,7 @@ const PetrolPumpCalculator = () => {
           {/* Main Calculator */}
           <div className="lg:col-span-2">
             <Card className="shadow-lg border-0 bg-white">
-              <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+              <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Calculator className="w-6 h-6" />
                   Fuel Calculator
@@ -415,12 +415,12 @@ const PetrolPumpCalculator = () => {
                       </div>
                       
                       {initialReading && finalReading && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-blue-700">Calculated Quantity:</span>
+                            <span className="text-sm text-gray-700">Calculated Quantity:</span>
                             <div className="flex items-center gap-1">
-                              <Droplets className="w-4 h-4 text-blue-600" />
-                              <span className="font-semibold text-blue-800">
+                              <Droplets className="w-4 h-4 text-gray-600" />
+                              <span className="font-semibold text-gray-800">
                                 {(parseFloat(finalReading) - parseFloat(initialReading)).toFixed(2)} L
                               </span>
                             </div>
@@ -436,8 +436,8 @@ const PetrolPumpCalculator = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-medium text-slate-700">Total Cost:</span>
                     <div className="flex items-center gap-1">
-                      <IndianRupee className="w-6 h-6 text-green-600" />
-                      <span className="text-3xl font-bold text-green-600">
+                      <IndianRupee className="w-6 h-6 text-gray-600" />
+                      <span className="text-3xl font-bold text-gray-600">
                         {totalCost.toFixed(2)}
                       </span>
                     </div>
@@ -503,15 +503,15 @@ const PetrolPumpCalculator = () => {
                       <div className="h-12 px-3 py-2 bg-slate-50 border border-slate-200 rounded-md flex items-center">
                         {paymentMethod === 'cash' ? (
                           <div className="flex items-center gap-1">
-                            <IndianRupee className="w-4 h-4 text-orange-600" />
-                            <span className="text-lg font-semibold text-orange-600">
+                            <IndianRupee className="w-4 h-4 text-gray-600" />
+                            <span className="text-lg font-semibold text-gray-600">
                               {changeAmount.toFixed(2)}
                             </span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <CreditCard className="w-4 h-4 text-blue-600" />
-                            <span className="text-sm text-blue-600">
+                            <CreditCard className="w-4 h-4 text-gray-600" />
+                            <span className="text-sm text-gray-600">
                               {parseFloat(amountReceived || 0) >= totalCost ? 'Payment Complete' : 'Pending Payment'}
                             </span>
                           </div>
@@ -525,7 +525,7 @@ const PetrolPumpCalculator = () => {
                 <div className="flex gap-3 pt-4">
                   <Button 
                     onClick={handleTransaction}
-                    className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-medium"
+                    className="flex-1 h-12 bg-gray-600 hover:bg-gray-700 text-white font-medium"
                   >
                     Complete Transaction
                   </Button>

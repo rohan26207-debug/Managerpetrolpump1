@@ -190,7 +190,7 @@ const ReportPreviewTab = ({
       <div className={cardCls}>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <Calendar className={`w-5 h-5 sm:w-6 sm:h-6 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <Calendar className={`w-5 h-5 sm:w-6 sm:h-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
             <div className="flex-1 min-w-0">
               <Label className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-600'}`}>
                 Operating Date
@@ -279,7 +279,7 @@ const ReportPreviewTab = ({
                 modifiers={{ hasData: hasDataDates }}
                 modifiersClassNames={{ hasData: 'bg-green-500 text-white font-semibold hover:bg-green-600 hover:text-white rounded-md' }}
                 classNames={{
-                  day_selected: 'ring-2 ring-blue-600 ring-offset-1 bg-primary text-primary-foreground',
+                  day_selected: 'ring-2 ring-gray-600 ring-offset-1 bg-primary text-primary-foreground',
                   day_today: 'underline underline-offset-2 font-bold',
                 }}
               />
@@ -2883,7 +2883,7 @@ window.onload = function() {
             <div 
               className="flex items-center gap-2 sm:gap-3"
             >
-              <div className="p-1.5 sm:p-2 bg-blue-600 rounded-full">
+              <div className="p-1.5 sm:p-2 bg-gray-600 rounded-full">
                 <Fuel className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
               <h1 className={`text-base sm:text-2xl font-bold ${
@@ -2942,8 +2942,8 @@ window.onload = function() {
               className={`py-3 px-4 text-center font-semibold transition-colors ${
                 parentTab === 'today'
                   ? isDarkMode
-                    ? 'bg-blue-900 text-white border-b-2 border-blue-500'
-                    : 'bg-blue-50 text-blue-600 border-b-2 border-blue-600'
+                    ? 'bg-gray-900 text-white border-b-2 border-gray-500'
+                    : 'bg-gray-50 text-gray-600 border-b-2 border-gray-600'
                   : isDarkMode
                     ? 'text-gray-400 hover:bg-gray-800'
                     : 'text-slate-600 hover:bg-slate-50'
@@ -2956,8 +2956,8 @@ window.onload = function() {
               className={`py-3 px-4 text-center font-semibold transition-colors ${
                 parentTab === 'outstanding'
                   ? isDarkMode
-                    ? 'bg-blue-900 text-white border-b-2 border-blue-500'
-                    : 'bg-blue-50 text-blue-600 border-b-2 border-blue-600'
+                    ? 'bg-gray-900 text-white border-b-2 border-gray-500'
+                    : 'bg-gray-50 text-gray-600 border-b-2 border-gray-600'
                   : isDarkMode
                     ? 'text-gray-400 hover:bg-gray-800'
                     : 'text-slate-600 hover:bg-slate-50'
@@ -2978,7 +2978,7 @@ window.onload = function() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <Calendar className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                      isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
                     }`} />
                     <div className="flex-1 min-w-0">
                       <Label className={`text-xs sm:text-sm font-medium ${
@@ -3104,7 +3104,7 @@ window.onload = function() {
             <CardContent className="p-2 sm:p-3">
               <div className="flex items-center gap-2 flex-wrap">
                 <Package className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${
-                  isDarkMode ? 'text-purple-400' : 'text-purple-600'
+                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 }`} />
                 <span className={`text-xs sm:text-sm font-semibold ${
                   isDarkMode ? 'text-gray-300' : 'text-slate-600'
@@ -3149,7 +3149,7 @@ window.onload = function() {
             >
               <CardContent className="p-2 sm:p-3">
                 <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-purple-600" />
+                  <Package className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-gray-600" />
                   <span className="text-xs sm:text-sm font-semibold text-slate-800">
                     Add Stock
                   </span>
@@ -3164,7 +3164,7 @@ window.onload = function() {
             >
               <CardContent className="p-2 sm:p-3">
                 <div className="flex items-center gap-2">
-                  <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-green-600" />
+                  <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-gray-600" />
                   <span className="text-xs sm:text-sm font-semibold text-slate-800">
                     Add Rate
                   </span>
@@ -3183,29 +3183,35 @@ window.onload = function() {
         } shadow-lg mb-2`}>
           <CardContent className="p-2 sm:p-3">
             <div className="grid grid-cols-2 gap-3">
-              {/* LEFT COLUMN - B&W report (same as Balance -> Reports) */}
-              <div data-testid="today-summary-report" className="overflow-x-auto">
-                <div className="min-w-[300px]">
-                <ReportPreviewTab
-                  previewOnly
-                  isDarkMode={isDarkMode}
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  formatDisplayDate={formatDisplayDate}
-                  goToPreviousDay={goToPreviousDay}
-                  goToNextDay={goToNextDay}
-                  generateDirectPDF={generateDirectPDF}
-                  copyToClipboard={copyToClipboard}
-                  stats={stats}
-                  salesData={salesData}
-                  creditData={creditData}
-                  settlementData={settlementData}
-                  incomeData={incomeData}
-                  expenseData={expenseData}
-                  payments={payments}
-                  fuelSettings={fuelSettings}
-                />
-                </div>
+              {/* LEFT COLUMN - Summary (B&W table, same style as Reports) */}
+              <div data-testid="today-summary-report">
+                <h2 className={`text-lg sm:text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                  Summary
+                </h2>
+                {(() => {
+                  const thB = `px-2 py-1 border text-xs font-bold ${isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-300 bg-slate-100 text-slate-800'}`;
+                  const tdB = `px-2 py-1 border text-xs ${isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-300 text-slate-800'}`;
+                  const tdR = `${tdB} text-right`;
+                  return (
+                    <table className="w-full border-collapse" data-testid="today-summary-table">
+                      <thead>
+                        <tr>
+                          <th className={thB}>Category</th>
+                          <th className={`${thB} text-right`}>Litres</th>
+                          <th className={`${thB} text-right`}>Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr><td className={tdB}>Fuel Sales</td><td className={tdR}>{stats.totalLiters.toFixed(2)}</td><td className={tdR}>{stats.totalFuelAmount.toFixed(2)}</td></tr>
+                        <tr><td className={tdB}>Credit Sales</td><td className={tdR}>{stats.creditLiters.toFixed(2)}</td><td className={tdR}>{stats.creditAmount.toFixed(2)}</td></tr>
+                        <tr><td className={tdB}>Settlement</td><td className={tdR}>-</td><td className={tdR}>{stats.totalSettlement.toFixed(2)}</td></tr>
+                        <tr><td className={tdB}>Income</td><td className={tdR}>-</td><td className={tdR}>{stats.otherIncome.toFixed(2)}</td></tr>
+                        <tr><td className={tdB}>Expenses</td><td className={tdR}>-</td><td className={tdR}>{stats.totalExpenses.toFixed(2)}</td></tr>
+                        <tr><td className={`${tdB} font-bold`}>Cash in Hand</td><td className={tdR}>-</td><td className={`${tdR} font-bold`}>{stats.cashInHand.toFixed(2)}</td></tr>
+                      </tbody>
+                    </table>
+                  );
+                })()}
               </div>
 
               {/* RIGHT COLUMN - Fuel Type Breakdown */}
@@ -3217,14 +3223,14 @@ window.onload = function() {
                 </h2>
                 {fuelSettings && Object.keys(fuelSettings).map((fuelType, index) => {
                   const fuelData = stats.fuelSalesByType[fuelType] || { liters: 0, amount: 0 };
-                  const colors = ['bg-blue-600', 'bg-green-600', 'bg-orange-600', 'bg-red-600', 'bg-purple-600', 'bg-teal-600'];
+                  const colors = ['bg-gray-600', 'bg-gray-600', 'bg-gray-600', 'bg-gray-600', 'bg-gray-600', 'bg-gray-600'];
                   const bgColors = [
-                    isDarkMode ? 'bg-gray-700' : 'bg-blue-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-green-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-orange-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-red-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-purple-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-teal-50'
+                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
+                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
                   ];
                   return (
                     <div key={fuelType} className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${bgColors[index % bgColors.length]}`}>
@@ -3259,7 +3265,7 @@ window.onload = function() {
         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-2">
           <Card 
             className={`${
-              isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'
+              isDarkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-600 hover:bg-gray-700'
             } border-0 shadow-lg cursor-pointer transition-colors`}
             onClick={() => {
               setEditingSaleData(null);
@@ -3308,7 +3314,7 @@ window.onload = function() {
 
           <Card 
             className={`${
-              isDarkMode ? 'bg-orange-600 hover:bg-orange-700' : 'bg-orange-600 hover:bg-orange-700'
+              isDarkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-600 hover:bg-gray-700'
             } border-0 shadow-lg cursor-pointer transition-colors`}
             onClick={() => {
               setEditingCreditData(null);
@@ -3325,7 +3331,7 @@ window.onload = function() {
 
           <Card 
             className={`${
-              isDarkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-600 hover:bg-purple-700'
+              isDarkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-600 hover:bg-gray-700'
             } border-0 shadow-lg cursor-pointer transition-colors`}
             onClick={() => {
               setEditingSettlementData(null);
@@ -4144,7 +4150,7 @@ window.onload = function() {
                   Cancel
                 </Button>
                 <Button
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
                   onClick={() => {
                     setPdfSettingsOpen(false);
                     generateDirectPDF();

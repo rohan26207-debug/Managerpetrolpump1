@@ -88,3 +88,6 @@ React-based petrol pump management application. 100% offline with localStorage o
 - Replaced the colorful left Summary column on Today Summary with the exact Balance → Reports B&W preview (Manager Pump header, STOCK/FUEL SALES lines, Category table, full record tables, Bank Settlement Report).
 - Implementation: ReportPreviewTab got a `previewOnly` prop (hides Operating Date header/buttons); Today Summary renders <ReportPreviewTab previewOnly .../> inside data-testid="today-summary-report" with overflow-x-auto + min-w-[300px] guard for narrow phones.
 - Right column (Fuel Type Breakdown) unchanged per user choice. Verified via screenshots; Android assets synced + cleaned.
+
+## Correction: Today Summary B&W (Oct 2026)
+- User clarified: only the SUMMARY should be B&W, not the full report. Left column now = "Summary" heading + bordered B&W table (Category/Litres/Amount, 6 rows ending with bold Cash in Hand), data-testid="today-summary-table". No record tables. Right Fuel Type Breakdown untouched. previewOnly prop on ReportPreviewTab retained (unused currently, harmless).

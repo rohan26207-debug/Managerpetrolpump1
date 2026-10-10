@@ -349,7 +349,7 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
         <Button
           variant={activeType === 'income' ? 'default' : 'outline'}
           onClick={() => { setActiveType('income'); resetForm(); }}
-          className={activeType === 'income' ? 'bg-green-600 hover:bg-green-700' : ''}
+          className={activeType === 'income' ? 'bg-gray-600 hover:bg-gray-700' : ''}
         >
           <TrendingUp className="w-4 h-4 mr-2" />
           Income
@@ -357,7 +357,7 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
         <Button
           variant={activeType === 'expense' ? 'default' : 'outline'}
           onClick={() => { setActiveType('expense'); resetForm(); }}
-          className={activeType === 'expense' ? 'bg-red-600 hover:bg-red-700' : ''}
+          className={activeType === 'expense' ? 'bg-gray-600 hover:bg-gray-700' : ''}
         >
           <TrendingDown className="w-4 h-4 mr-2" />
           Expense
@@ -412,13 +412,13 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-100 dark:hover:bg-red-900"
+                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-900"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteDescriptionHistory(desc);
                             }}
                           >
-                            <X className="h-3 w-3 text-red-600 dark:text-red-400" />
+                            <X className="h-3 w-3 text-gray-600 dark:text-gray-400" />
                           </Button>
                         </div>
                       ))}
@@ -466,8 +466,8 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
             onClick={handleAddAndContinue} 
             className={`w-full ${
               activeType === 'income' 
-                ? 'bg-green-600 hover:bg-green-700' 
-                : 'bg-red-600 hover:bg-red-700'
+                ? 'bg-gray-600 hover:bg-gray-700' 
+                : 'bg-gray-600 hover:bg-gray-700'
             }`}
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -479,8 +479,8 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
             onClick={handleSubmit} 
             className={`flex-1 ${
               activeType === 'income' 
-                ? 'bg-green-600 hover:bg-green-700' 
-                : 'bg-red-600 hover:bg-red-700'
+                ? 'bg-gray-600 hover:bg-gray-700' 
+                : 'bg-gray-600 hover:bg-gray-700'
             }`}
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -512,7 +512,7 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
           <h3 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
             {activeType === 'income' ? 'Income' : 'Expense'} Records
           </h3>
-          <Badge variant="outline" className={activeType === 'income' ? 'text-green-600 border-green-600' : 'text-red-600 border-red-600'}>
+          <Badge variant="outline" className={activeType === 'income' ? 'text-gray-600 border-gray-600' : 'text-gray-600 border-gray-600'}>
             {currentData.length} records
           </Badge>
         </div>
@@ -536,13 +536,13 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
                       <div className="flex items-center gap-2 mb-1">
                         <Badge className={`${
                           activeType === 'income' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-gray-100 text-gray-800' 
+                            : 'bg-gray-100 text-gray-800'
                         } border-0 text-xs`}>
                           {activeType === 'income' ? 'Income' : 'Expense'}
                         </Badge>
                         {record.mpp && (
-                          <Badge className="bg-blue-100 text-blue-800 border-0 text-xs">
+                          <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                             MPP
                           </Badge>
                         )}
@@ -554,9 +554,9 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
                       )}
                       <div className="flex items-center gap-2 text-lg font-semibold">
                         <IndianRupee className={`w-4 h-4 ${
-                          activeType === 'income' ? 'text-green-600' : 'text-red-600'
+                          activeType === 'income' ? 'text-gray-600' : 'text-gray-600'
                         }`} />
-                        <span className={activeType === 'income' ? 'text-green-600' : 'text-red-600'}>
+                        <span className={activeType === 'income' ? 'text-gray-600' : 'text-gray-600'}>
                           {record.amount.toFixed(2)}
                         </span>
                       </div>
@@ -569,7 +569,7 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
                         variant="ghost"
                         size="sm"
                         onClick={() => editRecord(record, activeType)}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -577,7 +577,7 @@ const IncomeExpense = ({ isDarkMode, incomeData, addIncomeRecord, updateIncomeRe
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteRecord(record.id, activeType)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

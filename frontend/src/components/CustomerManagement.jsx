@@ -105,7 +105,7 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
       }`}>
         <CardContent className="p-4">
           <div className="flex items-center gap-2 mb-4">
-            <Users className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <Users className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
             <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
               Add New Customer
             </h3>
@@ -124,11 +124,11 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
                 onKeyPress={handleKeyPress}
                 placeholder="Enter customer name"
                 className={`mt-1 ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : ''} ${
-                  addError ? 'border-red-500 focus:border-red-500' : ''
+                  addError ? 'border-gray-500 focus:border-gray-500' : ''
                 }`}
               />
               {addError && (
-                <div className="flex items-center gap-1 mt-1 text-red-500 text-sm">
+                <div className="flex items-center gap-1 mt-1 text-gray-500 text-sm">
                   <AlertTriangle className="w-4 h-4" />
                   <span>{addError}</span>
                 </div>
@@ -153,7 +153,7 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
             
             <Button
               onClick={handleAddCustomer}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white"
               disabled={!newCustomerName.trim()}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -215,7 +215,7 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
                 >
                   <div className="flex items-center gap-3 flex-1">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      isDarkMode ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-600'
+                      isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {customer.name.charAt(0).toUpperCase()}
                     </div>
@@ -232,15 +232,15 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
                               type="checkbox"
                               checked={customer.isMPP || false}
                               onChange={(e) => onUpdateCustomer(customer.id, customer.startingBalance, e.target.checked)}
-                              className="w-4 h-4 cursor-pointer accent-blue-500"
+                              className="w-4 h-4 cursor-pointer accent-gray-500"
                             />
-                            <span className={`text-xs font-semibold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                            <span className={`text-xs font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                               MPP
                             </span>
                           </label>
                         )}
                       </div>
-                      <span className={`text-xs ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}>
+                      <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         Balance: ₹{(customer.startingBalance || 0).toFixed(2)}
                       </span>
                     </div>
@@ -250,8 +250,8 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEditClick(customer)}
-                      className={`hover:bg-blue-100 hover:text-blue-600 ${
-                        isDarkMode ? 'text-gray-400 hover:bg-blue-900 hover:text-blue-400' : ''
+                      className={`hover:bg-gray-100 hover:text-gray-600 ${
+                        isDarkMode ? 'text-gray-400 hover:bg-gray-900 hover:text-gray-400' : ''
                       }`}
                     >
                       <Pencil className="w-4 h-4" />
@@ -260,8 +260,8 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteClick(customer)}
-                      className={`hover:bg-red-100 hover:text-red-600 ${
-                        isDarkMode ? 'text-gray-400 hover:bg-red-900 hover:text-red-400' : ''
+                      className={`hover:bg-gray-100 hover:text-gray-600 ${
+                        isDarkMode ? 'text-gray-400 hover:bg-gray-900 hover:text-gray-400' : ''
                       }`}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -283,7 +283,7 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
             <CardContent className="p-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className={`p-2 rounded-full ${
-                  isDarkMode ? 'bg-red-900 text-red-400' : 'bg-red-100 text-red-600'
+                  isDarkMode ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-600'
                 }`}>
                   <AlertTriangle className="w-6 h-6" />
                 </div>
@@ -320,7 +320,7 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
                 </Button>
                 <Button
                   onClick={confirmDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-gray-600 hover:bg-gray-700 text-white"
                 >
                   Yes, Delete
                 </Button>
@@ -380,7 +380,7 @@ const CustomerManagement = ({ customers, onAddCustomer, onDeleteCustomer, onUpda
                 </Button>
                 <Button
                   onClick={confirmEdit}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-gray-600 hover:bg-gray-700 text-white"
                 >
                   Save Changes
                 </Button>

@@ -194,7 +194,7 @@ const Settlement = ({
     <Card className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'}`}>
       <CardHeader className="pb-3">
         <CardTitle className={`flex items-center gap-2 text-lg ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-          <ArrowRightLeft className="w-5 h-5 text-orange-600" />
+          <ArrowRightLeft className="w-5 h-5 text-gray-600" />
           Settlement
         </CardTitle>
       </CardHeader>
@@ -273,7 +273,7 @@ const Settlement = ({
                       type="checkbox"
                       checked={formData.mpp}
                       onChange={(e) => setFormData(prev => ({ ...prev, mpp: e.target.checked }))}
-                      className="w-5 h-5 cursor-pointer accent-blue-500"
+                      className="w-5 h-5 cursor-pointer accent-gray-500"
                     />
                   </div>
                 </div>
@@ -286,7 +286,7 @@ const Settlement = ({
             <div className="flex gap-2">
               <Button 
                 onClick={() => handleSubmit(true)}
-                className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
                 disabled={!formData.amount || !formData.description}
               >
                 <Plus className="w-4 h-4 mr-1" />
@@ -304,7 +304,7 @@ const Settlement = ({
             <div className="space-y-2">
               <Button 
                 onClick={() => handleSubmit(false)}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white"
                 disabled={!formData.amount || !formData.description}
               >
                 <Plus className="w-4 h-4 mr-1" />
@@ -312,7 +312,7 @@ const Settlement = ({
               </Button>
               <Button 
                 onClick={() => handleSubmit(true)}
-                className="w-full bg-orange-700 hover:bg-orange-800 text-white"
+                className="w-full bg-gray-700 hover:bg-gray-800 text-white"
                 disabled={!formData.amount || !formData.description}
               >
                 <Plus className="w-4 h-4 mr-1" />
@@ -333,7 +333,7 @@ const Settlement = ({
                 <h3 className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
                   Today's Settlements
                 </h3>
-                <Badge variant="outline" className="text-orange-600 border-orange-600">
+                <Badge variant="outline" className="text-gray-600 border-gray-600">
                   Total: ₹{totalSettlements.toFixed(2)}
                 </Badge>
               </div>
@@ -361,7 +361,7 @@ const Settlement = ({
                                 {record.description}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 text-lg font-semibold text-orange-600">
+                            <div className="flex items-center gap-2 text-lg font-semibold text-gray-600">
                               <IndianRupee className="w-4 h-4" />
                               {record.amount.toFixed(2)}
                             </div>
@@ -371,7 +371,7 @@ const Settlement = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => handleEdit(record)}
-                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -379,7 +379,7 @@ const Settlement = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDelete(record.id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>

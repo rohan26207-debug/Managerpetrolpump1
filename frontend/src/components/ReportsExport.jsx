@@ -212,7 +212,7 @@ const generatePdfData = async () => {
       <Card className={`${
         isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
       } shadow-lg`}>
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
           <CardTitle className="flex items-center gap-2">
             <Filter className="w-5 h-5" />
             Report Filters
@@ -263,9 +263,9 @@ const generatePdfData = async () => {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
           <CardContent className="p-4 text-center">
-            <IndianRupee className="w-8 h-8 mx-auto mb-2 text-green-600" />
+            <IndianRupee className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <p className="text-sm text-slate-600">Total Sales</p>
-            <p className="text-xl font-bold text-green-600">₹{stats.totalSalesAmount.toFixed(2)}</p>
+            <p className="text-xl font-bold text-gray-600">₹{stats.totalSalesAmount.toFixed(2)}</p>
             <p className="text-xs text-slate-500">{stats.totalSalesLiters.toFixed(2)}L</p>
           </CardContent>
         </Card>
@@ -274,9 +274,9 @@ const generatePdfData = async () => {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
           <CardContent className="p-4 text-center">
-            <CreditCard className="w-8 h-8 mx-auto mb-2 text-orange-600" />
+            <CreditCard className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <p className="text-sm text-slate-600">Credit Sales</p>
-            <p className="text-xl font-bold text-orange-600">₹{stats.totalCreditAmount.toFixed(2)}</p>
+            <p className="text-xl font-bold text-gray-600">₹{stats.totalCreditAmount.toFixed(2)}</p>
             <p className="text-xs text-slate-500">{stats.totalCreditLiters.toFixed(2)}L</p>
           </CardContent>
         </Card>
@@ -285,9 +285,9 @@ const generatePdfData = async () => {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
           <CardContent className="p-4 text-center">
-            <TrendingUp className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+            <TrendingUp className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <p className="text-sm text-slate-600">Total Income</p>
-            <p className="text-xl font-bold text-blue-600">₹{stats.totalIncome.toFixed(2)}</p>
+            <p className="text-xl font-bold text-gray-600">₹{stats.totalIncome.toFixed(2)}</p>
           </CardContent>
         </Card>
 
@@ -295,9 +295,9 @@ const generatePdfData = async () => {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
           <CardContent className="p-4 text-center">
-            <TrendingDown className="w-8 h-8 mx-auto mb-2 text-red-600" />
+            <TrendingDown className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <p className="text-sm text-slate-600">Total Expenses</p>
-            <p className="text-xl font-bold text-red-600">₹{stats.totalExpenses.toFixed(2)}</p>
+            <p className="text-xl font-bold text-gray-600">₹{stats.totalExpenses.toFixed(2)}</p>
           </CardContent>
         </Card>
       </div>
@@ -309,26 +309,26 @@ const generatePdfData = async () => {
         <CardContent className="p-6">
           <div className="text-center">
             <BarChart3 className={`w-12 h-12 mx-auto mb-4 ${
-              stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'
+              stats.netProfit >= 0 ? 'text-gray-600' : 'text-gray-600'
             }`} />
             <h3 className="text-2xl font-bold mb-2">Net Profit Analysis</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-sm text-slate-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-gray-600">
                   ₹{stats.totalRevenue.toFixed(2)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-slate-600">Total Expenses</p>
-                <p className="text-2xl font-bold text-red-600">
+                <p className="text-2xl font-bold text-gray-600">
                   ₹{stats.totalExpenses.toFixed(2)}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-slate-600">Net Profit</p>
                 <p className={`text-3xl font-bold ${
-                  stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'
+                  stats.netProfit >= 0 ? 'text-gray-600' : 'text-gray-600'
                 }`}>
                   ₹{stats.netProfit.toFixed(2)}
                 </p>
@@ -342,7 +342,7 @@ const generatePdfData = async () => {
       <Card className={`${
         isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
       } shadow-lg`}>
-        <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg">
+        <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
           <CardTitle className="flex items-center gap-2">
             <Download className="w-5 h-5" />
             Export Reports
@@ -352,7 +352,7 @@ const generatePdfData = async () => {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Button 
               onClick={() => downloadCSV('summary')}
-              className="flex flex-col items-center gap-2 h-auto p-4 bg-blue-600 hover:bg-blue-700"
+              className="flex flex-col items-center gap-2 h-auto p-4 bg-gray-600 hover:bg-gray-700"
             >
               <BarChart3 className="w-6 h-6" />
               <span className="text-sm">Summary Report</span>
@@ -360,7 +360,7 @@ const generatePdfData = async () => {
 
             <Button 
               onClick={() => downloadCSV('sales')}
-              className="flex flex-col items-center gap-2 h-auto p-4 bg-green-600 hover:bg-green-700"
+              className="flex flex-col items-center gap-2 h-auto p-4 bg-gray-600 hover:bg-gray-700"
             >
               <Fuel className="w-6 h-6" />
               <span className="text-sm">Sales Report</span>
@@ -368,7 +368,7 @@ const generatePdfData = async () => {
 
             <Button 
               onClick={() => downloadCSV('credit')}
-              className="flex flex-col items-center gap-2 h-auto p-4 bg-orange-600 hover:bg-orange-700"
+              className="flex flex-col items-center gap-2 h-auto p-4 bg-gray-600 hover:bg-gray-700"
             >
               <CreditCard className="w-6 h-6" />
               <span className="text-sm">Credit Report</span>
@@ -376,7 +376,7 @@ const generatePdfData = async () => {
 
             <Button 
               onClick={() => downloadCSV('income')}
-              className="flex flex-col items-center gap-2 h-auto p-4 bg-teal-600 hover:bg-teal-700"
+              className="flex flex-col items-center gap-2 h-auto p-4 bg-gray-600 hover:bg-gray-700"
             >
               <TrendingUp className="w-6 h-6" />
               <span className="text-sm">Income Report</span>
@@ -384,7 +384,7 @@ const generatePdfData = async () => {
 
             <Button 
               onClick={() => downloadCSV('expenses')}
-              className="flex flex-col items-center gap-2 h-auto p-4 bg-red-600 hover:bg-red-700"
+              className="flex flex-col items-center gap-2 h-auto p-4 bg-gray-600 hover:bg-gray-700"
             >
               <TrendingDown className="w-6 h-6" />
               <span className="text-sm">Expense Report</span>
@@ -397,7 +397,7 @@ const generatePdfData = async () => {
             <p className="text-sm text-slate-600">
               Reports will be exported as CSV files for the selected date range
             </p>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+            <Badge variant="outline" className="bg-gray-50 text-gray-700">
               {dateRange.startDate} to {dateRange.endDate}
             </Badge>
           </div>

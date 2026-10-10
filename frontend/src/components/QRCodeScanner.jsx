@@ -163,7 +163,7 @@ const QRCodeScanner = ({ isDarkMode, onClose, onDataReceived }) => {
                 </p>
                 <Button
                   onClick={startScanning}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                  className="w-full bg-gray-600 hover:bg-gray-700 text-white"
                 >
                   <Camera className="w-4 h-4 mr-2" />
                   Start Camera
@@ -183,14 +183,14 @@ const QRCodeScanner = ({ isDarkMode, onClose, onDataReceived }) => {
             )}
 
             <div className={`text-center space-y-2 p-4 rounded-lg border ${
-              isDarkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
+              isDarkMode ? 'bg-gray-900/20 border-gray-800' : 'bg-gray-50 border-gray-200'
             }`}>
               <p className={`text-sm font-medium ${
-                isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
               }`}>
                 📱 Instructions
               </p>
-              <p className={`text-xs ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 1. Allow camera permission when prompted<br/>
                 2. Point camera at the QR code<br/>
                 3. Hold steady until scan completes<br/>

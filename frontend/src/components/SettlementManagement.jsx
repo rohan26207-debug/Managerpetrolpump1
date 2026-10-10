@@ -171,7 +171,7 @@ const SettlementManagement = ({
                       variant="ghost"
                       size="sm"
                       onClick={() => saveEditing(type.id)}
-                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                      className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                     >
                       <Check className="w-4 h-4" />
                     </Button>
@@ -186,7 +186,7 @@ const SettlementManagement = ({
                   </div>
                 ) : (
                   <div className="flex items-center justify-between">
-                    <Badge className="bg-orange-100 text-orange-800 border-0">
+                    <Badge className="bg-gray-100 text-gray-800 border-0">
                       {type.name}
                     </Badge>
                     {type.builtin ? (
@@ -201,7 +201,7 @@ const SettlementManagement = ({
                           variant="ghost"
                           size="sm"
                           onClick={() => startEditing(type.id, type.name)}
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                         >
                           <Edit className="w-3 h-3" />
                         </Button>
@@ -209,7 +209,7 @@ const SettlementManagement = ({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(type.id, type.name)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>
@@ -224,12 +224,12 @@ const SettlementManagement = ({
       </div>
 
       <div className={`p-4 rounded-lg border mt-4 ${
-        isDarkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
+        isDarkMode ? 'bg-gray-900/20 border-gray-800' : 'bg-gray-50 border-gray-200'
       }`}>
-        <p className={`text-xs ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>
+        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
           ℹ️ <strong>About Settlements:</strong>
         </p>
-        <p className={`text-xs mt-1 ${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`}>
+        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           Settlements are amounts transferred from cash sales to bank. This reduces your cash in hand but doesn't affect total sales.
         </p>
       </div>
@@ -239,13 +239,13 @@ const SettlementManagement = ({
         <DialogContent className={isDarkMode ? 'bg-gray-800 text-white' : ''}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+              <AlertTriangle className="w-5 h-5 text-gray-600" />
               Confirm Deletion
             </DialogTitle>
             <DialogDescription className={isDarkMode ? 'text-gray-300' : ''}>
               Are you sure you want to delete "{deleteConfirmation.name}"?
               <br />
-              <span className="text-red-600 font-semibold">This action cannot be undone.</span>
+              <span className="text-gray-600 font-semibold">This action cannot be undone.</span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
@@ -259,7 +259,7 @@ const SettlementManagement = ({
             <Button
               variant="destructive"
               onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-gray-600 hover:bg-gray-700"
             >
               Delete
             </Button>

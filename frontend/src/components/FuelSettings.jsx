@@ -141,11 +141,11 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
           <CardContent className="p-4 text-center">
-            <Fuel className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+            <Fuel className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>
               Fuel Types
             </p>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-2xl font-bold text-gray-600">
               {Object.keys(fuelSettings).length}
             </p>
           </CardContent>
@@ -155,11 +155,11 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
           <CardContent className="p-4 text-center">
-            <Gauge className="w-8 h-8 mx-auto mb-2 text-green-600" />
+            <Gauge className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>
               Total Nozzles
             </p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-gray-600">
               {getTotalNozzles()}
             </p>
           </CardContent>
@@ -169,11 +169,11 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
           <CardContent className="p-4 text-center">
-            <IndianRupee className="w-8 h-8 mx-auto mb-2 text-orange-600" />
+            <IndianRupee className="w-8 h-8 mx-auto mb-2 text-gray-600" />
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>
               Avg. Price/L
             </p>
-            <p className="text-2xl font-bold text-orange-600">
+            <p className="text-2xl font-bold text-gray-600">
               ₹{getAveragePrice()}
             </p>
           </CardContent>
@@ -185,7 +185,7 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
         <Card className={`${
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg`}>
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+          <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <Fuel className="w-5 h-5" />
               Fuel Type Configuration
@@ -200,7 +200,7 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
                   }`}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <Fuel className="w-4 h-4 text-blue-600" />
+                        <Fuel className="w-4 h-4 text-gray-600" />
                         <span className={`font-medium ${
                           isDarkMode ? 'text-white' : 'text-slate-800'
                         }`}>
@@ -211,7 +211,7 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
                         variant="ghost"
                         size="sm"
                         onClick={() => removeFuelType(fuelType)}
-                        className="text-red-600 hover:bg-red-50"
+                        className="text-gray-600 hover:bg-gray-50"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
@@ -307,7 +307,7 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
           <Card className={`${
             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
           } shadow-lg`}>
-            <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <Plus className="w-5 h-5" />
                 Add New Fuel Type
@@ -349,7 +349,7 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
               
               <Button 
                 onClick={addFuelType}
-                className="w-full h-12 bg-green-600 hover:bg-green-700"
+                className="w-full h-12 bg-gray-600 hover:bg-gray-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Fuel Type
@@ -361,7 +361,7 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
           <Card className={`${
             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
           } shadow-lg`}>
-            <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <SettingsIcon className="w-5 h-5" />
                 Quick Actions
@@ -415,9 +415,9 @@ const FuelSettings = ({ isDarkMode, fuelSettings, setFuelSettings }) => {
               </div>
 
               <div className={`p-3 rounded-lg ${
-                isDarkMode ? 'bg-blue-900/20 border border-blue-700' : 'bg-blue-50 border border-blue-200'
+                isDarkMode ? 'bg-gray-900/20 border border-gray-700' : 'bg-gray-50 border border-gray-200'
               }`}>
-                <p className="text-sm text-blue-600">
+                <p className="text-sm text-gray-600">
                   💡 Settings are automatically saved when you make changes. 
                   Changes will reflect immediately in Sales and Credit sections.
                 </p>

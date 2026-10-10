@@ -75,8 +75,8 @@ const ConfirmDialogUI = ({ options, typedValue, onTypedValueChange, onClose }) =
 
   const isConfirmEnabled = !requireTypedText || typedValue === requireTypedText;
   const confirmClass = variant === 'danger'
-    ? 'bg-red-600 hover:bg-red-700 text-white'
-    : 'bg-blue-600 hover:bg-blue-700 text-white';
+    ? 'bg-gray-600 hover:bg-gray-700 text-white'
+    : 'bg-gray-600 hover:bg-gray-700 text-white';
 
   return (
     <div
@@ -86,7 +86,7 @@ const ConfirmDialogUI = ({ options, typedValue, onTypedValueChange, onClose }) =
       <Card className={`w-full max-w-md ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'}`}>
         <CardContent className="p-6">
           <div className="flex items-start gap-4 mb-4">
-            <div className={`p-2 rounded-full flex-shrink-0 ${isDarkMode ? 'bg-red-900 text-red-400' : 'bg-red-100 text-red-600'}`}>
+            <div className={`p-2 rounded-full flex-shrink-0 ${isDarkMode ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-600'}`}>
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">

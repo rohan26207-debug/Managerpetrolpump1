@@ -472,7 +472,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                             isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
                           } ${
                             formData.customerName === customer.name 
-                              ? isDarkMode ? 'bg-blue-600' : 'bg-blue-100' 
+                              ? isDarkMode ? 'bg-gray-600' : 'bg-gray-100' 
                               : ''
                           }`}
                           onClick={() => {
@@ -545,7 +545,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                       type="checkbox"
                       checked={formData.mpp}
                       onChange={(e) => setFormData(prev => ({ ...prev, mpp: e.target.checked }))}
-                      className="w-5 h-5 cursor-pointer accent-blue-500"
+                      className="w-5 h-5 cursor-pointer accent-gray-500"
                     />
                   </div>
                 </div>
@@ -621,7 +621,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
               <div className="space-y-1">
                 <Label className="text-sm font-medium text-right block">Amount</Label>
                 <div className={`px-3 py-2 rounded-md text-lg font-bold text-right ${
-                  isDarkMode ? 'bg-green-900 text-green-400' : 'bg-green-50 text-green-600'
+                  isDarkMode ? 'bg-gray-900 text-gray-400' : 'bg-gray-50 text-gray-600'
                 }`}>
                   ₹{formData.fuelEntries[0].liters && formData.fuelEntries[0].rate
                     ? (parseFloat(formData.fuelEntries[0].liters) * parseFloat(formData.fuelEntries[0].rate)).toFixed(2)
@@ -633,7 +633,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
             {/* Display Final Total */}
             <div className="pt-2">
               <div className={`px-4 py-3 rounded-md text-xl font-bold text-center ${
-                isDarkMode ? 'bg-orange-900 text-orange-400' : 'bg-orange-50 text-orange-600'
+                isDarkMode ? 'bg-gray-900 text-gray-400' : 'bg-gray-50 text-gray-600'
               }`}>
                 Final: ₹{calculateTotalAmount()}
               </div>
@@ -644,14 +644,14 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
               <div className="mt-3 space-y-2">
                 {formData.incomeEntries.map((entry, index) => (
                   <div key={entry.id || "inc-" + index} className={`flex items-center justify-between px-3 py-2 rounded text-sm ${
-                    isDarkMode ? 'bg-green-900 bg-opacity-30 text-green-400' : 'bg-green-50 text-green-700'
+                    isDarkMode ? 'bg-gray-900 bg-opacity-30 text-gray-400' : 'bg-gray-50 text-gray-700'
                   }`}>
                     <span>+ {entry.description}</span>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">₹{parseFloat(entry.amount).toFixed(2)}</span>
                       <button
                         onClick={() => removeIncomeEntry(index)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-gray-500 hover:text-gray-700"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -666,14 +666,14 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
               <div className="mt-3 space-y-2">
                 {formData.expenseEntries.map((entry, index) => (
                   <div key={entry.id || "exp-" + index} className={`flex items-center justify-between px-3 py-2 rounded text-sm ${
-                    isDarkMode ? 'bg-red-900 bg-opacity-30 text-red-400' : 'bg-red-50 text-red-700'
+                    isDarkMode ? 'bg-gray-900 bg-opacity-30 text-gray-400' : 'bg-gray-50 text-gray-700'
                   }`}>
                     <span>- {entry.description}</span>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">₹{parseFloat(entry.amount).toFixed(2)}</span>
                       <button
                         onClick={() => removeExpenseEntry(index)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-gray-500 hover:text-gray-700"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -730,7 +730,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                     <Button
                       onClick={addIncomeEntry}
                       disabled={!tempIncome.description || !tempIncome.amount}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-gray-600 hover:bg-gray-700"
                     >
                       Add Income
                     </Button>
@@ -786,7 +786,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                     <Button
                       onClick={addExpenseEntry}
                       disabled={!tempExpense.description || !tempExpense.amount}
-                      className="bg-red-600 hover:bg-red-700"
+                      className="bg-gray-600 hover:bg-gray-700"
                     >
                       Add Expense
                     </Button>
@@ -800,14 +800,14 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
             {!editingId && (
               <Button 
                 onClick={handleAddAndContinue} 
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-full bg-gray-600 hover:bg-gray-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Credit & Add more
               </Button>
             )}
             <div className="flex gap-3">
-              <Button onClick={handleSubmit} className="flex-1 bg-orange-600 hover:bg-orange-700">
+              <Button onClick={handleSubmit} className="flex-1 bg-gray-600 hover:bg-gray-700">
                 <Plus className="w-4 h-4 mr-2" />
                 {editingId ? 'Update Credit' : 'Add Credit & Close'}
               </Button>
@@ -833,7 +833,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
           <Card className={`${
             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
           } shadow-lg`}>
-            <CardHeader className="bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="w-5 h-5" />
                 {editingId ? 'Edit Credit Sale' : 'Add Credit Sale'}
@@ -850,7 +850,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
       <Card className={`${
         isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
       } shadow-lg`}>
-        <CardHeader className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-t-lg">
+        <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
             Credit Sales Records ({filteredCreditData.length})
@@ -893,10 +893,10 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                             isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-slate-50 border-slate-200'
                           }`}>
                             <div className="flex items-center justify-between">
-                              <Badge className="bg-purple-100 text-purple-800 border-0 text-xs">
+                              <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                                 {entry.fuelType}
                               </Badge>
-                              <span className="text-xs font-medium text-orange-600">
+                              <span className="text-xs font-medium text-gray-600">
                                 ₹{entry.amount.toFixed(2)}
                               </span>
                             </div>
@@ -916,7 +916,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                     ) : (
                       // Legacy single entry display
                       <div className="space-y-1.5 mb-3">
-                        <Badge className="bg-purple-100 text-purple-800 border-0 text-xs">
+                        <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                           {credit.fuelType}
                         </Badge>
                         <div className="space-y-1.5 text-xs sm:text-sm mt-2">
@@ -939,13 +939,13 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                       <div className="space-y-2 mb-3">
                         {credit.incomeEntries.map((entry, index) => (
                           <div key={"item-" + index} className={`p-2 rounded border ${
-                            isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-green-50 border-green-200'
+                            isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-gray-50 border-gray-200'
                           }`}>
                             <div className="flex items-center justify-between">
-                              <Badge className="bg-green-100 text-green-800 border-0 text-xs">
+                              <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                                 Income
                               </Badge>
-                              <span className="text-xs font-medium text-green-600">
+                              <span className="text-xs font-medium text-gray-600">
                                 +₹{entry.amount.toFixed(2)}
                               </span>
                             </div>
@@ -964,13 +964,13 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                       <div className="space-y-2 mb-3">
                         {credit.expenseEntries.map((entry, index) => (
                           <div key={"item-" + index} className={`p-2 rounded border ${
-                            isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-red-50 border-red-200'
+                            isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-gray-50 border-gray-200'
                           }`}>
                             <div className="flex items-center justify-between">
-                              <Badge className="bg-red-100 text-red-800 border-0 text-xs">
+                              <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                                 Expense
                               </Badge>
-                              <span className="text-xs font-medium text-red-600">
+                              <span className="text-xs font-medium text-gray-600">
                                 -₹{entry.amount.toFixed(2)}
                               </span>
                             </div>
@@ -989,8 +989,8 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className={`font-semibold text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Total Amount:</span>
                       <div className="flex items-center gap-1">
-                        <IndianRupee className="w-4 h-4 text-orange-600" />
-                        <span className="text-lg sm:text-xl font-bold text-orange-600">
+                        <IndianRupee className="w-4 h-4 text-gray-600" />
+                        <span className="text-lg sm:text-xl font-bold text-gray-600">
                           {credit.amount.toFixed(2)}
                         </span>
                       </div>
@@ -1014,7 +1014,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
             <CardContent className="p-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className={`p-2 rounded-full ${
-                  isDarkMode ? 'bg-red-900 text-red-400' : 'bg-red-100 text-red-600'
+                  isDarkMode ? 'bg-gray-900 text-gray-400' : 'bg-gray-100 text-gray-600'
                 }`}>
                   <AlertTriangle className="w-6 h-6" />
                 </div>
@@ -1051,7 +1051,7 @@ const CreditSales = ({ isDarkMode, creditData, addCreditRecord, updateCreditReco
                 </Button>
                 <Button
                   onClick={confirmDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-gray-600 hover:bg-gray-700 text-white"
                 >
                   Yes, Delete
                 </Button>

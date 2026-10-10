@@ -407,7 +407,7 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
                 type="checkbox"
                 checked={formData.mpp}
                 onChange={(e) => setFormData(prev => ({ ...prev, mpp: e.target.checked }))}
-                className="w-5 h-5 cursor-pointer accent-blue-500"
+                className="w-5 h-5 cursor-pointer accent-gray-500"
               />
             </div>
           </div>
@@ -463,21 +463,21 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
       </div>
 
       {calculation && (
-        <div className={`bg-green-50 border border-green-200 rounded-lg p-4 ${
-          isDarkMode ? 'bg-green-900/20 border-green-700' : ''
+        <div className={`bg-gray-50 border border-gray-200 rounded-lg p-4 ${
+          isDarkMode ? 'bg-gray-900/20 border-gray-700' : ''
         }`}>
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
-              <p className="text-sm text-green-600">Net Liters</p>
-              <p className="text-xl font-bold text-green-700">{calculation.liters}</p>
-              <p className="text-xs text-green-600 mt-1">
+              <p className="text-sm text-gray-600">Net Liters</p>
+              <p className="text-xl font-bold text-gray-700">{calculation.liters}</p>
+              <p className="text-xs text-gray-600 mt-1">
                 End - Start - Testing
               </p>
             </div>
             <div>
-              <p className="text-sm text-green-600">Amount</p>
-              <p className="text-xl font-bold text-green-700">₹{calculation.amount}</p>
-              <p className="text-xs text-green-600 mt-1">
+              <p className="text-sm text-gray-600">Amount</p>
+              <p className="text-xl font-bold text-gray-700">₹{calculation.amount}</p>
+              <p className="text-xs text-gray-600 mt-1">
                 Net Liters × Rate
               </p>
             </div>
@@ -489,14 +489,14 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
         {!editingId && (
           <Button 
             onClick={handleAddAndContinue} 
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-gray-600 hover:bg-gray-700"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Sale & Add more
           </Button>
         )}
         <div className="flex gap-3">
-          <Button onClick={handleSubmit} className="flex-1 bg-green-600 hover:bg-green-700">
+          <Button onClick={handleSubmit} className="flex-1 bg-gray-600 hover:bg-gray-700">
             <Plus className="w-4 h-4 mr-2" />
             {editingId ? 'Update Sale' : 'Add Sale & Close'}
           </Button>
@@ -522,7 +522,7 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
           <Card className={`${
             isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
           } shadow-lg`}>
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg py-2">
+            <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg py-2">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Calculator className="w-5 h-5" />
                 {editingId ? 'Edit Sale Record' : 'Add Sale Record'}
@@ -539,7 +539,7 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
       <Card className={`${
         isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
       } shadow-lg`}>
-        <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+        <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
           <CardTitle className="flex items-center gap-2">
             <Fuel className="w-5 h-5" />
             Sales Records ({filteredSalesData.length})
@@ -560,10 +560,10 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
                   }`}>
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <Badge className="bg-blue-100 text-blue-800 border-0 text-xs">
+                        <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                           {sale.nozzle}
                         </Badge>
-                        <Badge className="bg-purple-100 text-purple-800 border-0 text-xs">
+                        <Badge className="bg-gray-100 text-gray-800 border-0 text-xs">
                           {sale.fuelType}
                         </Badge>
                       </div>
@@ -603,8 +603,8 @@ const SalesTracker = ({ isDarkMode, salesData, addSaleRecord, updateSaleRecord, 
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className={`font-semibold text-sm ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>Total Amount:</span>
                       <div className="flex items-center gap-1">
-                        <IndianRupee className="w-4 h-4 text-green-600" />
-                        <span className="text-lg sm:text-xl font-bold text-green-600">
+                        <IndianRupee className="w-4 h-4 text-gray-600" />
+                        <span className="text-lg sm:text-xl font-bold text-gray-600">
                           {sale.amount.toFixed(2)}
                         </span>
                       </div>

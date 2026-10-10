@@ -50,7 +50,7 @@ const CashManagement = ({ cashInHand, onCashUpdate }) => {
 
   return (
     <Card className="shadow-lg border-0 bg-white">
-      <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg">
+      <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
         <CardTitle className="flex items-center gap-2 text-xl">
           <Wallet className="w-6 h-6" />
           Cash Management
@@ -58,12 +58,12 @@ const CashManagement = ({ cashInHand, onCashUpdate }) => {
       </CardHeader>
       <CardContent className="p-6 space-y-6">
         {/* Current Cash Display */}
-        <div className="bg-green-50 rounded-lg p-4 border-2 border-green-200">
+        <div className="bg-gray-50 rounded-lg p-4 border-2 border-gray-200">
           <div className="flex items-center justify-between">
-            <span className="text-lg font-medium text-green-700">Cash in Hand:</span>
+            <span className="text-lg font-medium text-gray-700">Cash in Hand:</span>
             <div className="flex items-center gap-1">
-              <IndianRupee className="w-6 h-6 text-green-600" />
-              <span className="text-3xl font-bold text-green-600">
+              <IndianRupee className="w-6 h-6 text-gray-600" />
+              <span className="text-3xl font-bold text-gray-600">
                 {cashInHand.toFixed(2)}
               </span>
             </div>
@@ -109,7 +109,7 @@ const CashManagement = ({ cashInHand, onCashUpdate }) => {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <Button 
                 onClick={() => handleCashAdjustment('add')}
-                className="h-12 bg-green-600 hover:bg-green-700 text-white font-medium"
+                className="h-12 bg-gray-600 hover:bg-gray-700 text-white font-medium"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Cash
@@ -117,7 +117,7 @@ const CashManagement = ({ cashInHand, onCashUpdate }) => {
               <Button 
                 onClick={() => handleCashAdjustment('subtract')}
                 variant="outline"
-                className="h-12 border-red-300 text-red-600 hover:bg-red-50"
+                className="h-12 border-gray-300 text-gray-600 hover:bg-gray-50"
               >
                 <Minus className="w-4 h-4 mr-2" />
                 Remove Cash
@@ -132,11 +132,11 @@ const CashManagement = ({ cashInHand, onCashUpdate }) => {
         <div className="space-y-3">
           <h4 className="text-md font-medium text-slate-700">Quick Actions</h4>
           <div className="grid grid-cols-2 gap-2">
-            <Badge variant="outline" className="justify-center p-3 cursor-pointer hover:bg-blue-50">
+            <Badge variant="outline" className="justify-center p-3 cursor-pointer hover:bg-gray-50">
               <CreditCard className="w-4 h-4 mr-2" />
               Card Payment
             </Badge>
-            <Badge variant="outline" className="justify-center p-3 cursor-pointer hover:bg-green-50">
+            <Badge variant="outline" className="justify-center p-3 cursor-pointer hover:bg-gray-50">
               <Banknote className="w-4 h-4 mr-2" />
               Cash Payment
             </Badge>
