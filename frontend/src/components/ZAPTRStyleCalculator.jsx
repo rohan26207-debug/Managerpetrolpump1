@@ -3102,49 +3102,6 @@ window.onload = function() {
           </Card>
         )}
 
-        {/* Stock Summary - Single line showing start stock */}
-        {parentTab === 'today' && (
-          <Card key={`stock-summary-${stockDataVersion}`} className={`${
-            isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
-          } shadow-lg mb-2`}>
-            <CardContent className="p-2 sm:p-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                <Package className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${
-                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                }`} />
-                <span className={`text-xs sm:text-sm font-semibold ${
-                  isDarkMode ? 'text-gray-300' : 'text-slate-600'
-                }`}>
-                  STOCK:
-                </span>
-                {fuelSettings && Object.keys(fuelSettings).map((fuelType, index) => {
-                  const storageKey = `${fuelType.toLowerCase()}StockData`;
-                  const savedData = localStorageService.getItem(storageKey);
-                  let startStock = 0;
-                  
-                  if (savedData) {
-                    const dateData = savedData[selectedDate];
-                    if (dateData) {
-                      startStock = dateData.startStock || 0;
-                    }
-                  }
-                  
-                  return (
-                    <span 
-                      key={fuelType}
-                      className={`text-xs sm:text-sm font-medium ${
-                        isDarkMode ? 'text-white' : 'text-slate-800'
-                      }`}
-                    >
-                      {fuelType}-{startStock.toFixed(0)} L{index < Object.keys(fuelSettings).length - 1 ? ', ' : ''}
-                    </span>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Stock and Rate Buttons - Same height as STOCK summary */}
         {parentTab === 'today' && (
           <div className="grid grid-cols-2 gap-2 mb-2">
