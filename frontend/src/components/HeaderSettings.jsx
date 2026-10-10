@@ -1952,7 +1952,7 @@ const HeaderSettings = ({ isDarkMode, fuelSettings, setFuelSettings, customers, 
                                   : "Auto backup has been turned off"
                               });
                             }}
-                            className="w-4 h-4"
+                            className="w-4 h-4 accent-gray-800"
                           />
                           <label 
                             htmlFor="weekly-backup-toggle"

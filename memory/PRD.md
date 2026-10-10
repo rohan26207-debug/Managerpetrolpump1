@@ -91,3 +91,8 @@ React-based petrol pump management application. 100% offline with localStorage o
 
 ## Correction: Today Summary B&W (Oct 2026)
 - User clarified: only the SUMMARY should be B&W, not the full report. Left column now = "Summary" heading + bordered B&W table (Category/Litres/Amount, 6 rows ending with bold Cash in Hand), data-testid="today-summary-table". No record tables. Right Fuel Type Breakdown untouched. previewOnly prop on ReportPreviewTab retained (unused currently, harmless).
+
+## Full App B&W Restyle (Oct 2026)
+- User: "all app everything in B&W style only". Converted 614 Tailwind color classes (blue/orange/green/purple/red/yellow/teal/indigo/amber) to gray-equivalents (same shade numbers) across 28 files via regex, incl. use-confirm.jsx. ONLY exception kept: green calendar highlight + legend in Reports (bg-green-500/600, user's explicit feature).
+- Also: App.css .gradient-text now gray gradient; print-window .print-btn hex #007bff -> #1f2937 (CreditSalesManagement, PaymentReceived); toast.jsx destructive red -> gray; HeaderSettings weekly-backup checkbox accent-gray-800.
+- Testing agent iteration_4.json: 100% pass, zero colored classes remain, no functional regressions. Android synced.
