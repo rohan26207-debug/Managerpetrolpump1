@@ -103,3 +103,7 @@ React-based petrol pump management application. 100% offline with localStorage o
 - data-testid="today-fuel-sales-line" added. Verified show/hide in both views via screenshots. Android synced.
 ## Removed standalone STOCK bar on Today Summary (Oct 2026) - STOCK now only inside Summary B&W section. Android synced.
 ## Add Stock/Add Rate buttons restyled to match Reading Sales/Credit Sales (dark gray filled, white text, centered) - Oct 2026. Android synced.
+
+## Dark Mode Text Readability Fix (Oct 2026)
+- After B&W restyle, hardcoded text-gray-500/600/700 (amounts next to D1/Diesel badges etc.) were invisible on dark backgrounds.
+- Global CSS fix in index.css: `.dark .text-gray-500/600/700 { color: #f9fafb }` — covers ALL screens at once (dark class is toggled on documentElement). Light mode unaffected. Verified computed color rgb(249,250,251) in dark mode. Android synced.

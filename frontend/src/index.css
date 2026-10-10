@@ -139,3 +139,10 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* Dark mode readability: hardcoded grey text (meant for light bg) becomes near-white */
+.dark .text-gray-500,
+.dark .text-gray-600,
+.dark .text-gray-700 {
+  color: #f9fafb;
+}
