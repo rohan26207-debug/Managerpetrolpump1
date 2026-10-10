@@ -102,3 +102,4 @@ React-based petrol pump management application. 100% offline with localStorage o
 - FUEL SALES line in BOTH Today Summary and Balance → Reports appends "MPP-<L> L" only when MPP-tagged sales exist for the selected date (gross litres = liters + testing); hidden otherwise.
 - data-testid="today-fuel-sales-line" added. Verified show/hide in both views via screenshots. Android synced.
 ## Removed standalone STOCK bar on Today Summary (Oct 2026) - STOCK now only inside Summary B&W section. Android synced.
+## Add Stock/Add Rate buttons restyled to match Reading Sales/Credit Sales (dark gray filled, white text, centered) - Oct 2026. Android synced.

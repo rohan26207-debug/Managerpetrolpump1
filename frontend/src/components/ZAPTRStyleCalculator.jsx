@@ -3107,13 +3107,13 @@ window.onload = function() {
           <div className="grid grid-cols-2 gap-2 mb-2">
             {/* Stock Button */}
             <Card 
-              className="bg-white border-slate-200 shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+              className="bg-gray-600 hover:bg-gray-700 border-0 shadow-lg cursor-pointer transition-colors"
               onClick={() => setStockDialogOpen(true)}
             >
               <CardContent className="p-2 sm:p-3">
-                <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-gray-600" />
-                  <span className="text-xs sm:text-sm font-semibold text-slate-800">
+                <div className="flex items-center justify-center gap-2">
+                  <Package className="w-4 h-4 text-white" />
+                  <span className="text-xs sm:text-sm font-semibold text-white">
                     Add Stock
                   </span>
                 </div>
@@ -3122,13 +3122,13 @@ window.onload = function() {
 
             {/* Rate Button */}
             <Card 
-              className="bg-white border-slate-200 shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+              className="bg-gray-600 hover:bg-gray-700 border-0 shadow-lg cursor-pointer transition-colors"
               onClick={() => setRateDialogOpen(true)}
             >
               <CardContent className="p-2 sm:p-3">
-                <div className="flex items-center gap-2">
-                  <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-gray-600" />
-                  <span className="text-xs sm:text-sm font-semibold text-slate-800">
+                <div className="flex items-center justify-center gap-2">
+                  <IndianRupee className="w-4 h-4 text-white" />
+                  <span className="text-xs sm:text-sm font-semibold text-white">
                     Add Rate
                   </span>
                 </div>
