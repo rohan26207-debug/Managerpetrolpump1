@@ -96,3 +96,8 @@ React-based petrol pump management application. 100% offline with localStorage o
 - User: "all app everything in B&W style only". Converted 614 Tailwind color classes (blue/orange/green/purple/red/yellow/teal/indigo/amber) to gray-equivalents (same shade numbers) across 28 files via regex, incl. use-confirm.jsx. ONLY exception kept: green calendar highlight + legend in Reports (bg-green-500/600, user's explicit feature).
 - Also: App.css .gradient-text now gray gradient; print-window .print-btn hex #007bff -> #1f2937 (CreditSalesManagement, PaymentReceived); toast.jsx destructive red -> gray; HeaderSettings weekly-backup checkbox accent-gray-800.
 - Testing agent iteration_4.json: 100% pass, zero colored classes remain, no functional regressions. Android synced.
+
+## Today Summary STOCK/FUEL SALES + MPP line (Oct 2026)
+- Today Summary now shows STOCK and FUEL SALES text lines (same as Reports preview) above the B&W summary table; removed the right "Fuel Sales" breakdown column (card is single-column now).
+- FUEL SALES line in BOTH Today Summary and Balance → Reports appends "MPP-<L> L" only when MPP-tagged sales exist for the selected date (gross litres = liters + testing); hidden otherwise.
+- data-testid="today-fuel-sales-line" added. Verified show/hide in both views via screenshots. Android synced.

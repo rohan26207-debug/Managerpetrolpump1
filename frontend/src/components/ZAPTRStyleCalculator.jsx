@@ -323,15 +323,21 @@ const ReportPreviewTab = ({
             }).join(', ')}
           </div>
         )}
-        {fuelSettings && (
-          <div className={`text-xs mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
-            <span className="font-semibold">FUEL SALES: </span>
-            {Object.keys(fuelSettings).map(ft => {
-              const fd = stats.fuelSalesByType[ft] || { liters: 0 };
-              return `${ft}-${fd.liters.toFixed(0)} L`;
-            }).join(', ')}
-          </div>
-        )}
+        {fuelSettings && (() => {
+          const mppL = daySales
+            .filter(s => s.mpp === true || s.mpp === 'true')
+            .reduce((a, s) => a + (parseFloat(s.liters) || 0) + (parseFloat(s.testing) || 0), 0);
+          const parts = Object.keys(fuelSettings).map(ft => {
+            const fd = stats.fuelSalesByType[ft] || { liters: 0 };
+            return `${ft}-${fd.liters.toFixed(0)} L`;
+          });
+          if (mppL > 0) parts.push(`MPP-${mppL.toFixed(0)} L`);
+          return (
+            <div className={`text-xs mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+              <span className="font-semibold">FUEL SALES: </span>{parts.join(', ')}
+            </div>
+          );
+        })()}
 
         {/* Summary table */}
         <table className="w-full border-collapse mb-3">
@@ -3182,79 +3188,60 @@ window.onload = function() {
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
         } shadow-lg mb-2`}>
           <CardContent className="p-2 sm:p-3">
-            <div className="grid grid-cols-2 gap-3">
-              {/* LEFT COLUMN - Summary (B&W table, same style as Reports) */}
-              <div data-testid="today-summary-report">
-                <h2 className={`text-lg sm:text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-                  Summary
-                </h2>
-                {(() => {
-                  const thB = `px-2 py-1 border text-xs font-bold ${isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-300 bg-slate-100 text-slate-800'}`;
-                  const tdB = `px-2 py-1 border text-xs ${isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-300 text-slate-800'}`;
-                  const tdR = `${tdB} text-right`;
-                  return (
-                    <table className="w-full border-collapse" data-testid="today-summary-table">
-                      <thead>
-                        <tr>
-                          <th className={thB}>Category</th>
-                          <th className={`${thB} text-right`}>Litres</th>
-                          <th className={`${thB} text-right`}>Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr><td className={tdB}>Fuel Sales</td><td className={tdR}>{stats.totalLiters.toFixed(2)}</td><td className={tdR}>{stats.totalFuelAmount.toFixed(2)}</td></tr>
-                        <tr><td className={tdB}>Credit Sales</td><td className={tdR}>{stats.creditLiters.toFixed(2)}</td><td className={tdR}>{stats.creditAmount.toFixed(2)}</td></tr>
-                        <tr><td className={tdB}>Settlement</td><td className={tdR}>-</td><td className={tdR}>{stats.totalSettlement.toFixed(2)}</td></tr>
-                        <tr><td className={tdB}>Income</td><td className={tdR}>-</td><td className={tdR}>{stats.otherIncome.toFixed(2)}</td></tr>
-                        <tr><td className={tdB}>Expenses</td><td className={tdR}>-</td><td className={tdR}>{stats.totalExpenses.toFixed(2)}</td></tr>
-                        <tr><td className={`${tdB} font-bold`}>Cash in Hand</td><td className={tdR}>-</td><td className={`${tdR} font-bold`}>{stats.cashInHand.toFixed(2)}</td></tr>
-                      </tbody>
-                    </table>
-                  );
-                })()}
-              </div>
-
-              {/* RIGHT COLUMN - Fuel Type Breakdown */}
-              <div className="space-y-1.5 sm:space-y-2">
-                <h2 className={`text-lg sm:text-2xl font-bold mb-2 ${
-                  isDarkMode ? 'text-white' : 'text-slate-800'
-                }`}>
-                  Fuel Sales
-                </h2>
-                {fuelSettings && Object.keys(fuelSettings).map((fuelType, index) => {
-                  const fuelData = stats.fuelSalesByType[fuelType] || { liters: 0, amount: 0 };
-                  const colors = ['bg-gray-600', 'bg-gray-600', 'bg-gray-600', 'bg-gray-600', 'bg-gray-600', 'bg-gray-600'];
-                  const bgColors = [
-                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50',
-                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-                  ];
-                  return (
-                    <div key={fuelType} className={`flex items-center justify-between py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg ${bgColors[index % bgColors.length]}`}>
-                      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                        <div className={`w-6 h-6 sm:w-8 sm:h-8 ${colors[index % colors.length]} rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0`}>
-                          {fuelType.charAt(0)}
-                        </div>
-                        <span className={`font-medium text-xs sm:text-base truncate ${
-                          isDarkMode ? 'text-white' : 'text-slate-800'
-                        }`}>
-                          {fuelType}
-                        </span>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <div className={`text-xs sm:text-lg font-bold whitespace-nowrap ${
-                          isDarkMode ? 'text-white' : 'text-slate-800'
-                        }`}>
-                          {fuelData.liters.toFixed(2)} L
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            {/* Summary (B&W, same style as Reports: STOCK + FUEL SALES lines + table) */}
+            <div data-testid="today-summary-report">
+              <h2 className={`text-lg sm:text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
+                Summary
+              </h2>
+              {fuelSettings && (
+                <div className={`text-xs mb-2 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                  <span className="font-semibold">STOCK: </span>
+                  {Object.keys(fuelSettings).map(ft => {
+                    const sd = localStorageService.getItem(ft.toLowerCase() + 'StockData');
+                    const ss = (sd && sd[selectedDate]) ? (sd[selectedDate].startStock || 0) : 0;
+                    return `${ft}-${ss.toFixed(0)} L`;
+                  }).join(', ')}
+                </div>
+              )}
+              {fuelSettings && (() => {
+                const mppL = salesData
+                  .filter(s => s.date === selectedDate && (s.mpp === true || s.mpp === 'true'))
+                  .reduce((a, s) => a + (parseFloat(s.liters) || 0) + (parseFloat(s.testing) || 0), 0);
+                const parts = Object.keys(fuelSettings).map(ft => {
+                  const fd = stats.fuelSalesByType[ft] || { liters: 0 };
+                  return `${ft}-${fd.liters.toFixed(0)} L`;
+                });
+                if (mppL > 0) parts.push(`MPP-${mppL.toFixed(0)} L`);
+                return (
+                  <div className={`text-xs mb-3 ${isDarkMode ? 'text-gray-300' : 'text-slate-700'}`} data-testid="today-fuel-sales-line">
+                    <span className="font-semibold">FUEL SALES: </span>{parts.join(', ')}
+                  </div>
+                );
+              })()}
+              {(() => {
+                const thB = `px-2 py-1 border text-xs font-bold ${isDarkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-slate-300 bg-slate-100 text-slate-800'}`;
+                const tdB = `px-2 py-1 border text-xs ${isDarkMode ? 'border-gray-600 text-gray-200' : 'border-slate-300 text-slate-800'}`;
+                const tdR = `${tdB} text-right`;
+                return (
+                  <table className="w-full border-collapse" data-testid="today-summary-table">
+                    <thead>
+                      <tr>
+                        <th className={thB}>Category</th>
+                        <th className={`${thB} text-right`}>Litres</th>
+                        <th className={`${thB} text-right`}>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td className={tdB}>Fuel Sales</td><td className={tdR}>{stats.totalLiters.toFixed(2)}</td><td className={tdR}>{stats.totalFuelAmount.toFixed(2)}</td></tr>
+                      <tr><td className={tdB}>Credit Sales</td><td className={tdR}>{stats.creditLiters.toFixed(2)}</td><td className={tdR}>{stats.creditAmount.toFixed(2)}</td></tr>
+                      <tr><td className={tdB}>Settlement</td><td className={tdR}>-</td><td className={tdR}>{stats.totalSettlement.toFixed(2)}</td></tr>
+                      <tr><td className={tdB}>Income</td><td className={tdR}>-</td><td className={tdR}>{stats.otherIncome.toFixed(2)}</td></tr>
+                      <tr><td className={tdB}>Expenses</td><td className={tdR}>-</td><td className={tdR}>{stats.totalExpenses.toFixed(2)}</td></tr>
+                      <tr><td className={`${tdB} font-bold`}>Cash in Hand</td><td className={tdR}>-</td><td className={`${tdR} font-bold`}>{stats.cashInHand.toFixed(2)}</td></tr>
+                    </tbody>
+                  </table>
+                );
+              })()}
             </div>
           </CardContent>
         </Card>
